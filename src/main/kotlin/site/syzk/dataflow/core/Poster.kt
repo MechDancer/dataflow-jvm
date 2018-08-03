@@ -1,6 +1,4 @@
-package core
-
-import core.annotations.ThreadSafety
+package site.syzk.dataflow.core
 
 /**
  * 发送器

@@ -1,16 +1,15 @@
-package core
+package site.syzk.dataflow.core
 
-import core.Feedback.Accept
-import core.Feedback.Decline
-import core.annotations.ThreadSafety
+import site.syzk.dataflow.core.Feedback.Accept
+import site.syzk.dataflow.core.Feedback.Decline
 import java.util.concurrent.atomic.AtomicInteger
 
 @ThreadSafety(true)
 class Link<TIn, TOut>(
-        private val target: ITarget<TOut>,
-        private val filter: (TIn) -> Boolean,
-        private val transformer: (TIn) -> TOut,
-        private val counter: (Int) -> Boolean
+		private val target: ITarget<TOut>,
+		private val filter: (TIn) -> Boolean,
+		private val transformer: (TIn) -> TOut,
+		private val counter: (Int) -> Boolean
 ) {
     private var count: AtomicInteger = AtomicInteger(0)
 
