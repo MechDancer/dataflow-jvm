@@ -1,4 +1,4 @@
-package core
+package site.syzk.dataflow.core
 
 /**
  * 事件
