@@ -5,12 +5,13 @@ import core.Feedback.Decline
 import core.annotations.ThreadSafety
 import java.util.concurrent.atomic.AtomicInteger
 
+/**
+ * LinkTo产生的链接对象
+ */
 @ThreadSafety(true)
 class Link<TIn, TOut>(
         private val target: ITarget<TOut>,
-        private val filter: (TIn) -> Boolean,
-        private val transformer: (TIn) -> TOut,
-        private val counter: (Int) -> Boolean
+        private val options: LinkOptions<TIn, TOut>
 ) {
     private var count: AtomicInteger = AtomicInteger(0)
 
@@ -19,13 +20,16 @@ class Link<TIn, TOut>(
      */
     internal fun post(event: Event<TIn>): Feedback {
         //直接拒绝
-        if (!filter(event.value)) return Decline
-        //进行转换
-        val actual = Event(event.begin, transformer(event.value))
-        //向目标节点发送
-        val feedback = target.post(actual)
+        if (options.filter == null || !options.filter.invoke(event.value))
+            return Decline
+        //向目标节点发送转换过的数据
+        val feedback = target.post(Event(
+                event.begin,
+                options.transformer.invoke(event.value)))
         //若目标节点接受，计数，并检查是否解除链接
-        if (feedback == Accept && counter(count.incrementAndGet()))
+        if (feedback == Accept
+                && options.counter != null
+                && options.counter.invoke(count.incrementAndGet()))
             dispose()
         //返回目标节点的反馈
         return feedback

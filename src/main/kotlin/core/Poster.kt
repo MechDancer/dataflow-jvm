@@ -8,7 +8,7 @@ import core.annotations.ThreadSafety
  */
 @ThreadSafety(true)
 class Poster<T> {
-    private val targets = mutableListOf<ITarget<T>>()
+    private val targets = mutableListOf<Link<T, *>>()
 
     /**
      * 尝试向所有链接发送事件
