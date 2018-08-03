@@ -2,6 +2,7 @@ package site.syzk.dataflow.core
 
 import site.syzk.dataflow.core.Feedback.Accept
 import site.syzk.dataflow.core.Feedback.Decline
+import site.syzk.dataflow.core.annotations.ThreadSafety
 import java.util.concurrent.atomic.AtomicInteger
 
 @ThreadSafety(true)

@@ -1,5 +1,7 @@
 package site.syzk.dataflow.core
 
+import site.syzk.dataflow.core.annotations.ThreadSafety
+
 /**
  * 发送器
  * 用于从源向链接转发

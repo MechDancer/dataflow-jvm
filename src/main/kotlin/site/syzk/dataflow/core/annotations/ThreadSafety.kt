@@ -1,4 +1,4 @@
-package site.syzk.dataflow.core
+package site.syzk.dataflow.core.annotations
 
 import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.CLASS
