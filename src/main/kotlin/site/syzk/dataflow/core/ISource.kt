@@ -1,4 +1,4 @@
-package core
+package site.syzk.dataflow.core
 
 interface ISource<T> {
     fun receive(timeout: Long): Event<T>

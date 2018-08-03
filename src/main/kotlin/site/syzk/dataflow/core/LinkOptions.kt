@@ -1,4 +1,4 @@
-package core
+package site.syzk.dataflow.core
 
 data class LinkOptions<TIn, TOut>(
         val filter: ((TIn) -> Boolean)?,
