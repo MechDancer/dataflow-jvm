@@ -24,8 +24,6 @@ class BroadcastBlock<T> : ISource<T>, ITarget<T> {
         buffer.put(event)
     }
 
-    override fun receive(timeout: Long) = buffer.take()
-
     override fun linkTo(target: ITarget<T>) {
         links.add(target)
     }
