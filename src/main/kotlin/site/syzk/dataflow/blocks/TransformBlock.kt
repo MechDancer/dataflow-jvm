@@ -9,15 +9,23 @@ import kotlin.concurrent.thread
 class TransformBlock<TIn, TOut>(private val map: (TIn) -> TOut)
     : ITarget<TIn>, ISource<TOut> {
     private val buffer = LinkedBlockingQueue<TOut>()
+    private val links = mutableListOf<ITarget<TOut>>()
+
+    init {
+        thread {
+            while (true)
+                if (links.isNotEmpty()) links.first().post(buffer.take())
+        }
+    }
 
     override fun consume(event: TIn) {
-        if (!buffer.isEmpty()) buffer.poll()
+        if (!buffer.isEmpty()) buffer.take()
         buffer.put(map(event))
     }
 
-    override fun receive(timeout: Long) = buffer.poll()
+    override fun receive(timeout: Long) = buffer.take()
 
     override fun linkTo(target: ITarget<TOut>) {
-        thread { while (true) target.post(buffer.poll()) }
+        links.add(target)
     }
 }

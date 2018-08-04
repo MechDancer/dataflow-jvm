@@ -6,22 +6,27 @@ import site.syzk.dataflow.core.post
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.concurrent.thread
 
-class BufferBlock<T> : ISource<T>, ITarget<T> {
-    private val queue = LinkedBlockingQueue<T>()
+class BroadcastBlock<T> : ISource<T>, ITarget<T> {
+    private val buffer = LinkedBlockingQueue<T>()
     private val links = mutableListOf<ITarget<T>>()
 
     init {
         thread {
-            while (true)
-                if (links.isNotEmpty()) links.first().post(queue.take())
+            while (true) {
+                val temp = buffer.take()
+                links.forEach { it.post(temp) }
+            }
         }
     }
 
-    override fun receive(timeout: Long) = queue.take()
+    override fun consume(event: T) {
+        if (!buffer.isEmpty()) buffer.take()
+        buffer.put(event)
+    }
+
+    override fun receive(timeout: Long) = buffer.take()
 
     override fun linkTo(target: ITarget<T>) {
         links.add(target)
     }
-
-    override fun consume(event: T) = queue.put(event)
 }

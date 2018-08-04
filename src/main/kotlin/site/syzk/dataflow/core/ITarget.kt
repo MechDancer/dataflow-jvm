@@ -6,4 +6,4 @@ interface ITarget<T> {
     fun consume(event: T)
 }
 
-fun <T> ITarget<T>.post(event: T) = thread { consume(event) }
+fun <T> ITarget<T>.post(event: T) = thread { this.consume(event) }
