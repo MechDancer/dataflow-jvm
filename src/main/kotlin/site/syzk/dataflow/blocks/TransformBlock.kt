@@ -1,34 +1,30 @@
 package site.syzk.dataflow.blocks
 
-import site.syzk.dataflow.core.ISource
-import site.syzk.dataflow.core.ITarget
-import site.syzk.dataflow.core.post
-import java.util.*
-import java.util.concurrent.LinkedBlockingQueue
-import kotlin.concurrent.thread
+import site.syzk.dataflow.core.*
 
-class TransformBlock<TIn, TOut>(private val map: (TIn) -> TOut)
-    : ITarget<TIn>, ISource<TOut> {
-    private val queue = LinkedBlockingQueue<Pair<TOut, Queue<ITarget<TOut>>>>()
-    private val initList = mutableListOf<ITarget<TOut>>()
+class TransformBlock<TIn, TOut>(
+        private val map: (TIn) -> TOut
+) : ITarget<TIn>, ISource<TOut> {
+    override val defaultSource = DefaultSource<TIn>()
 
-    init {
-        thread {
-            while (true) {
-                val current = queue.take()
-                while (current.second.isNotEmpty()) {
-                    current.second.poll()?.post(current.first)
-                }
-            }
+    private val targets = mutableListOf<ITarget<TOut>>()
+
+    private val sourceCore = SourceCore<TOut>()
+
+    private val targetCore = TargetCore<TIn> {
+        val newId = sourceCore.register(map(it))
+        synchronized(targets) {
+            for (target in targets)
+                target.offer(newId, this)
         }
     }
 
-    override fun linkTo(target: ITarget<TOut>) {
-        initList.add(target)
-        queue.forEach { it.second.offer(target) }
-    }
+    override fun offer(eventId: Long, source: ISource<TIn>) =
+            targetCore.offer(eventId, source)
 
-    override fun consume(event: TIn) {
-        queue.put(map(event) to LinkedList(initList))
+    override fun consume(id: Long) = sourceCore.consume(id)
+
+    override fun linkTo(target: ITarget<TOut>) {
+        synchronized(target) { targets.add(target) }
     }
 }
