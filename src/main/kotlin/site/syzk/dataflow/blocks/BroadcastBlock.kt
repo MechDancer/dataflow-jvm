@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicLong
  * 广播节点
  * 堆中的事件只会被新事件顶替，不会因为接收而消耗
  */
-class BroadcastBlock<T> : ITarget<T>, ISource<T> {
+class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     override val defaultSource = DefaultSource<T>()
 
     /**
@@ -25,6 +25,13 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T> {
      */
     private val buffer = hashMapOf<Long, T>()
 
+    //--------------------------
+    // IReceivable
+    //--------------------------
+    private val receiveLock = Object()
+    private var receivable = false
+    private var value: T? = null
+
     /**
      * 作为目的节点的内核
      * 新到来的事件顶替旧事件，然后向所有目的节点通报事件到来
@@ -38,6 +45,11 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T> {
         synchronized(targets) {
             for (target in targets)
                 target.offer(newId, this)
+        }
+        synchronized(receiveLock) {
+            receivable = true
+            value = it
+            receiveLock.notifyAll()
         }
     }
 
@@ -63,5 +75,13 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T> {
 
     override fun unlink(target: ITarget<T>) {
         synchronized(target) { targets.remove(target) }
+    }
+
+    override fun receive(): T {
+        synchronized(receiveLock) {
+            if (!receivable) receiveLock.wait()
+            @Suppress("UNCHECKED_CAST")
+            return value as T
+        }
     }
 }

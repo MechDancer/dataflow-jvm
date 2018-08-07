@@ -1,10 +1,12 @@
 package site.syzk.dataflow.core
 
+import site.syzk.dataflow.annotations.ThreadSafe
 import java.util.concurrent.atomic.AtomicLong
 
 /**
  * 源节点的通用内核
  */
+@ThreadSafe(true)
 internal class SourceCore<T> {
     /**
      * 原子长整型，用于生成唯一Id
@@ -27,6 +29,18 @@ internal class SourceCore<T> {
 
     /**
      * 从堆中消费一个事件
+     * 消费中需要同步锁
      */
-    fun consume(id: Long) = buffer.containsKey(id) to buffer.remove(id)
+    fun consume(id: Long): Pair<Boolean, T?> {
+        synchronized(buffer) {
+            return buffer.containsKey(id) to buffer.remove(id)
+        }
+    }
+
+    /**
+     * 从堆中丢弃一个事件
+     */
+    fun drop(id: Long) {
+        synchronized(buffer) { buffer.remove(id) }
+    }
 }

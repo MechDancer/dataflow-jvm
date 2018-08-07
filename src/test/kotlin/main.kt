@@ -13,6 +13,9 @@ fun main(args: Array<String>) {
     source.linkTo(ActionBlock { println(it) })
     bridge.linkTo(source)
     source.post(100)
-    readLine()
+    while (true) {
+        readLine()
+        println("收到2: ${source.receive()}")
+    }
 }
 
