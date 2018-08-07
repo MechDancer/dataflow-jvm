@@ -5,7 +5,7 @@ package site.syzk.dataflow.core
  * 为来自外部的事件提供堆
  */
 class DefaultSource<T> : ISource<T> {
-    private val core = SourceCore<T>()
+    private val core = SourceCore(this)
 
     fun offer(event: T) = core.offer(event)
     override fun consume(id: Long) = core.consume(id)

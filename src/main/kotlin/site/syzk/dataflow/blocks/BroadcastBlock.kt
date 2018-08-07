@@ -79,9 +79,8 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
 
     override fun receive(): T {
         synchronized(receiveLock) {
-            if (!receivable) receiveLock.wait()
-            @Suppress("UNCHECKED_CAST")
-            return value as T
+            while (!receivable) receiveLock.wait()
+            @Suppress("UNCHECKED_CAST") return value as T
         }
     }
 }

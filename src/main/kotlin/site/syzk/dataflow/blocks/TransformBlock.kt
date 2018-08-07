@@ -14,13 +14,12 @@ class TransformBlock<TIn, TOut>(
     //--------------------------
     // ITarget & ISource
     //--------------------------
-    private val targets = mutableListOf<ITarget<TOut>>()
-    private val sourceCore = SourceCore<TOut>()
+    private val sourceCore = SourceCore(this)
     private val targetCore = TargetCore<TIn> { event ->
         val out = map(event)
         val newId = sourceCore.offer(out)
-        synchronized(targets) {
-            targets
+        synchronized(sourceCore.targets) {
+            sourceCore.targets
                     .map { it.offer(newId, this) }
                     .any { it.positive }
                     .otherwise {
@@ -49,21 +48,15 @@ class TransformBlock<TIn, TOut>(
 
     override fun consume(id: Long) = sourceCore.consume(id)
 
-    override fun linkTo(target: ITarget<TOut>): Link<TOut> {
-        synchronized(target) { targets.add(target) }
-        return Link(this, target)
-    }
+    override fun linkTo(target: ITarget<TOut>) = sourceCore.linkTo(target)
 
-    override fun unlink(target: ITarget<TOut>) {
-        synchronized(target) { targets.remove(target) }
-    }
+    override fun unlink(target: ITarget<TOut>) = sourceCore.unlink(target)
 
     override fun receive(): TOut {
         synchronized(receiveLock) {
-            if (!receivable) receiveLock.wait()
+            while (!receivable) receiveLock.wait()
             receivable = false
-            @Suppress("UNCHECKED_CAST")
-            return value as TOut
+            @Suppress("UNCHECKED_CAST") return value as TOut
         }
     }
 }
