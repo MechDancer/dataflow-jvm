@@ -1,5 +1,6 @@
 package site.syzk.dataflow.core
 
+import site.syzk.dataflow.core.Feedback.Accepted
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -15,9 +16,11 @@ class Link<T>(
     private val _eventCount = AtomicLong(0)
     val eventCount get() = _eventCount.get()
 
-    fun recordEvent() {
-        if (_eventCount.incrementAndGet() > options.eventLimit)
+    fun offer(id: Long, source: ISource<T>): Feedback {
+        val feedback = target.offer(id, source)
+        if (feedback == Accepted && _eventCount.incrementAndGet() > options.eventLimit)
             dispose()
+        return feedback
     }
 
     fun dispose() = source.unlink(target)

@@ -1,7 +1,6 @@
 package site.syzk.dataflow.blocks
 
 import site.syzk.dataflow.core.*
-import site.syzk.dataflow.core.Feedback.Accepted
 import site.syzk.dataflow.core.internal.LinkManager
 import site.syzk.dataflow.core.internal.TargetCore
 import java.util.concurrent.atomic.AtomicLong
@@ -47,9 +46,7 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
         }
         manager.links
                 .filter { it.options.predicate(event) }
-                .map { it to it.target.offer(newId, this) }
-                .filter { it.second == Accepted }
-                .forEach { it.first.recordEvent() }
+                .map { it to it.offer(newId, this) }
         synchronized(receiveLock) {
             receivable = true
             value = event
@@ -60,11 +57,8 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     override fun offer(id: Long, source: ISource<T>) = targetCore.offer(id, source)
     override fun consume(id: Long) = buffer.containsKey(id) to buffer[id]
 
-    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>?) =
-            manager.linkTo(target, options ?: linkOptions())
-
-    override fun unlink(target: ITarget<T>) =
-            manager.unlink(target)
+    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.linkTo(target, options)
+    override fun unlink(target: ITarget<T>) = manager.unlink(target)
 
     override fun receive(): T {
         synchronized(receiveLock) {

@@ -1,7 +1,6 @@
 package site.syzk.dataflow.blocks
 
 import site.syzk.dataflow.core.*
-import site.syzk.dataflow.core.Feedback.Accepted
 import site.syzk.dataflow.core.internal.LinkManager
 import site.syzk.dataflow.core.internal.SourceCore
 import site.syzk.dataflow.core.internal.TargetCore
@@ -19,17 +18,15 @@ class BufferBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     private val sourceCore = SourceCore<T>()
     private val targetCore = TargetCore<T> { event ->
         val newId = sourceCore.offer(event)
-        val result = manager.links
+        manager.links
                 .filter { it.options.predicate(event) }
                 .map { it to it.target.offer(newId, this) }
-        result.any { it.second.positive }
+                .any { it.second.positive }
                 .otherwise {
                     synchronized(receiveLock) {
                         receiveLock.notifyAll()
                     }
                 }
-        result.filter { it.second == Accepted }
-                .forEach { it.first.recordEvent() }
     }
 
     val count get() = sourceCore.bufferCount
@@ -37,11 +34,8 @@ class BufferBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     override fun offer(id: Long, source: ISource<T>) = targetCore.offer(id, source)
     override fun consume(id: Long) = sourceCore.consume(id)
 
-    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>?) =
-            manager.linkTo(target, options ?: linkOptions())
-
-    override fun unlink(target: ITarget<T>) =
-            manager.unlink(target)
+    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.linkTo(target, options)
+    override fun unlink(target: ITarget<T>) = manager.unlink(target)
 
     override fun receive(): T {
         synchronized(receiveLock) {
