@@ -8,4 +8,4 @@ import kotlin.annotation.AnnotationTarget.CLASS
  */
 @Target(CLASS)
 @Retention(SOURCE)
-annotation class ThreadSafety(val safety: Boolean)
+annotation class ThreadSafe

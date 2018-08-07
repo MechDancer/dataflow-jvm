@@ -9,6 +9,10 @@ import site.syzk.dataflow.core.internal.SourceCore
 import site.syzk.dataflow.core.internal.TargetCore
 import site.syzk.dataflow.core.internal.otherwise
 
+/**
+ * 缓冲模块
+ * 未消耗的数据将保留，直到被消费
+ */
 class BufferBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     override val defaultSource = DefaultSource<T>()
 

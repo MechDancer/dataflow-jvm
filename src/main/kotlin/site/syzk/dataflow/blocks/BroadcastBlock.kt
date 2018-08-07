@@ -18,7 +18,7 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     /**
      * 存储已链接的节点
      */
-    private val mannager = LinkManager(this)
+    private val manager = LinkManager(this)
 
     /**
      * 唯一Id分配器
@@ -47,7 +47,7 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
             buffer.clear()
             buffer[newId] = event
         }
-        mannager.targets
+        manager.targets
                 .forEach { it.offer(newId, this) }
         synchronized(receiveLock) {
             receivable = true
@@ -68,8 +68,8 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     override fun consume(id: Long) =
             buffer.containsKey(id) to buffer[id]
 
-    override fun linkTo(target: ITarget<T>) = mannager.linkTo(target)
-    override fun unlink(target: ITarget<T>) = mannager.unlink(target)
+    override fun linkTo(target: ITarget<T>) = manager.linkTo(target)
+    override fun unlink(target: ITarget<T>) = manager.unlink(target)
 
     override fun receive(): T {
         synchronized(receiveLock) {

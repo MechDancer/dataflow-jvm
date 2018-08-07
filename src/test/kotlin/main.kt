@@ -6,7 +6,7 @@ import site.syzk.dataflow.core.post
 fun main(args: Array<String>) {
     val source = BroadcastBlock<Int>()
     val bridge = TransformBlock<Int, Int> {
-        Thread.sleep(1000)
+        Thread.sleep(200)
         it - 1
     }
     source.linkTo(bridge)

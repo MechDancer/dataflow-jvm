@@ -1,13 +1,13 @@
 package site.syzk.dataflow.core.internal
 
-import site.syzk.dataflow.annotations.ThreadSafety
+import site.syzk.dataflow.annotations.ThreadSafe
 import java.util.concurrent.atomic.AtomicLong
 
 /**
  * 源节点的通用内核
  * 提供事件管理和基于散列的事件缓存
  */
-@ThreadSafety(true)
+@ThreadSafe
 internal class SourceCore<T> {
     /**
      * 原子长整型，用于生成唯一Id
