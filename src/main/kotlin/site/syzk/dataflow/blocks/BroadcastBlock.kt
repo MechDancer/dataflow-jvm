@@ -1,6 +1,11 @@
 package site.syzk.dataflow.blocks
 
-import site.syzk.dataflow.core.*
+import site.syzk.dataflow.core.DefaultSource
+import site.syzk.dataflow.core.IReceivable
+import site.syzk.dataflow.core.ISource
+import site.syzk.dataflow.core.ITarget
+import site.syzk.dataflow.core.internal.LinkManager
+import site.syzk.dataflow.core.internal.TargetCore
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -13,7 +18,7 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     /**
      * 存储已链接的节点
      */
-    private val targets = mutableListOf<ITarget<T>>()
+    private val mannager = LinkManager(this)
 
     /**
      * 唯一Id分配器
@@ -36,19 +41,17 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
      * 作为目的节点的内核
      * 新到来的事件顶替旧事件，然后向所有目的节点通报事件到来
      */
-    private val targetCore = TargetCore<T> {
+    private val targetCore = TargetCore<T> { event ->
         val newId = id.incrementAndGet()
         synchronized(buffer) {
             buffer.clear()
-            buffer[newId] = it
+            buffer[newId] = event
         }
-        synchronized(targets) {
-            for (target in targets)
-                target.offer(newId, this)
-        }
+        mannager.targets
+                .forEach { it.offer(newId, this) }
         synchronized(receiveLock) {
             receivable = true
-            value = it
+            value = event
             receiveLock.notifyAll()
         }
     }
@@ -56,8 +59,8 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     /**
      * 源通报事件到来时调用
      */
-    override fun offer(eventId: Long, source: ISource<T>) =
-            targetCore.offer(eventId, source)
+    override fun offer(id: Long, source: ISource<T>) =
+            targetCore.offer(id, source)
 
     /**
      * 目的节点获取事件时调用
@@ -65,17 +68,8 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
     override fun consume(id: Long) =
             buffer.containsKey(id) to buffer[id]
 
-    /**
-     * 链接新目的节点
-     */
-    override fun linkTo(target: ITarget<T>): Link<T> {
-        synchronized(target) { targets.add(target) }
-        return Link(this, target)
-    }
-
-    override fun unlink(target: ITarget<T>) {
-        synchronized(target) { targets.remove(target) }
-    }
+    override fun linkTo(target: ITarget<T>) = mannager.linkTo(target)
+    override fun unlink(target: ITarget<T>) = mannager.unlink(target)
 
     override fun receive(): T {
         synchronized(receiveLock) {

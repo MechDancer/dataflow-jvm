@@ -1,7 +1,8 @@
-package site.syzk.dataflow.core
+package site.syzk.dataflow.core.internal
 
 import site.syzk.dataflow.core.Feedback.Accepted
 import site.syzk.dataflow.core.Feedback.NotAvailable
+import site.syzk.dataflow.core.ISource
 import kotlin.concurrent.thread
 
 /**
@@ -13,6 +14,7 @@ internal class TargetCore<T>(private val action: (T) -> Unit) {
             source.consume(eventId)
                     .let {
                         if (it.first) {
+                            @Suppress("UNCHECKED_CAST")
                             thread { action(it.second as T) }
                             Accepted
                         } else

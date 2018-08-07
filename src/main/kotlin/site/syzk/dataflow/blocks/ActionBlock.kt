@@ -3,11 +3,11 @@ package site.syzk.dataflow.blocks
 import site.syzk.dataflow.core.DefaultSource
 import site.syzk.dataflow.core.ISource
 import site.syzk.dataflow.core.ITarget
-import site.syzk.dataflow.core.TargetCore
+import site.syzk.dataflow.core.internal.TargetCore
 
 class ActionBlock<T>(action: (T) -> Unit) : ITarget<T> {
-    override fun offer(eventId: Long, source: ISource<T>) =
-            core.offer(eventId, source)
+    override fun offer(id: Long, source: ISource<T>) =
+            core.offer(id, source)
 
     override val defaultSource = DefaultSource<T>()
 

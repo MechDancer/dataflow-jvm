@@ -1,13 +1,14 @@
-package site.syzk.dataflow.core
+package site.syzk.dataflow.core.internal
 
-import site.syzk.dataflow.annotations.ThreadSafe
+import site.syzk.dataflow.annotations.ThreadSafety
 import java.util.concurrent.atomic.AtomicLong
 
 /**
  * 源节点的通用内核
+ * 提供事件管理和基于散列的事件缓存
  */
-@ThreadSafe(true)
-internal class SourceCore<T>(private val owner: ISource<T>) {
+@ThreadSafety(true)
+internal class SourceCore<T> {
     /**
      * 原子长整型，用于生成唯一Id
      */
@@ -18,6 +19,9 @@ internal class SourceCore<T>(private val owner: ISource<T>) {
      */
     private val buffer = hashMapOf<Long, T>()
 
+    /**
+     * 缓存存量
+     */
     val bufferCount get() = buffer.size
 
     /**
@@ -55,25 +59,5 @@ internal class SourceCore<T>(private val owner: ISource<T>) {
      */
     fun drop(id: Long) {
         synchronized(buffer) { buffer.remove(id) }
-    }
-
-    /**
-     * 宿节点
-     */
-    val targets = mutableListOf<ITarget<T>>()
-
-    /**
-     * 添加链接
-     */
-    fun linkTo(target: ITarget<T>): Link<T> {
-        synchronized(target) { targets.add(target) }
-        return Link(owner, target)
-    }
-
-    /**
-     * 取消链接
-     */
-    fun unlink(target: ITarget<T>) {
-        synchronized(target) { targets.remove(target) }
     }
 }
