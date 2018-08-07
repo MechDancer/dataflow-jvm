@@ -1,9 +1,7 @@
 package site.syzk.dataflow.blocks
 
-import site.syzk.dataflow.core.DefaultSource
-import site.syzk.dataflow.core.IReceivable
-import site.syzk.dataflow.core.ISource
-import site.syzk.dataflow.core.ITarget
+import site.syzk.dataflow.core.*
+import site.syzk.dataflow.core.Feedback.Accepted
 import site.syzk.dataflow.core.internal.LinkManager
 import site.syzk.dataflow.core.internal.SourceCore
 import site.syzk.dataflow.core.internal.TargetCore
@@ -16,6 +14,7 @@ import site.syzk.dataflow.core.internal.otherwise
 class TransformBlock<TIn, TOut>(
         private val map: (TIn) -> TOut
 ) : ITarget<TIn>, ISource<TOut>, IReceivable<TOut> {
+
     override val defaultSource = DefaultSource<TIn>()
 
     private val manager = LinkManager(this)
@@ -27,9 +26,10 @@ class TransformBlock<TIn, TOut>(
     private val targetCore = TargetCore<TIn> { event ->
         val out = map(event)
         val newId = sourceCore.offer(out)
-        manager.targets
-                .map { it.offer(newId, this) }
-                .any { it.positive }
+        val result = manager.links
+                .filter { it.options.predicate(out) }
+                .map { it to it.target.offer(newId, this) }
+        result.any { it.second.positive }
                 .otherwise {
                     sourceCore.drop(newId)
                     synchronized(receiveLock) {
@@ -38,6 +38,8 @@ class TransformBlock<TIn, TOut>(
                         receiveLock.notifyAll()
                     }
                 }
+        result.filter { it.second == Accepted }
+                .forEach { it.first.recordEvent() }
     }
 
     //--------------------------
@@ -54,8 +56,11 @@ class TransformBlock<TIn, TOut>(
     override fun offer(id: Long, source: ISource<TIn>) = targetCore.offer(id, source)
     override fun consume(id: Long) = sourceCore.consume(id)
 
-    override fun linkTo(target: ITarget<TOut>) = manager.linkTo(target)
-    override fun unlink(target: ITarget<TOut>) = manager.unlink(target)
+    override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>?) =
+            manager.linkTo(target, options ?: linkOptions())
+
+    override fun unlink(target: ITarget<TOut>) =
+            manager.unlink(target)
 
     override fun receive(): TOut {
         synchronized(receiveLock) {

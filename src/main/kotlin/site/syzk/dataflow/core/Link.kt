@@ -9,13 +9,15 @@ import java.util.concurrent.atomic.AtomicLong
  */
 class Link<T>(
         private val source: ISource<T>,
-        val target: ITarget<T>
+        val target: ITarget<T>,
+        val options: LinkOptions<T>
 ) {
     private val _eventCount = AtomicLong(0)
     val eventCount get() = _eventCount.get()
 
     fun recordEvent() {
-        _eventCount.incrementAndGet()
+        if (_eventCount.incrementAndGet() > options.eventLimit)
+            dispose()
     }
 
     fun dispose() = source.unlink(target)

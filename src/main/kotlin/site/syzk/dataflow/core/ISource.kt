@@ -9,7 +9,7 @@ interface ISource<T> {
      */
     fun consume(id: Long): Pair<Boolean, T?>
 
-    fun linkTo(target: ITarget<T>): Link<T>
+    fun linkTo(target: ITarget<T>, options: LinkOptions<T>? = null): Link<T>
 
     fun unlink(target: ITarget<T>)
 }

@@ -9,7 +9,7 @@ fun main(args: Array<String>) {
         while (true) {
             buffer.post(i++)
             println("插入: $i, 计数: ${buffer.count}")
-            Thread.sleep(1000)
+            Thread.sleep(500)
         }
     }
     while (true) {

@@ -4,21 +4,22 @@ import site.syzk.dataflow.annotations.ThreadSafe
 import site.syzk.dataflow.core.ISource
 import site.syzk.dataflow.core.ITarget
 import site.syzk.dataflow.core.Link
+import site.syzk.dataflow.core.LinkOptions
 
 @ThreadSafe
 internal class LinkManager<T>(private val owner: ISource<T>) {
     private val _links = mutableListOf<Link<T>>()
 
     /**
-     * 宿节点列表
+     * 链接列表
      */
-    val targets get() = _links.map { it.target }
+    val links get() = _links.toList()
 
     /**
      * 添加链接
      */
-    fun linkTo(target: ITarget<T>): Link<T> {
-        val link = Link(owner, target)
+    fun linkTo(target: ITarget<T>, options: LinkOptions<T>): Link<T> {
+        val link = Link(owner, target, options)
         synchronized(_links) { _links.add(link) }
         return link
     }

@@ -1,9 +1,7 @@
 package site.syzk.dataflow.blocks
 
-import site.syzk.dataflow.core.DefaultSource
-import site.syzk.dataflow.core.IReceivable
-import site.syzk.dataflow.core.ISource
-import site.syzk.dataflow.core.ITarget
+import site.syzk.dataflow.core.*
+import site.syzk.dataflow.core.Feedback.Accepted
 import site.syzk.dataflow.core.internal.LinkManager
 import site.syzk.dataflow.core.internal.TargetCore
 import java.util.concurrent.atomic.AtomicLong
@@ -47,8 +45,11 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
             buffer.clear()
             buffer[newId] = event
         }
-        manager.targets
-                .forEach { it.offer(newId, this) }
+        manager.links
+                .filter { it.options.predicate(event) }
+                .map { it to it.target.offer(newId, this) }
+                .filter { it.second == Accepted }
+                .forEach { it.first.recordEvent() }
         synchronized(receiveLock) {
             receivable = true
             value = event
@@ -56,20 +57,14 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
         }
     }
 
-    /**
-     * 源通报事件到来时调用
-     */
-    override fun offer(id: Long, source: ISource<T>) =
-            targetCore.offer(id, source)
+    override fun offer(id: Long, source: ISource<T>) = targetCore.offer(id, source)
+    override fun consume(id: Long) = buffer.containsKey(id) to buffer[id]
 
-    /**
-     * 目的节点获取事件时调用
-     */
-    override fun consume(id: Long) =
-            buffer.containsKey(id) to buffer[id]
+    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>?) =
+            manager.linkTo(target, options ?: linkOptions())
 
-    override fun linkTo(target: ITarget<T>) = manager.linkTo(target)
-    override fun unlink(target: ITarget<T>) = manager.unlink(target)
+    override fun unlink(target: ITarget<T>) =
+            manager.unlink(target)
 
     override fun receive(): T {
         synchronized(receiveLock) {
