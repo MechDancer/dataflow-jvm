@@ -1,9 +1,6 @@
 package site.syzk.dataflow.blocks
 
-import site.syzk.dataflow.core.DefaultSource
-import site.syzk.dataflow.core.ISource
-import site.syzk.dataflow.core.ITarget
-import site.syzk.dataflow.core.TargetCore
+import site.syzk.dataflow.core.*
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -59,7 +56,12 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T> {
     /**
      * 链接新目的节点
      */
-    override fun linkTo(target: ITarget<T>) {
+    override fun linkTo(target: ITarget<T>): Link<T> {
         synchronized(target) { targets.add(target) }
+        return Link(this, target)
+    }
+
+    override fun unlink(target: ITarget<T>) {
+        synchronized(target) { targets.remove(target) }
     }
 }

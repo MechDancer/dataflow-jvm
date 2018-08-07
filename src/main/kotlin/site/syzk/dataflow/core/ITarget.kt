@@ -19,4 +19,4 @@ interface ITarget<T> {
 /**
  * 从外部直接发送事件到目标节点
  */
-fun <T> ITarget<T>.post(event: T) = offer(defaultSource.register(event), defaultSource)
+fun <T> ITarget<T>.post(event: T) = offer(defaultSource.offer(event), defaultSource)

@@ -7,8 +7,9 @@ package site.syzk.dataflow.core
 class DefaultSource<T> : ISource<T> {
     private val core = SourceCore<T>()
 
-    fun register(event: T) = core.register(event)
+    fun offer(event: T) = core.offer(event)
     override fun consume(id: Long) = core.consume(id)
 
     override fun linkTo(target: ITarget<T>) = throw Exception("这个方法没有任何用处")
+    override fun unlink(target: ITarget<T>) = throw Exception("这个方法没有任何用处")
 }

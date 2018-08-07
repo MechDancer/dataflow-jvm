@@ -19,7 +19,7 @@ internal class SourceCore<T> {
     /**
      * 将一个事件放入堆
      */
-    fun register(event: T): Long {
+    fun offer(event: T): Long {
         val newId = id.incrementAndGet()
         buffer[newId] = event
         return newId

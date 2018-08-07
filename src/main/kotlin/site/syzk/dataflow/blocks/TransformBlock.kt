@@ -12,7 +12,7 @@ class TransformBlock<TIn, TOut>(
     private val sourceCore = SourceCore<TOut>()
 
     private val targetCore = TargetCore<TIn> {
-        val newId = sourceCore.register(map(it))
+        val newId = sourceCore.offer(map(it))
         synchronized(targets) {
             for (target in targets)
                 target.offer(newId, this)
@@ -24,7 +24,12 @@ class TransformBlock<TIn, TOut>(
 
     override fun consume(id: Long) = sourceCore.consume(id)
 
-    override fun linkTo(target: ITarget<TOut>) {
+    override fun linkTo(target: ITarget<TOut>): Link<TOut> {
         synchronized(target) { targets.add(target) }
+        return Link(this, target)
+    }
+
+    override fun unlink(target: ITarget<TOut>) {
+        synchronized(target) { targets.remove(target) }
     }
 }
