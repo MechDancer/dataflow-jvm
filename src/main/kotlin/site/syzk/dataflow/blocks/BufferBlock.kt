@@ -21,13 +21,8 @@ class BufferBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
         val newId = sourceCore.offer(event)
         manager.links
                 .filter { it.options.predicate(event) }
-                .map { it to it.target.offer(newId, it) }
-                .any { it.second.positive }
-                .otherwise {
-                    synchronized(receiveLock) {
-                        receiveLock.notifyAll()
-                    }
-                }
+                .any { it.target.offer(newId, it).positive }
+                .otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
     }
 
     val count get() = sourceCore.bufferCount

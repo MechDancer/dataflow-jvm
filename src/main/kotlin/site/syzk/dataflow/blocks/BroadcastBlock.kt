@@ -47,7 +47,7 @@ class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
         }
         manager.links
                 .filter { it.options.predicate(event) }
-                .map { it to it.target.offer(newId, it) }
+                .forEach { it.target.offer(newId, it) }
         synchronized(receiveLock) {
             receivable = true
             value = event

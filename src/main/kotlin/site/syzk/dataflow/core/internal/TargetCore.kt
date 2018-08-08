@@ -19,24 +19,36 @@ internal class TargetCore<T>(
     private val parallelismDegree = AtomicInteger(0)
     private val waitingQueue = mutableListOf<Pair<Long, Link<T>>>()
 
+    private fun bound(id: Long, link: Link<T>) {
+        synchronized(waitingQueue) { waitingQueue.add(id to link) }
+    }
+
+    private fun unbound(): Pair<Long, Link<T>>? {
+        synchronized(waitingQueue) {
+            return if (waitingQueue.isNotEmpty()) {
+                val pair = waitingQueue.first()
+                waitingQueue.removeAt(0)
+                pair
+            } else null
+        }
+    }
+
     fun offer(eventId: Long, link: Link<T>): Feedback =
             if (parallelismDegree.incrementAndGet() > maxParallelismDegree) {
-                synchronized(waitingQueue) { waitingQueue.add(eventId to link) }
+                bound(eventId, link)
                 parallelismDegree.decrementAndGet()
                 Postponed
             } else link.source.consume(eventId, link)
                     .let { pair ->
                         if (pair.first) {
                             @Suppress("UNCHECKED_CAST")
-                            thread {
+                            thread(name = "target") {
                                 action(pair.second as T)
                                 parallelismDegree.decrementAndGet()
-                                synchronized(waitingQueue) {
-                                    if (waitingQueue.isNotEmpty()) {
-                                        val temp = waitingQueue.first()
-                                        waitingQueue.removeAt(0)
-                                        offer(temp.first, temp.second)
-                                    }
+                                while (true) {
+                                    unbound()
+                                            ?.let { offer(it.first, it.second) }
+                                            ?: break
                                 }
                             }
                             Accepted

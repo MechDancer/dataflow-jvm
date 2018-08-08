@@ -30,8 +30,7 @@ class TransformBlock<TIn, TOut>(
         val newId = sourceCore.offer(out)
         manager.links
                 .filter { it.options.predicate(out) }
-                .map { it to it.target.offer(newId, it) }
-                .any { it.second.positive }
+                .any { it.target.offer(newId, it).positive }
                 .otherwise {
                     sourceCore.drop(newId)
                     synchronized(receiveLock) {
