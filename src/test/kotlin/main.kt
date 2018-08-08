@@ -5,14 +5,16 @@ import site.syzk.dataflow.core.executableOpotions
 import site.syzk.dataflow.core.post
 
 fun main(args: Array<String>) {
-    val source = BroadcastBlock<Int>()
+    val source = BroadcastBlock<Int>("source")
     val bridge1 = TransformBlock<Int, Int>(
-            executableOpotions(1)) { it - 1 }
+            "bridge1",
+            executableOpotions(2)) { it - 1 }
     val bridge2 = TransformBlock<Int, Int>(
-            executableOpotions(1)) { -it }
+            "bridge2",
+            executableOpotions(2)) { -it }
     source.linkTo(bridge1)
     source.linkTo(bridge2)
-    source.linkTo(ActionBlock {
+    source.linkTo(ActionBlock("out") {
         println("[${System.nanoTime() / 1000000 % 100000}][$it]")
     })
     bridge1.linkTo(source)

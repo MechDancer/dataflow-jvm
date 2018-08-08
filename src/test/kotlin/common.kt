@@ -3,7 +3,7 @@ import site.syzk.dataflow.core.post
 import kotlin.concurrent.thread
 
 fun main(args: Array<String>) {
-    val buffer = BufferBlock<Int>()
+    val buffer = BufferBlock<Int>("buffer")
     thread {
         var i = 0
         while (true) {

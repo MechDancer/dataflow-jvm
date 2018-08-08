@@ -1,6 +1,6 @@
 package site.syzk.dataflow.core
 
-interface ISource<T> {
+interface ISource<T> : IBlock {
     /**
      * 消费一个事件
      * 如果成功，事件从源的队列中移除

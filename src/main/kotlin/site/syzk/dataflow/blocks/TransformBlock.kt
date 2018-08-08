@@ -11,18 +11,19 @@ import site.syzk.dataflow.core.internal.otherwise
  * @param map 转换函数
  */
 class TransformBlock<TIn, TOut>(
+        override val name: String,
         executableOptions: ExecutableOptions =
                 ExecutableOptions(Int.MAX_VALUE, null),
         private val map: (TIn) -> TOut
 ) : ITarget<TIn>, ISource<TOut>, IReceivable<TOut> {
 
     override val defaultSource = DefaultSource(this)
-
     private val manager = LinkManager(this)
 
     //--------------------------
     // ITarget & ISource
     //--------------------------
+
     private val sourceCore = SourceCore<TOut>()
     private val targetCore = TargetCore<TIn>(executableOptions.parallelismDegree)
     { event ->
@@ -44,6 +45,7 @@ class TransformBlock<TIn, TOut>(
     //--------------------------
     // IReceivable
     //--------------------------
+
     private val receiveLock = Object()
     private var receivable = false
     private var value: TOut? = null

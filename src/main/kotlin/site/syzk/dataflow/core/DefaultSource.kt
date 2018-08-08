@@ -8,6 +8,7 @@ import site.syzk.dataflow.core.internal.SourceCore
  */
 class DefaultSource<T>(owner: ITarget<T>) : ISource<T> {
     private val link = Link(this, owner, linkOptions())
+    override val name = "default source of ${owner.name}"
 
     override fun consume(id: Long, link: Link<T>) = core.consume(id)
 

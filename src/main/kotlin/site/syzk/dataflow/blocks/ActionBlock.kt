@@ -7,6 +7,7 @@ import site.syzk.dataflow.core.Link
 import site.syzk.dataflow.core.internal.TargetCore
 
 class ActionBlock<T>(
+        override val name: String,
         executableOptions: ExecutableOptions =
                 ExecutableOptions(Int.MAX_VALUE, null),
         action: (T) -> Unit

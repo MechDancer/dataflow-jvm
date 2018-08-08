@@ -33,26 +33,28 @@ internal class TargetCore<T>(
         }
     }
 
-    fun offer(eventId: Long, link: Link<T>): Feedback =
+    fun offer(id: Long, link: Link<T>): Feedback =
             if (parallelismDegree.incrementAndGet() > maxParallelismDegree) {
-                bound(eventId, link)
+                bound(id, link)
                 parallelismDegree.decrementAndGet()
                 Postponed
-            } else link.source.consume(eventId, link)
-                    .let { pair ->
-                        if (pair.first) {
-                            @Suppress("UNCHECKED_CAST")
-                            thread(name = "target") {
-                                action(pair.second as T)
-                                parallelismDegree.decrementAndGet()
-                                while (true) {
-                                    unbound()
-                                            ?.let { offer(it.first, it.second) }
-                                            ?: break
+            } else
+                link.source.consume(id, link)
+                        .let { pair ->
+                            if (pair.first) {
+                                thread {
+                                    @Suppress("UNCHECKED_CAST")
+                                    action(pair.second as T)
+                                    parallelismDegree.decrementAndGet()
+                                    while (true)
+                                        unbound()
+                                                ?.let { offer(it.first, it.second) }
+                                                ?: break
                                 }
+                                Accepted
+                            } else {
+                                parallelismDegree.decrementAndGet()
+                                NotAvailable
                             }
-                            Accepted
-                        } else
-                            NotAvailable
-                    }
+                        }
 }

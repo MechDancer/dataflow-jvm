@@ -1,6 +1,6 @@
 package site.syzk.dataflow.core
 
-interface ITarget<T> {
+interface ITarget<T> : IBlock {
     /**
      * 默认源
      * 储存来自外部的事件

@@ -9,7 +9,9 @@ import java.util.concurrent.atomic.AtomicLong
  * 广播节点
  * 堆中的事件只会被新事件顶替，不会因为接收而消耗
  */
-class BroadcastBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
+class BroadcastBlock<T>(
+        override val name: String
+) : ITarget<T>, ISource<T>, IReceivable<T> {
     override val defaultSource = DefaultSource(this)
 
     /**
