@@ -1,6 +1,7 @@
 package site.syzk.dataflow.core
 
-data class LinkOptions<T>(
+data class LinkOptions<T>
+internal constructor(
         val predicate: (T) -> Boolean,
         val eventLimit: Int
 )

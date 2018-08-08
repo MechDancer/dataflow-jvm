@@ -12,8 +12,7 @@ import site.syzk.dataflow.core.internal.otherwise
  */
 class TransformBlock<TIn, TOut>(
         override val name: String,
-        executableOptions: ExecutableOptions =
-                ExecutableOptions(Int.MAX_VALUE, null),
+        options: ExecutableOptions = executableOptions(),
         private val map: (TIn) -> TOut
 ) : ITarget<TIn>, ISource<TOut>, IReceivable<TOut> {
 
@@ -25,7 +24,7 @@ class TransformBlock<TIn, TOut>(
     //--------------------------
 
     private val sourceCore = SourceCore<TOut>()
-    private val targetCore = TargetCore<TIn>(executableOptions)
+    private val targetCore = TargetCore<TIn>(options)
     { event ->
         val out = map(event)
         val newId = sourceCore.offer(out)
