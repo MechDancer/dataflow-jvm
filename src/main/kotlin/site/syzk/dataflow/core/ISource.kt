@@ -7,7 +7,7 @@ interface ISource<T> {
      * 由得到源通知的宿调用
      * @param id 事件的标识
      */
-    fun consume(id: Long): Pair<Boolean, T?>
+    fun consume(id: Long, link: Link<T>): Pair<Boolean, T?>
 
     fun linkTo(target: ITarget<T>, options: LinkOptions<T> = linkOptions()): Link<T>
 

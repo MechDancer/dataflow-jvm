@@ -11,16 +11,17 @@ import site.syzk.dataflow.core.internal.otherwise
  * 未消耗的数据将保留，直到被消费
  */
 class BufferBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
-    override val defaultSource = DefaultSource<T>()
+    override val defaultSource = DefaultSource(this)
 
     private val manager = LinkManager(this)
     private val receiveLock = Object()
     private val sourceCore = SourceCore<T>()
-    private val targetCore = TargetCore<T> { event ->
+    private val targetCore = TargetCore<T>(Int.MAX_VALUE)
+    { event ->
         val newId = sourceCore.offer(event)
         manager.links
                 .filter { it.options.predicate(event) }
-                .map { it to it.target.offer(newId, this) }
+                .map { it to it.target.offer(newId, it) }
                 .any { it.second.positive }
                 .otherwise {
                     synchronized(receiveLock) {
@@ -31,8 +32,8 @@ class BufferBlock<T> : ITarget<T>, ISource<T>, IReceivable<T> {
 
     val count get() = sourceCore.bufferCount
 
-    override fun offer(id: Long, source: ISource<T>) = targetCore.offer(id, source)
-    override fun consume(id: Long) = sourceCore.consume(id)
+    override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
+    override fun consume(id: Long, link: Link<T>) = sourceCore.consume(id).apply { if (this.first) link.record() }
 
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.linkTo(target, options)
     override fun unlink(target: ITarget<T>) = manager.unlink(target)

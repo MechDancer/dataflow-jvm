@@ -11,10 +11,12 @@ import site.syzk.dataflow.core.internal.otherwise
  * @param map 转换函数
  */
 class TransformBlock<TIn, TOut>(
+        executableOptions: ExecutableOptions =
+                ExecutableOptions(Int.MAX_VALUE, null),
         private val map: (TIn) -> TOut
 ) : ITarget<TIn>, ISource<TOut>, IReceivable<TOut> {
 
-    override val defaultSource = DefaultSource<TIn>()
+    override val defaultSource = DefaultSource(this)
 
     private val manager = LinkManager(this)
 
@@ -22,12 +24,13 @@ class TransformBlock<TIn, TOut>(
     // ITarget & ISource
     //--------------------------
     private val sourceCore = SourceCore<TOut>()
-    private val targetCore = TargetCore<TIn> { event ->
+    private val targetCore = TargetCore<TIn>(executableOptions.parallelismDegree)
+    { event ->
         val out = map(event)
         val newId = sourceCore.offer(out)
         manager.links
                 .filter { it.options.predicate(out) }
-                .map { it to it.offer(newId, this) }
+                .map { it to it.target.offer(newId, it) }
                 .any { it.second.positive }
                 .otherwise {
                     sourceCore.drop(newId)
@@ -50,8 +53,8 @@ class TransformBlock<TIn, TOut>(
     // Methods
     //--------------------------
 
-    override fun offer(id: Long, source: ISource<TIn>) = targetCore.offer(id, source)
-    override fun consume(id: Long) = sourceCore.consume(id)
+    override fun offer(id: Long, link: Link<TIn>) = targetCore.offer(id, link)
+    override fun consume(id: Long, link: Link<TOut>) = sourceCore.consume(id).apply { if (this.first) link.record() }
 
     override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) = manager.linkTo(target, options)
     override fun unlink(target: ITarget<TOut>) = manager.unlink(target)
