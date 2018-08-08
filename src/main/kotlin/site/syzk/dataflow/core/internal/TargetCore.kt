@@ -1,5 +1,6 @@
 package site.syzk.dataflow.core.internal
 
+import kotlinx.coroutines.experimental.launch
 import site.syzk.dataflow.annotations.ThreadSafe
 import site.syzk.dataflow.core.ExecutableOptions
 import site.syzk.dataflow.core.Feedback
@@ -7,7 +8,6 @@ import site.syzk.dataflow.core.Feedback.*
 import site.syzk.dataflow.core.Link
 import site.syzk.dataflow.core.executableOptions
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.concurrent.thread
 
 /**
  * 目的节点的通用内核
@@ -51,7 +51,7 @@ internal class TargetCore<T>(
                                     while (true)
                                         unbind()?.let { offer(it.first, it.second) } ?: break
                                 }
-                                options.dispatcher?.execute(task) ?: thread(block = task)
+                                options.dispatcher?.execute(task) ?: launch { task() }
                                 Accepted
                             } else {
                                 parallelismDegree.decrementAndGet()
