@@ -18,8 +18,7 @@ class BufferBlock<T>(
     private val manager = LinkManager(this)
     private val receiveLock = Object()
     private val sourceCore = SourceCore<T>()
-    private val targetCore = TargetCore<T>(Int.MAX_VALUE)
-    { event ->
+    private val targetCore = TargetCore<T> { event ->
         val newId = sourceCore.offer(event)
         manager.links
                 .filter { it.options.predicate(event) }
@@ -32,15 +31,15 @@ class BufferBlock<T>(
     override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
     override fun consume(id: Long, link: Link<T>) = sourceCore.consume(id).apply { if (this.first) link.record() }
 
-    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.linkTo(target, options)
-    override fun unlink(target: ITarget<T>) = manager.unlink(target)
+    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.build(target, options)
+    override fun unlink(link: Link<T>) = manager.cancel(link)
 
     override fun receive(): T {
         synchronized(receiveLock) {
-            var pair = sourceCore.consumeFirst()
+            var pair = sourceCore.consume()
             while (!pair.first) {
                 receiveLock.wait()
-                pair = sourceCore.consumeFirst()
+                pair = sourceCore.consume()
             }
             @Suppress("UNCHECKED_CAST") return pair.second as T
         }

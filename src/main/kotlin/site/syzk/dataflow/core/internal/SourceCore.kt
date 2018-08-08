@@ -45,7 +45,7 @@ internal class SourceCore<T> {
     /**
      * 从堆中消费第一个事件
      */
-    fun consumeFirst(): Pair<Boolean, T?> {
+    fun consume(): Pair<Boolean, T?> {
         synchronized(buffer) {
             return if (!buffer.any())
                 false to null

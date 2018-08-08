@@ -13,7 +13,7 @@ class DefaultSource<T>(owner: ITarget<T>) : ISource<T> {
     override fun consume(id: Long, link: Link<T>) = core.consume(id)
 
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = throw Exception("这个方法没有任何作用")
-    override fun unlink(target: ITarget<T>) = throw Exception("这个方法没有任何作用")
+    override fun unlink(link: Link<T>) = throw Exception("这个方法没有任何作用")
 
     private val core = SourceCore<T>()
     fun offer(event: T) = core.offer(event) to link

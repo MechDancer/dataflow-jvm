@@ -8,11 +8,11 @@ internal constructor(
         val dispatcher: ThreadPoolExecutor?
 )
 
-fun executableOpotions() =
+fun executableOptions() =
         ExecutableOptions(Int.MAX_VALUE, null)
 
-fun executableOpotions(parallelismDegree: Int) =
+fun executableOptions(parallelismDegree: Int) =
         ExecutableOptions(parallelismDegree, null)
 
-fun executableOpotions(dispatcher: ThreadPoolExecutor) =
+fun executableOptions(dispatcher: ThreadPoolExecutor) =
         ExecutableOptions(Int.MAX_VALUE, dispatcher)

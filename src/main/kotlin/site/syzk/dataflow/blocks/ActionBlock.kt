@@ -14,7 +14,7 @@ class ActionBlock<T>(
 ) : ITarget<T> {
     override val defaultSource = DefaultSource(this)
 
-    private val core = TargetCore(executableOptions.parallelismDegree, action)
+    private val core = TargetCore(executableOptions, action)
 
     override fun offer(id: Long, link: Link<T>) = core.offer(id, link)
 }

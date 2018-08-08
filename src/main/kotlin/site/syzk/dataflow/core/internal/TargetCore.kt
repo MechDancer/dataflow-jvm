@@ -1,9 +1,11 @@
 package site.syzk.dataflow.core.internal
 
 import site.syzk.dataflow.annotations.ThreadSafe
+import site.syzk.dataflow.core.ExecutableOptions
 import site.syzk.dataflow.core.Feedback
 import site.syzk.dataflow.core.Feedback.*
 import site.syzk.dataflow.core.Link
+import site.syzk.dataflow.core.executableOptions
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 
@@ -13,17 +15,17 @@ import kotlin.concurrent.thread
  */
 @ThreadSafe
 internal class TargetCore<T>(
-        private val maxParallelismDegree: Int,
+        private val options: ExecutableOptions = executableOptions(),
         private val action: (T) -> Unit
 ) {
     private val parallelismDegree = AtomicInteger(0)
     private val waitingQueue = mutableListOf<Pair<Long, Link<T>>>()
 
-    private fun bound(id: Long, link: Link<T>) {
+    private fun bind(id: Long, link: Link<T>) {
         synchronized(waitingQueue) { waitingQueue.add(id to link) }
     }
 
-    private fun unbound(): Pair<Long, Link<T>>? {
+    private fun unbind(): Pair<Long, Link<T>>? {
         synchronized(waitingQueue) {
             return if (waitingQueue.isNotEmpty()) {
                 val pair = waitingQueue.first()
@@ -34,23 +36,22 @@ internal class TargetCore<T>(
     }
 
     fun offer(id: Long, link: Link<T>): Feedback =
-            if (parallelismDegree.incrementAndGet() > maxParallelismDegree) {
-                bound(id, link)
+            if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
+                bind(id, link)
                 parallelismDegree.decrementAndGet()
                 Postponed
             } else
                 link.source.consume(id, link)
                         .let { pair ->
                             if (pair.first) {
-                                thread {
+                                val task = {
                                     @Suppress("UNCHECKED_CAST")
                                     action(pair.second as T)
                                     parallelismDegree.decrementAndGet()
                                     while (true)
-                                        unbound()
-                                                ?.let { offer(it.first, it.second) }
-                                                ?: break
+                                        unbind()?.let { offer(it.first, it.second) } ?: break
                                 }
+                                options.dispatcher?.execute(task) ?: thread(block = task)
                                 Accepted
                             } else {
                                 parallelismDegree.decrementAndGet()

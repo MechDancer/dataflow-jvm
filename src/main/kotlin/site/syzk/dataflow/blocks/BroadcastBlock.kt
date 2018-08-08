@@ -40,8 +40,7 @@ class BroadcastBlock<T>(
      * 作为目的节点的内核
      * 新到来的事件顶替旧事件，然后向所有目的节点通报事件到来
      */
-    private val targetCore = TargetCore<T>(Int.MAX_VALUE)
-    { event ->
+    private val targetCore = TargetCore<T> { event ->
         val newId = id.incrementAndGet()
         synchronized(buffer) {
             buffer.clear()
@@ -69,8 +68,8 @@ class BroadcastBlock<T>(
         }
     }
 
-    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.linkTo(target, options)
-    override fun unlink(target: ITarget<T>) = manager.unlink(target)
+    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.build(target, options)
+    override fun unlink(link: Link<T>) = manager.cancel(link)
 
     override fun receive(): T {
         synchronized(receiveLock) {

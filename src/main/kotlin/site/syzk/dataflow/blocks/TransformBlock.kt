@@ -25,7 +25,7 @@ class TransformBlock<TIn, TOut>(
     //--------------------------
 
     private val sourceCore = SourceCore<TOut>()
-    private val targetCore = TargetCore<TIn>(executableOptions.parallelismDegree)
+    private val targetCore = TargetCore<TIn>(executableOptions)
     { event ->
         val out = map(event)
         val newId = sourceCore.offer(out)
@@ -57,8 +57,8 @@ class TransformBlock<TIn, TOut>(
     override fun offer(id: Long, link: Link<TIn>) = targetCore.offer(id, link)
     override fun consume(id: Long, link: Link<TOut>) = sourceCore.consume(id).apply { if (this.first) link.record() }
 
-    override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) = manager.linkTo(target, options)
-    override fun unlink(target: ITarget<TOut>) = manager.unlink(target)
+    override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) = manager.build(target, options)
+    override fun unlink(link: Link<TOut>) = manager.cancel(link)
 
     override fun receive(): TOut {
         synchronized(receiveLock) {

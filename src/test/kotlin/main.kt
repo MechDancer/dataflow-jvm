@@ -1,17 +1,23 @@
 import site.syzk.dataflow.blocks.ActionBlock
 import site.syzk.dataflow.blocks.BroadcastBlock
 import site.syzk.dataflow.blocks.TransformBlock
-import site.syzk.dataflow.core.executableOpotions
+import site.syzk.dataflow.core.executableOptions
 import site.syzk.dataflow.core.post
 
 fun main(args: Array<String>) {
     val source = BroadcastBlock<Int>("source")
     val bridge1 = TransformBlock<Int, Int>(
             "bridge1",
-            executableOpotions(2)) { it - 1 }
+            executableOptions(2)) {
+        Thread.sleep(20)
+        it - 1
+    }
     val bridge2 = TransformBlock<Int, Int>(
             "bridge2",
-            executableOpotions(2)) { -it }
+            executableOptions(2)) {
+        Thread.sleep(20)
+        -it
+    }
     source.linkTo(bridge1)
     source.linkTo(bridge2)
     source.linkTo(ActionBlock("out") {

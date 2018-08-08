@@ -20,5 +20,5 @@ class Link<T>(
             dispose()
     }
 
-    fun dispose() = source.unlink(target)
+    fun dispose() = source.unlink(this)
 }
