@@ -11,7 +11,7 @@ import site.syzk.dataflow.core.internal.otherwise
  * @param map 转换函数
  */
 class TransformBlock<TIn, TOut>(
-        override val name: String,
+        override val name: String = "transform",
         options: ExecutableOptions = executableOptions(),
         private val map: (TIn) -> TOut
 ) : ITarget<TIn>, ISource<TOut>, IReceivable<TOut> {

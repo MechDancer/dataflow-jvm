@@ -1,27 +1,18 @@
-import site.syzk.dataflow.blocks.ActionBlock
-import site.syzk.dataflow.blocks.BroadcastBlock
-import site.syzk.dataflow.blocks.TransformBlock
-import site.syzk.dataflow.core.executableOptions
-import site.syzk.dataflow.core.post
+import site.syzk.dataflow.core.internal.broadcast
+import site.syzk.dataflow.core.internal.minus
+import site.syzk.dataflow.core.internal.post
+import site.syzk.dataflow.core.internal.transform
 
 fun main(args: Array<String>) {
-    val source = BroadcastBlock<Int>("source")
-    val bridge1 = TransformBlock<Int, Int>(
-            "bridge1", executableOptions(2)) {
-        it - 1
-    }
-    val bridge2 = TransformBlock<Int, Int>(
-            "bridge2", executableOptions(2)) {
-        -it
-    }
-    source.linkTo(bridge1)
-    source.linkTo(bridge2)
-    source.linkTo(ActionBlock("out", executableOptions(1)) {
-        println("[${System.currentTimeMillis()}][$it]")
-    })
-    bridge1.linkTo(source)
-    bridge2.linkTo(source)
-    source.post(100)
+    val source = broadcast<Int>()
+    val bridge1 = transform<Int, Int> { it - 1 }
+    val bridge2 = transform<Int, Int> { -it }
+    source - bridge1
+    source - bridge2
+    source - { println("[${System.currentTimeMillis()}][$it]") }
+    bridge1 - source
+    //bridge2 - source
+    source post 100
     while (true) {
         readLine()
         println("收到: ${source.receive()}")

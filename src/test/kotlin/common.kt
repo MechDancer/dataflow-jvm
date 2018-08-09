@@ -1,5 +1,5 @@
 import site.syzk.dataflow.blocks.BufferBlock
-import site.syzk.dataflow.core.post
+import site.syzk.dataflow.core.internal.post
 import kotlin.concurrent.thread
 
 fun main(args: Array<String>) {
@@ -7,7 +7,7 @@ fun main(args: Array<String>) {
     thread {
         var i = 0
         while (true) {
-            buffer.post(i++)
+            buffer post i++
             println("插入: $i, 计数: ${buffer.count}")
             Thread.sleep(500)
         }

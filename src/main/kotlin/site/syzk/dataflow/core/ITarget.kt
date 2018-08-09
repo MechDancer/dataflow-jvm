@@ -16,7 +16,4 @@ interface ITarget<T> : IBlock {
     fun offer(id: Long, link: Link<T>): Feedback
 }
 
-/**
- * 从外部直接发送事件到目标节点
- */
-fun <T> ITarget<T>.post(event: T) = defaultSource.offer(event).let { offer(it.first, it.second) }
+

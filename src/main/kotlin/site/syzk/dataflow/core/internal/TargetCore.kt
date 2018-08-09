@@ -1,13 +1,16 @@
 package site.syzk.dataflow.core.internal
 
-import kotlinx.coroutines.experimental.launch
 import site.syzk.dataflow.annotations.ThreadSafe
 import site.syzk.dataflow.core.ExecutableOptions
 import site.syzk.dataflow.core.Feedback
 import site.syzk.dataflow.core.Feedback.*
 import site.syzk.dataflow.core.Link
 import site.syzk.dataflow.core.executableOptions
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.min
 
 /**
  * 目的节点的通用内核
@@ -20,6 +23,15 @@ internal class TargetCore<T>(
 ) {
     private val parallelismDegree = AtomicInteger(0)
     private val waitingQueue = mutableListOf<Pair<Long, Link<T>>>()
+    private val executor =
+            options.dispatcher
+                    ?: ThreadPoolExecutor(
+                            min(options.parallelismDegree, 4),
+                            options.parallelismDegree,
+                            100,
+                            MILLISECONDS,
+                            LinkedBlockingQueue<Runnable>(4)
+                    )
 
     private fun bind(id: Long, link: Link<T>) {
         synchronized(waitingQueue) { waitingQueue.add(id to link) }
@@ -51,7 +63,8 @@ internal class TargetCore<T>(
                                     while (true)
                                         unbind()?.let { offer(it.first, it.second) } ?: break
                                 }
-                                options.dispatcher?.execute(task) ?: launch { task() }
+                                //options.dispatcher?.execute(task) ?: thread(block = task)
+                                executor.execute(task)
                                 Accepted
                             } else {
                                 parallelismDegree.decrementAndGet()

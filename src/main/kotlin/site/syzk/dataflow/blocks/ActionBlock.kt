@@ -4,7 +4,7 @@ import site.syzk.dataflow.core.*
 import site.syzk.dataflow.core.internal.TargetCore
 
 class ActionBlock<T>(
-        override val name: String,
+        override val name: String = "action",
         options: ExecutableOptions = executableOptions(),
         action: (T) -> Unit
 ) : ITarget<T> {
