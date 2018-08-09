@@ -6,6 +6,7 @@ import site.syzk.dataflow.core.Feedback
 import site.syzk.dataflow.core.Feedback.*
 import site.syzk.dataflow.core.Link
 import site.syzk.dataflow.core.executableOptions
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
@@ -21,7 +22,7 @@ internal class TargetCore<T>(
         private val action: (T) -> Unit
 ) {
     private val parallelismDegree = AtomicInteger(0)
-    private val waitingQueue = mutableListOf<Pair<Long, Link<T>>>()
+    private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, Link<T>>>()
     private val executor =
             options.dispatcher
                     ?: ThreadPoolExecutor(
@@ -32,19 +33,9 @@ internal class TargetCore<T>(
                             LinkedBlockingQueue<Runnable>(4)
                     )
 
-    private fun bind(id: Long, link: Link<T>) {
-        synchronized(waitingQueue) { waitingQueue.add(id to link) }
-    }
+    private fun bind(id: Long, link: Link<T>) = waitingQueue.add(id to link)
 
-    private fun unbind(): Pair<Long, Link<T>>? {
-        synchronized(waitingQueue) {
-            return if (waitingQueue.isNotEmpty()) {
-                val pair = waitingQueue.first()
-                waitingQueue.removeAt(0)
-                pair
-            } else null
-        }
-    }
+    private fun unbind(): Pair<Long, Link<T>>? = waitingQueue.poll()
 
     fun offer(id: Long, link: Link<T>): Feedback =
             if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
