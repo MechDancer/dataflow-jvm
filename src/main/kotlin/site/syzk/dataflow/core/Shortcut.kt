@@ -8,6 +8,10 @@ import site.syzk.dataflow.blocks.TransformBlock
 infix fun <T> ITarget<T>.post(event: T) =
         defaultSource.offer(event).let { offer(it.first, it.second) }
 
+//-------------------------------
+// link
+//-------------------------------
+
 infix fun <T> ISource<T>.linkTo(target: ITarget<T>) =
         linkTo(target)
 
@@ -29,8 +33,16 @@ fun <T> link(source: ISource<T>, target: ITarget<T>, options: LinkOptions<T>) =
 operator fun <T> ISource<T>.minus(target: ITarget<T>) =
         linkTo(target)
 
-operator fun <T> ISource<T>.minus(target: (T) -> Unit) =
-        linkTo(ActionBlock(action = target))
+operator fun <TIn, TOut> ISource<TIn>.minus(target: (TIn) -> TOut) =
+        let {
+            val bridge = TransformBlock(map = target)
+            linkTo(bridge)
+            bridge
+        }
+
+//-------------------------------
+// build
+//-------------------------------
 
 fun <T> action(
         name: String = "action",
