@@ -10,7 +10,6 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.math.min
 
 /**
  * 目的节点的通用内核
@@ -26,7 +25,7 @@ internal class TargetCore<T>(
     private val executor =
             options.dispatcher
                     ?: ThreadPoolExecutor(
-                            min(options.parallelismDegree, 4),
+                            0,
                             options.parallelismDegree,
                             100,
                             MILLISECONDS,
