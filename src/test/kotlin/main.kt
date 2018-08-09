@@ -1,17 +1,14 @@
-import site.syzk.dataflow.core.internal.broadcast
-import site.syzk.dataflow.core.internal.minus
-import site.syzk.dataflow.core.internal.post
-import site.syzk.dataflow.core.internal.transform
+import site.syzk.dataflow.core.*
 
 fun main(args: Array<String>) {
     val source = broadcast<Int>()
     val bridge1 = transform<Int, Int> { it - 1 }
     val bridge2 = transform<Int, Int> { -it }
-    source - bridge1
-    source - bridge2
-    source - { println("[${System.currentTimeMillis()}][$it]") }
-    bridge1 - source
-    //bridge2 - source
+    link(source, bridge1) { x -> x >= -100 }
+    link(source, bridge2) { x -> x < -100 }
+    source linkTo { println("[${System.currentTimeMillis()}][$it]") }
+    bridge1 linkTo source
+    bridge2 linkTo source
     source post 100
     while (true) {
         readLine()

@@ -1,5 +1,5 @@
 import site.syzk.dataflow.blocks.BufferBlock
-import site.syzk.dataflow.core.internal.post
+import site.syzk.dataflow.core.post
 import kotlin.concurrent.thread
 
 fun main(args: Array<String>) {
