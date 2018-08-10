@@ -14,5 +14,6 @@ fun main(args: Array<String>) {
 //        readLine()
 //        println("收到: ${source.receive()}")
 //    }
+    while (true);
 }
 
