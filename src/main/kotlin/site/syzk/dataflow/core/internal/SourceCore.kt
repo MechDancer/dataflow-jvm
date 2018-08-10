@@ -38,7 +38,8 @@ internal class SourceCore<T> {
      */
     fun consume(id: Long): Pair<Boolean, T?> {
         synchronized(buffer) {
-            return buffer.containsKey(id) to buffer.remove(id)
+            return buffer.containsKey(id)
+                    .let { it to if (it) buffer.remove(id) else null }
         }
     }
 
@@ -47,10 +48,8 @@ internal class SourceCore<T> {
      */
     fun consume(): Pair<Boolean, T?> {
         synchronized(buffer) {
-            return if (!buffer.any())
-                false to null
-            else
-                buffer.keys.min().let { buffer.containsKey(it) to buffer.remove(it) }
+            return buffer.isNotEmpty()
+                    .let { it to if (it) buffer.remove(buffer.keys.min()) else null }
         }
     }
 

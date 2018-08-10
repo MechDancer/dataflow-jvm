@@ -10,9 +10,9 @@ fun main(args: Array<String>) {
     bridge1 linkTo source
     bridge2 linkTo source
     source post 100
-    while (true) {
-        readLine()
-        println("收到: ${source.receive()}")
-    }
+//    while (true) {
+//        readLine()
+//        println("收到: ${source.receive()}")
+//    }
 }
 
