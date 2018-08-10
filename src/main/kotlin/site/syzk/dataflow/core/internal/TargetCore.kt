@@ -19,27 +19,16 @@ internal class TargetCore<T>(
 		private val options: ExecutableOptions = executableOptions(),
 		private val action: (T) -> Unit
 ) {
-
-	companion object {
-		internal val defaultDispatcher = ForkJoinPool()
+	private companion object {
+		val defaultDispatcher = ForkJoinPool()
 	}
-
+	
 	private val parallelismDegree = AtomicInteger(0)
 	private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, Link<T>>>()
-//	private val executor =
-//			options.dispatcher
-//					?: ThreadPoolExecutor(
-//							0,
-//							options.parallelismDegree,
-//							100,
-//							MILLISECONDS,
-//							LinkedBlockingQueue<Runnable>(4)
-//					)
-
+	
 	private fun bind(id: Long, link: Link<T>) = waitingQueue.add(id to link)
-
 	private fun unbind(): Pair<Long, Link<T>>? = waitingQueue.poll()
-
+	
 	fun offer(id: Long, link: Link<T>): Feedback =
 			if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
 				bind(id, link)
@@ -53,10 +42,10 @@ internal class TargetCore<T>(
 									@Suppress("UNCHECKED_CAST")
 									action(pair.second as T)
 									parallelismDegree.decrementAndGet()
-									while (true)
+									while (parallelismDegree.get() < options.parallelismDegree)
 										unbind()?.let { offer(it.first, it.second) } ?: break
 								}
-								options.dispatcher?.execute(task) ?: defaultDispatcher.submit(task)
+								(options.dispatcher ?: defaultDispatcher).execute(task)
 								Accepted
 							} else {
 								parallelismDegree.decrementAndGet()
