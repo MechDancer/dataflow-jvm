@@ -1,10 +1,17 @@
+buildscript{
+    dependencies{
+        classpath 'com.novoda:bintray-release:0.8.1'
+    }
+}
+
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.2.60'
 }
+apply plugin: 'com.novoda.bintray-release'
 
 group 'syzk'
-version '1.0-SNAPSHOT'
+version '0.1.0-RELEASE'
 
 sourceCompatibility = 1.8
 
@@ -29,4 +36,14 @@ kotlin {
     experimental {
         coroutines "enable"
     }
+}
+
+publish {
+    userOrg = 'ydrmaster'
+    groupId = 'com.syzk'
+    artifactId = 'DataflowJVM'
+    repoName='syzk'
+    publishVersion = '0.1.0'
+    desc = 'from @Microsoft .Net Core: "System.threading.tasks.dataflow"'
+    website = 'https://github.com/YdrMaster/DataflowJVM'
 }
