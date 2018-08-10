@@ -1,5 +1,5 @@
-buildscript{
-    dependencies{
+buildscript {
+    dependencies {
         classpath 'com.novoda:bintray-release:0.8.1'
     }
 }
@@ -8,6 +8,7 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.2.60'
 }
+
 apply plugin: 'com.novoda.bintray-release'
 
 group 'syzk'
@@ -29,9 +30,11 @@ dependencies {
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
 kotlin {
     experimental {
         coroutines "enable"
@@ -40,10 +43,18 @@ kotlin {
 
 publish {
     userOrg = 'ydrmaster'
-    groupId = 'com.syzk'
+    groupId = 'site.syzk'
     artifactId = 'DataflowJVM'
-    repoName='syzk'
+    repoName = 'syzk'
     publishVersion = '0.1.0'
     desc = 'from @Microsoft .Net Core: "System.threading.tasks.dataflow"'
     website = 'https://github.com/YdrMaster/DataflowJVM'
 }
+
+task fatJar(group: 'build', type: Jar) {
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with(jar)
+}
+
+jar.dependsOn(fatJar)
