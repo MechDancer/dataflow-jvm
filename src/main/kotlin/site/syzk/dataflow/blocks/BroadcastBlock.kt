@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicLong
  * 堆中的事件只会被新事件顶替，不会因为接收而消耗
  */
 class BroadcastBlock<T>(override val name: String = "broadcast")
-	: ITarget<T>, ISource<T>, IReceivable<T> {
+	: IPropagatorBlock<T, T>, IReceivable<T> {
 	override val defaultSource = DefaultSource(this)
 
 	/**
@@ -64,7 +64,6 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 					buffer[id]
 				}
 			}
-
 
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.build(target, options)
 	override fun unlink(link: Link<T>) = manager.cancel(link)

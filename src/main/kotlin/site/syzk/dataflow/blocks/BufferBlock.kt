@@ -11,7 +11,7 @@ import site.syzk.dataflow.core.internal.otherwise
  * 未消耗的数据将保留，直到被消费
  */
 class BufferBlock<T>(override val name: String = "buffer")
-	: ITarget<T>, ISource<T>, IReceivable<T> {
+	: IPropagatorBlock<T, T>, IReceivable<T> {
 	override val defaultSource = DefaultSource(this)
 
 	private val manager = LinkManager(this)

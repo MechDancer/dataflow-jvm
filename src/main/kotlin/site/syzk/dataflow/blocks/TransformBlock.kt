@@ -14,7 +14,7 @@ class TransformBlock<TIn, TOut>(
 		override val name: String = "transform",
 		options: ExecutableOptions = executableOptions(),
 		private val map: (TIn) -> TOut
-) : ITarget<TIn>, ISource<TOut>, IReceivable<TOut> {
+) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut> {
 
 	override val defaultSource = DefaultSource(this)
 	private val manager = LinkManager(this)
