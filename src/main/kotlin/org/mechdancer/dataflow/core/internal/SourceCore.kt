@@ -1,6 +1,6 @@
-package site.syzk.dataflow.core.internal
+package org.mechdancer.dataflow.core.internal
 
-import site.syzk.dataflow.annotations.ThreadSafe
+import org.mechdancer.dataflow.annotations.ThreadSafe
 import java.util.concurrent.atomic.AtomicLong
 
 /**

@@ -1,4 +1,4 @@
-package site.syzk.dataflow.core.internal
+package org.mechdancer.dataflow.core.internal
 
 internal fun Boolean.then(block: () -> Unit): Boolean {
 	if (this) block()

@@ -1,4 +1,4 @@
-import site.syzk.dataflow.core.*
+import org.mechdancer.dataflow.core.*
 
 fun main(args: Array<String>) {
 	val source = broadcast<Int>()

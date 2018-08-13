@@ -1,4 +1,4 @@
-package site.syzk.dataflow.core
+package org.mechdancer.dataflow.core
 
 enum class Feedback(val positive: Boolean) {
     Accepted(true),

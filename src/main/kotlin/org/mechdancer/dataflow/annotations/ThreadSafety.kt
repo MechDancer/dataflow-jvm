@@ -1,4 +1,4 @@
-package site.syzk.dataflow.annotations
+package org.mechdancer.dataflow.annotations
 
 import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.CLASS

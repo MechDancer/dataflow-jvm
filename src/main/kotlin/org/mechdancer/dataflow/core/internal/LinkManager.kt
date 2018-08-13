@@ -1,12 +1,11 @@
-package site.syzk.dataflow.core.internal
+package org.mechdancer.dataflow.core.internal
 
-import site.syzk.dataflow.annotations.ThreadSafe
-import site.syzk.dataflow.core.ISource
-import site.syzk.dataflow.core.ITarget
-import site.syzk.dataflow.core.Link
-import site.syzk.dataflow.core.LinkOptions
+import org.mechdancer.dataflow.core.ISource
+import org.mechdancer.dataflow.core.ITarget
+import org.mechdancer.dataflow.core.Link
+import org.mechdancer.dataflow.core.LinkOptions
 
-@ThreadSafe
+@org.mechdancer.dataflow.annotations.ThreadSafe
 internal class LinkManager<T>(private val owner: ISource<T>) {
 	private val _links = mutableListOf<Link<T>>()
 	val links get() = _links.toList()

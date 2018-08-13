@@ -1,6 +1,6 @@
 # 计算图模型的JVM实现
 
-[![Download](https://api.bintray.com/packages/ydrmaster/syzk/DataflowJVM/images/download.svg?version=0.1.0) ](https://bintray.com/ydrmaster/syzk/DataflowJVM/0.1.0/link)
+[![Download](https://api.bintray.com/packages/mechdancer/maven/dataflow-jvm/images/download.svg) ](https://bintray.com/mechdancer/maven/dataflow-jvm/_latestVersion)
 
 此项目模仿微软的 [数据流（任务并行库）](https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/dataflow-task-parallel-library?view=netcore-2.1)，目标是在Java虚拟机实现可用于机器人系统的并行计算网络。
 
@@ -46,7 +46,7 @@ repositories {
     jcenter()
 }
 dependencies {
-    compile "site.syzk:DataflowJVM:0.1.0"
+    compile 'org.mechdancer:dataflow-jvm:0.1.0'
 }
 ```
 
@@ -62,8 +62,8 @@ dependencies {
 </repositories>
 
 <dependency>
-  <groupId>site.syzk</groupId>
-  <artifactId>DataflowJVM</artifactId>
+  <groupId>org.mechdancer</groupId>
+  <artifactId>dataflow-jvm</artifactId>
   <version>0.1.0</version>
   <type>pom</type>
 </dependency>
@@ -71,4 +71,5 @@ dependencies {
 
 ### Bintray
 
-您总可以从 bintray 直接下载 jar：[![Download](https://api.bintray.com/packages/ydrmaster/syzk/DataflowJVM/images/download.svg?version=0.1.0) ](https://bintray.com/ydrmaster/syzk/DataflowJVM/0.1.0/link)
+您总可以从 bintray 直接下载 jar：[![Download](https://api.bintray.com/packages/mechdancer/maven/dataflow-jvm/images/download.svg) ](https://bintray.com/mechdancer/maven/dataflow-jvm/_latestVersion)
+

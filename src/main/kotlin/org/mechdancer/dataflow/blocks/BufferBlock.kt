@@ -1,10 +1,10 @@
-package site.syzk.dataflow.blocks
+package org.mechdancer.dataflow.blocks
 
-import site.syzk.dataflow.core.*
-import site.syzk.dataflow.core.internal.LinkManager
-import site.syzk.dataflow.core.internal.SourceCore
-import site.syzk.dataflow.core.internal.TargetCore
-import site.syzk.dataflow.core.internal.otherwise
+import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.internal.LinkManager
+import org.mechdancer.dataflow.core.internal.SourceCore
+import org.mechdancer.dataflow.core.internal.TargetCore
+import org.mechdancer.dataflow.core.internal.otherwise
 
 /**
  * 缓冲模块
@@ -12,7 +12,7 @@ import site.syzk.dataflow.core.internal.otherwise
  */
 class BufferBlock<T>(override val name: String = "buffer")
 	: IPropagatorBlock<T, T>, IReceivable<T> {
-	override val defaultSource = DefaultSource(this)
+	override val defaultSource = org.mechdancer.dataflow.core.DefaultSource(this)
 
 	private val manager = LinkManager(this)
 	private val receiveLock = Object()

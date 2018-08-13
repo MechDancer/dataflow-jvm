@@ -1,4 +1,4 @@
-package site.syzk.dataflow.core
+package org.mechdancer.dataflow.core
 
 fun <TIn, TOut, TMid> encapsulate(
 		i: IPropagatorBlock<TIn, TMid>,

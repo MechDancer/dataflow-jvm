@@ -11,7 +11,7 @@ plugins {
 
 apply plugin: 'com.novoda.bintray-release'
 
-group 'syzk'
+group 'mechdancer'
 version '0.1.0-RELEASE'
 
 sourceCompatibility = 1.8
@@ -42,13 +42,12 @@ kotlin {
 }
 
 publish {
-    userOrg = 'ydrmaster'
-    groupId = 'site.syzk'
-    artifactId = 'DataflowJVM'
-    repoName = 'syzk'
+    userOrg = 'mechdancer'
+    groupId = 'org.mechdancer'
+    artifactId = 'dataflow-jvm'
     publishVersion = '0.1.0'
     desc = 'from @Microsoft .Net Core: "System.threading.tasks.dataflow"'
-    website = 'https://github.com/YdrMaster/DataflowJVM'
+    website = 'https://github.com/MechDancer/dataflow-jvm'
 }
 
 task fatJar(group: 'build', type: Jar) {

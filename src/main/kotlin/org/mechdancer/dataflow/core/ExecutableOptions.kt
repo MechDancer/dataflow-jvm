@@ -1,4 +1,4 @@
-package site.syzk.dataflow.core
+package org.mechdancer.dataflow.core
 
 import java.util.concurrent.Executor
 

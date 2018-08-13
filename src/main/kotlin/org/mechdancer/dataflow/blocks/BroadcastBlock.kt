@@ -1,9 +1,9 @@
-package site.syzk.dataflow.blocks
+package org.mechdancer.dataflow.blocks
 
-import site.syzk.dataflow.core.*
-import site.syzk.dataflow.core.internal.LinkManager
-import site.syzk.dataflow.core.internal.TargetCore
-import site.syzk.dataflow.core.internal.zip
+import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.internal.LinkManager
+import org.mechdancer.dataflow.core.internal.TargetCore
+import org.mechdancer.dataflow.core.internal.zip
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong
  */
 class BroadcastBlock<T>(override val name: String = "broadcast")
 	: IPropagatorBlock<T, T>, IReceivable<T> {
-	override val defaultSource = DefaultSource(this)
+	override val defaultSource = org.mechdancer.dataflow.core.DefaultSource(this)
 
 	/**
 	 * 存储已链接的节点

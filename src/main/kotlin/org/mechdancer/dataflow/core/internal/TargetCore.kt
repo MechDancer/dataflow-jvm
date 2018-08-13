@@ -1,11 +1,10 @@
-package site.syzk.dataflow.core.internal
+package org.mechdancer.dataflow.core.internal
 
-import site.syzk.dataflow.annotations.ThreadSafe
-import site.syzk.dataflow.core.ExecutableOptions
-import site.syzk.dataflow.core.Feedback
-import site.syzk.dataflow.core.Feedback.*
-import site.syzk.dataflow.core.Link
-import site.syzk.dataflow.core.executableOptions
+import org.mechdancer.dataflow.core.ExecutableOptions
+import org.mechdancer.dataflow.core.Feedback
+import org.mechdancer.dataflow.core.Feedback.*
+import org.mechdancer.dataflow.core.Link
+import org.mechdancer.dataflow.core.executableOptions
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicInteger
@@ -14,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger
  * 目的节点的通用内核
  * @param action 目的节点接收事件后的动作
  */
-@ThreadSafe
+@org.mechdancer.dataflow.annotations.ThreadSafe
 internal class TargetCore<T>(
 		private val options: ExecutableOptions = executableOptions(),
 		private val action: (T) -> Unit
@@ -22,13 +21,13 @@ internal class TargetCore<T>(
 	private companion object {
 		val defaultDispatcher = ForkJoinPool()
 	}
-	
+
 	private val parallelismDegree = AtomicInteger(0)
 	private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, Link<T>>>()
-	
+
 	private fun bind(id: Long, link: Link<T>) = waitingQueue.add(id to link)
 	private fun unbind(): Pair<Long, Link<T>>? = waitingQueue.poll()
-	
+
 	fun offer(id: Long, link: Link<T>): Feedback =
 			if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
 				bind(id, link)

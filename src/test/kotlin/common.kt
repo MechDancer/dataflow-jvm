@@ -1,9 +1,8 @@
-import site.syzk.dataflow.blocks.BufferBlock
-import site.syzk.dataflow.core.post
+import org.mechdancer.dataflow.core.post
 import kotlin.concurrent.thread
 
 fun main(args: Array<String>) {
-    val buffer = BufferBlock<Int>("buffer")
+    val buffer = org.mechdancer.dataflow.blocks.BufferBlock<Int>("buffer")
     thread {
         var i = 0
         while (true) {
