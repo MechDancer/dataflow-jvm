@@ -1,8 +1,8 @@
 # 计算图模型的JVM实现
 
-[ ![Download](https://api.bintray.com/packages/ydrmaster/syzk/DataflowJVM/images/download.svg?version=0.1.0) ](https://bintray.com/ydrmaster/syzk/DataflowJVM/0.1.0/link)
+[![Download](https://api.bintray.com/packages/ydrmaster/syzk/DataflowJVM/images/download.svg?version=0.1.0) ](https://bintray.com/ydrmaster/syzk/DataflowJVM/0.1.0/link)
 
-此项目模仿微软的[数据流（任务并行库）](https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/dataflow-task-parallel-library?view=netcore-2.1)，目标是在Java虚拟机实现可用于机器人系统的并行计算网络。
+此项目模仿微软的 [数据流（任务并行库）](https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/dataflow-task-parallel-library?view=netcore-2.1)，目标是在Java虚拟机实现可用于机器人系统的并行计算网络。
 
 项目采用将从最简单的可用系统开始，逐步优化并添加功能。
 
@@ -30,3 +30,45 @@
 - [ ] 添加DSL，允许用户快速定义拓扑
 - [ ] 采用数据交换格式定义解耦合模型
 - [ ] 添加对分布式拓扑的支持
+
+## 开始使用
+
+* Gradle
+* Maven
+* Bintray
+
+您需要将其添加至  [仓库和依赖](https://docs.gradle.org/current/userguide/declaring_dependencies.html) 中。
+
+### Gradle
+
+```groovy
+repositories {
+    jcenter()
+}
+dependencies {
+    compile "site.syzk:DataflowJVM:0.1.0"
+}
+```
+
+### Maven
+
+```xml
+<repositories>
+   <repository>
+     <id>jcenter</id>
+     <name>JCenter</name>
+     <url>https://jcenter.bintray.com/</url>
+   </repository>
+</repositories>
+
+<dependency>
+  <groupId>site.syzk</groupId>
+  <artifactId>DataflowJVM</artifactId>
+  <version>0.1.0</version>
+  <type>pom</type>
+</dependency>
+```
+
+### Bintray
+
+您总可以从 bintray 直接下载 jar：[![Download](https://api.bintray.com/packages/ydrmaster/syzk/DataflowJVM/images/download.svg?version=0.1.0) ](https://bintray.com/ydrmaster/syzk/DataflowJVM/0.1.0/link)
