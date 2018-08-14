@@ -16,8 +16,8 @@ class TransformBlock<TIn, TOut>(
 		options: ExecutableOptions = executableOptions(),
 		private val map: (TIn) -> TOut
 ) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut> {
-
-	override val defaultSource = org.mechdancer.dataflow.core.DefaultSource(this)
+	
+	override val defaultSource = DefaultSource(this)
 	private val manager = LinkManager(this)
 
 	//--------------------------

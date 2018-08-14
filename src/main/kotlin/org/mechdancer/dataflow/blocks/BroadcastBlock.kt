@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong
  */
 class BroadcastBlock<T>(override val name: String = "broadcast")
 	: IPropagatorBlock<T, T>, IReceivable<T> {
-	override val defaultSource = org.mechdancer.dataflow.core.DefaultSource(this)
+	override val defaultSource = DefaultSource(this)
 
 	/**
 	 * 存储已链接的节点

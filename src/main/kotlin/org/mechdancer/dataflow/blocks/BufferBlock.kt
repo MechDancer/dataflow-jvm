@@ -12,8 +12,8 @@ import org.mechdancer.dataflow.core.internal.otherwise
  */
 class BufferBlock<T>(override val name: String = "buffer")
 	: IPropagatorBlock<T, T>, IReceivable<T> {
-	override val defaultSource = org.mechdancer.dataflow.core.DefaultSource(this)
-
+	override val defaultSource = DefaultSource(this)
+	
 	private val manager = LinkManager(this)
 	private val receiveLock = Object()
 	private val sourceCore = SourceCore<T>()
@@ -24,15 +24,15 @@ class BufferBlock<T>(override val name: String = "buffer")
 				.any { it.target.offer(newId, it).positive }
 				.otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
 	}
-
+	
 	val count get() = sourceCore.bufferCount
-
+	
 	override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
 	override fun consume(id: Long, link: Link<T>) = sourceCore.consume(id).apply { if (this.first) link.record() }
-
+	
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.build(target, options)
 	override fun unlink(link: Link<T>) = manager.cancel(link)
-
+	
 	override fun receive(): T {
 		synchronized(receiveLock) {
 			var pair = sourceCore.consume()

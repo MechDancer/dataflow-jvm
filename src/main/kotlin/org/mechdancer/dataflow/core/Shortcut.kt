@@ -1,6 +1,5 @@
 package org.mechdancer.dataflow.core
 
-import org.mechdancer.dataflow.blocks.ActionBlock
 import org.mechdancer.dataflow.blocks.BroadcastBlock
 import org.mechdancer.dataflow.blocks.BufferBlock
 import org.mechdancer.dataflow.blocks.TransformBlock
@@ -34,7 +33,7 @@ operator fun <T> ISource<T>.minus(target: ITarget<T>) =
 		linkTo(target)
 
 operator fun <TIn, TOut> ISource<TIn>.minus(target: (TIn) -> TOut) =
-		org.mechdancer.dataflow.blocks.TransformBlock(map = target).also { linkTo(it) }
+		TransformBlock(map = target).also { linkTo(it) }
 
 //-------------------------------
 // build
@@ -46,12 +45,12 @@ fun <T> action(
 		action: (T) -> Unit
 ) = org.mechdancer.dataflow.blocks.ActionBlock(name, options, action)
 
-fun <T> broadcast(name: String = "broadcast") = org.mechdancer.dataflow.blocks.BroadcastBlock<T>(name)
+fun <T> broadcast(name: String = "broadcast") = BroadcastBlock<T>(name)
 
-fun <T> buffer(name: String = "buffer") = org.mechdancer.dataflow.blocks.BufferBlock<T>(name)
+fun <T> buffer(name: String = "buffer") = BufferBlock<T>(name)
 
 fun <TIn, TOut> transform(
 		name: String = "transform",
 		options: ExecutableOptions = executableOptions(),
 		map: (TIn) -> TOut
-) = org.mechdancer.dataflow.blocks.TransformBlock(name, options, map)
+) = TransformBlock(name, options, map)
