@@ -1,15 +1,22 @@
 package org.mechdancer.dataflow.core
 
-fun <TIn, TOut, TMid> encapsulate(
-		i: IPropagatorBlock<TIn, TMid>,
-		o: IPropagatorBlock<TMid, TOut>) =
-		object : IPropagatorBlock<TIn, TOut> {
-			init {
-				i linkTo o
-			}
+import java.util.*
 
-			override val name = "${i.name} -> ${o.name}"
+/**
+ * 封装
+ * 此方法将两个块合并成一个，但这样做只是让他们看起来是一个块，没有实际的效果，也不会在两个块之间建立通知的逻辑
+ */
+fun <TIn, TOut> encapsulate(
+		i: ITarget<TIn>,
+		o: ISource<TOut>,
+		name: String = "") =
+		object : IPropagatorBlock<TIn, TOut> {
+			override val uuid = UUID.randomUUID()
 			override val defaultSource = i.defaultSource
+			override val name =
+					if (name.isEmpty())
+						"${i.name} -> ${o.name}"
+					else name
 
 			override fun offer(id: Long, link: Link<TIn>) =
 					i.offer(id, link)
@@ -20,6 +27,6 @@ fun <TIn, TOut, TMid> encapsulate(
 			override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
 					o.linkTo(target, options)
 
-			override fun unlink(link: Link<TOut>) =
-					o.unlink(link)
+			override fun cancel(link: Link<TOut>) =
+					o.cancel(link)
 		}

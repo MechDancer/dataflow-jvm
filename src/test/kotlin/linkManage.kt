@@ -6,14 +6,14 @@ fun main(args: Array<String>) {
 	val bridge2 = transform { x: Int -> -x }
 	val begin = System.currentTimeMillis()
 	val link = link(source, bridge1)
-	//link(source, bridge2)
-	//source - { it > 0 } - { println(if (it) "+" else "-") }
+	link(source, bridge2)
 	bridge1 linkTo source
 	bridge2 linkTo source
 	source linkTo { println(link.eventCount / (System.currentTimeMillis() - begin)) }
-	source post 100
-	while (true) {
-		readLine()
-		println("收到: ${source.receive()}")
-	}
+
+	Link.view().forEach { println(it) }
+
+	link.dispose()
+
+	Link.view().forEach { println(it) }
 }

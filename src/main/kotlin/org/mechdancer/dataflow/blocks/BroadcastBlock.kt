@@ -1,9 +1,10 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
-import org.mechdancer.dataflow.core.internal.LinkManager
 import org.mechdancer.dataflow.core.internal.TargetCore
 import org.mechdancer.dataflow.core.internal.zip
+import java.util.*
+import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -12,12 +13,9 @@ import java.util.concurrent.atomic.AtomicLong
  */
 class BroadcastBlock<T>(override val name: String = "broadcast")
 	: IPropagatorBlock<T, T>, IReceivable<T> {
+	override val uuid = UUID.randomUUID()!!
 	override val defaultSource = DefaultSource(this)
-
-	/**
-	 * 存储已链接的节点
-	 */
-	private val manager = LinkManager(this)
+	private val links = ConcurrentSkipListSet<Link<T>>()
 
 	/**
 	 * 唯一Id分配器
@@ -46,8 +44,8 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 			buffer.clear()
 			buffer[newId] = event
 		}
-		manager.links
-				.filter { it.options.predicate(event) }
+		@Suppress("UNCHECKED_CAST")
+		links.filter { it.options.predicate(event) }
 				.forEach { it.target.offer(newId, it) }
 		synchronized(receiveLock) {
 			receivable = true
@@ -65,8 +63,12 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 				}
 			}
 
-	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = manager.build(target, options)
-	override fun unlink(link: Link<T>) = manager.cancel(link)
+	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
+			Link(this, target, options).apply {
+				links.add(this)
+			}
+
+	override fun cancel(link: Link<T>) = links.remove(link)
 
 	override fun receive(): T =
 			synchronized(receiveLock) {
@@ -74,5 +76,4 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 				@Suppress("UNCHECKED_CAST")
 				value as T
 			}
-
 }
