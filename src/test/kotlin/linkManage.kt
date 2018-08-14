@@ -12,8 +12,8 @@ fun main(args: Array<String>) {
 	source linkTo { println(link.eventCount / (System.currentTimeMillis() - begin)) }
 
 	Link.view().forEach { println(it) }
-
+	println("↑修改前↑")
 	link.dispose()
-
+	println("↓修改前↓")
 	Link.view().forEach { println(it) }
 }

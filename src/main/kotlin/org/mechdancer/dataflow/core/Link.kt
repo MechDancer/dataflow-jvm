@@ -17,7 +17,7 @@ class Link<T>(
 ) : Comparable<Link<*>> {
 	override fun compareTo(other: Link<*>) = id.compareTo(other.id)
 
-	val id = linkId.getAndIncrement()
+	val id = idAtomic.getAndIncrement()
 
 	init {
 		list.add(this)
@@ -39,7 +39,7 @@ class Link<T>(
 	override fun toString() = "$id: ${source.view()} -> ${target.view()}"
 
 	companion object {
-		private val linkId = AtomicLong(0)
+		private val idAtomic = AtomicLong(0)
 		private val list = ConcurrentSkipListSet<Link<*>>()
 
 		fun view() = list.toList()
