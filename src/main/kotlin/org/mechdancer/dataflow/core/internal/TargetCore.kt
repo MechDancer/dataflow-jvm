@@ -34,7 +34,7 @@ internal class TargetCore<T>(
 				parallelismDegree.decrementAndGet()
 				Postponed
 			} else
-				link.source.consume(id, link)
+				link.consume(id)
 						.let { pair ->
 							if (pair.first) {
 								val task = {

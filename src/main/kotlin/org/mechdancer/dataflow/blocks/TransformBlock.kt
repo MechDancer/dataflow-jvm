@@ -27,11 +27,8 @@ class TransformBlock<TIn, TOut>(
 	{ event ->
 		val out = map(event)
 		val newId = sourceCore.offer(out)
-		@Suppress("UNCHECKED_CAST")
-		Link.view()
-				.filter { it.source == this }
-				.map { it as Link<TIn> }
-				.filter { it.options.predicate(event) }
+		Link.find(this)
+				.filter { it.options.predicate(out) }
 				.any { it.target.offer(newId, it).positive }
 				.otherwise {
 					sourceCore.drop(newId)
@@ -56,8 +53,7 @@ class TransformBlock<TIn, TOut>(
 	//--------------------------
 
 	override fun offer(id: Long, link: Link<TIn>) = targetCore.offer(id, link)
-	override fun consume(id: Long, link: Link<TOut>) =
-			sourceCore.consume(id).apply { if (this.first) link.record() }
+	override fun consume(id: Long) = sourceCore.consume(id)
 
 	override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
 			Link(this, target, options)

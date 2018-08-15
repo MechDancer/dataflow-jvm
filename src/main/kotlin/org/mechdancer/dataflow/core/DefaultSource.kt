@@ -14,7 +14,7 @@ class DefaultSource<T>(owner: ITarget<T>) : ISource<T> {
 	private val link = Link(this, owner, linkOptions())
 	override val name = "default source of ${owner.view()}"
 
-	override fun consume(id: Long, link: Link<T>) = core.consume(id)
+	override fun consume(id: Long) = core.consume(id)
 
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = stub("这个方法没有任何作用")
 

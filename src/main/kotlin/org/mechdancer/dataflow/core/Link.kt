@@ -19,7 +19,7 @@ class Link<T> internal constructor(
 	override fun compareTo(other: Link<*>) = uuid.compareTo(other.uuid)
 
 	//唯一标识符
-	val uuid = UUID.randomUUID()
+	val uuid = UUID.randomUUID()!!
 
 	//构造时加入列表
 	init {
@@ -30,22 +30,27 @@ class Link<T> internal constructor(
 	private val _eventCount = AtomicLong(0)
 	val eventCount get() = _eventCount.get()
 
-	//记录一个事件通过了节点
-	//若达到上限则断开链接
-	fun record() {
-		if (_eventCount.incrementAndGet() > options.eventLimit)
-			dispose()
-	}
+	fun offer(id: Long) = target.offer(id, this)
+	fun consume(id: Long) =
+			source.consume(id).apply {
+				if (this.first && _eventCount.incrementAndGet() > options.eventLimit)
+					dispose()
+			}
 
 	//断开链接
 	fun dispose() = list.remove(this)
 
-	override fun toString() = "$[$uuid]: ${source.view()} -> ${target.view()}"
+	override fun toString() = "[$uuid]: ${source.view()} -> ${target.view()}"
 
 	companion object {
 		//全局链接列表
 		private val list = ConcurrentSkipListSet<Link<*>>()
 
 		fun view() = list.toList()
+
+		//按源从列表中查找
+		fun <T> find(source: ISource<T>) =
+				@Suppress("UNCHECKED_CAST")
+				list.filter { it.source === source }.map { it as Link<T> }
 	}
 }

@@ -19,10 +19,7 @@ class BufferBlock<T>(override val name: String = "buffer")
 	private val sourceCore = SourceCore<T>()
 	private val targetCore = TargetCore<T> { event ->
 		val newId = sourceCore.offer(event)
-		@Suppress("UNCHECKED_CAST")
-		Link.view()
-				.filter { it.source == this }
-				.map { it as Link<T> }
+		Link.find(this)
 				.filter { it.options.predicate(event) }
 				.any { it.target.offer(newId, it).positive }
 				.otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
@@ -31,8 +28,7 @@ class BufferBlock<T>(override val name: String = "buffer")
 	val count get() = sourceCore.bufferCount
 
 	override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
-	override fun consume(id: Long, link: Link<T>) =
-			sourceCore.consume(id).apply { if (this.first) link.record() }
+	override fun consume(id: Long) = sourceCore.consume(id)
 
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
 			Link(this, target, options)

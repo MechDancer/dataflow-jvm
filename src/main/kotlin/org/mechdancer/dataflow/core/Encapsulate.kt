@@ -18,11 +18,8 @@ fun <TIn, TOut> encapsulate(
 						"${i.name} -> ${o.name}"
 					else name
 
-			override fun offer(id: Long, link: Link<TIn>) =
-					i.offer(id, link)
-
-			override fun consume(id: Long, link: Link<TOut>) =
-					o.consume(id, link)
+			override fun offer(id: Long, link: Link<TIn>) = i.offer(id, link)
+			override fun consume(id: Long) = o.consume(id)
 
 			override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
 					o.linkTo(target, options)

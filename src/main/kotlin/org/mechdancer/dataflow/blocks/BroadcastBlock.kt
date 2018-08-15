@@ -42,12 +42,9 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 			buffer.clear()
 			buffer[newId] = event
 		}
-		@Suppress("UNCHECKED_CAST")
-		Link.view()
-				.filter { it.source == this }
-				.map { it as Link<T> }
+		Link.find(this)
 				.filter { it.options.predicate(event) }
-				.forEach { it.target.offer(newId, it) }
+				.forEach { it.offer(newId) }
 		synchronized(receiveLock) {
 			receivable = true
 			value = event
@@ -56,12 +53,9 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 	}
 
 	override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
-	override fun consume(id: Long, link: Link<T>): Pair<Boolean, T?> =
+	override fun consume(id: Long): Pair<Boolean, T?> =
 			synchronized(buffer) {
-				buffer.containsKey(id).zip {
-					link.record()
-					buffer[id]
-				}
+				buffer.containsKey(id).zip { buffer[id] }
 			}
 
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
