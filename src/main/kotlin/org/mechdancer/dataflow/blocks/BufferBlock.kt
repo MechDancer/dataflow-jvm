@@ -5,7 +5,6 @@ import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
 import org.mechdancer.dataflow.core.internal.otherwise
 import java.util.*
-import java.util.concurrent.ConcurrentSkipListSet
 
 /**
  * 缓冲模块
@@ -15,14 +14,16 @@ class BufferBlock<T>(override val name: String = "buffer")
 	: IPropagatorBlock<T, T>, IReceivable<T> {
 	override val uuid = UUID.randomUUID()!!
 	override val defaultSource = DefaultSource(this)
-	private val links = ConcurrentSkipListSet<Link<T>>()
 
 	private val receiveLock = Object()
 	private val sourceCore = SourceCore<T>()
 	private val targetCore = TargetCore<T> { event ->
 		val newId = sourceCore.offer(event)
 		@Suppress("UNCHECKED_CAST")
-		links.filter { it.options.predicate(event) }
+		Link.view()
+				.filter { it.source == this }
+				.map { it as Link<T> }
+				.filter { it.options.predicate(event) }
 				.any { it.target.offer(newId, it).positive }
 				.otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
 	}
@@ -34,11 +35,7 @@ class BufferBlock<T>(override val name: String = "buffer")
 			sourceCore.consume(id).apply { if (this.first) link.record() }
 
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-			Link(this, target, options).apply {
-				links.add(this)
-			}
-
-	override fun cancel(link: Link<T>) = links.remove(link)
+			Link(this, target, options)
 
 	override fun receive(): T {
 		synchronized(receiveLock) {

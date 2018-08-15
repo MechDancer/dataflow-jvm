@@ -14,9 +14,4 @@ interface ISource<T> : IBlock {
 	 * 链接到宿
 	 */
 	fun linkTo(target: ITarget<T>, options: LinkOptions<T> = linkOptions()): Link<T>
-
-	/**
-	 * 取消链接
-	 */
-	fun cancel(link: Link<T>): Boolean
 }

@@ -26,7 +26,4 @@ fun <TIn, TOut> encapsulate(
 
 			override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
 					o.linkTo(target, options)
-
-			override fun cancel(link: Link<TOut>) =
-					o.cancel(link)
 		}

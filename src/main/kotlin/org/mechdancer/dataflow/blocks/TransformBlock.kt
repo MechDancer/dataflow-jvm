@@ -5,7 +5,6 @@ import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
 import org.mechdancer.dataflow.core.internal.otherwise
 import java.util.*
-import java.util.concurrent.ConcurrentSkipListSet
 
 /**
  * 转换模块
@@ -18,7 +17,6 @@ class TransformBlock<TIn, TOut>(
 ) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut> {
 	override val uuid = UUID.randomUUID()!!
 	override val defaultSource = DefaultSource(this)
-	private val links = ConcurrentSkipListSet<Link<TOut>>()
 
 	//--------------------------
 	// ITarget & ISource
@@ -30,7 +28,10 @@ class TransformBlock<TIn, TOut>(
 		val out = map(event)
 		val newId = sourceCore.offer(out)
 		@Suppress("UNCHECKED_CAST")
-		links.filter { it.options.predicate(out) }
+		Link.view()
+				.filter { it.source == this }
+				.map { it as Link<TIn> }
+				.filter { it.options.predicate(event) }
 				.any { it.target.offer(newId, it).positive }
 				.otherwise {
 					sourceCore.drop(newId)
@@ -59,11 +60,7 @@ class TransformBlock<TIn, TOut>(
 			sourceCore.consume(id).apply { if (this.first) link.record() }
 
 	override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
-			Link(this, target, options).apply {
-				links.add(this)
-			}
-
-	override fun cancel(link: Link<TOut>) = links.remove(link)
+			Link(this, target, options)
 
 	override fun receive(): TOut =
 			synchronized(receiveLock) {

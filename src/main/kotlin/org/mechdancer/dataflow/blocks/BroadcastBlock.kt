@@ -4,7 +4,6 @@ import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.internal.TargetCore
 import org.mechdancer.dataflow.core.internal.zip
 import java.util.*
-import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -15,7 +14,6 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 	: IPropagatorBlock<T, T>, IReceivable<T> {
 	override val uuid = UUID.randomUUID()!!
 	override val defaultSource = DefaultSource(this)
-	private val links = ConcurrentSkipListSet<Link<T>>()
 
 	/**
 	 * 唯一Id分配器
@@ -45,7 +43,10 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 			buffer[newId] = event
 		}
 		@Suppress("UNCHECKED_CAST")
-		links.filter { it.options.predicate(event) }
+		Link.view()
+				.filter { it.source == this }
+				.map { it as Link<T> }
+				.filter { it.options.predicate(event) }
 				.forEach { it.target.offer(newId, it) }
 		synchronized(receiveLock) {
 			receivable = true
@@ -64,11 +65,7 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 			}
 
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-			Link(this, target, options).apply {
-				links.add(this)
-			}
-
-	override fun cancel(link: Link<T>) = links.remove(link)
+			Link(this, target, options)
 
 	override fun receive(): T =
 			synchronized(receiveLock) {

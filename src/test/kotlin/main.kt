@@ -6,7 +6,7 @@ fun main(args: Array<String>) {
 	val bridge2 = transform { x: Int -> -x }
 	val begin = System.currentTimeMillis()
 	val link = link(source, bridge1)
-	//link(source, bridge2)
+	link(source, bridge2)
 	//source - { it > 0 } - { println(if (it) "+" else "-") }
 	bridge1 linkTo source
 	bridge2 linkTo source

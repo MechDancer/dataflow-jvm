@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.core
 
 import org.mechdancer.dataflow.core.internal.view
+import java.util.*
 import java.util.concurrent.ConcurrentSkipListSet
 import java.util.concurrent.atomic.AtomicLong
 
@@ -10,36 +11,39 @@ import java.util.concurrent.atomic.AtomicLong
  * @param target 事件宿
  * @param options 链接选项
  */
-class Link<T>(
+class Link<T> internal constructor(
 		val source: ISource<T>,
 		val target: ITarget<T>,
 		val options: LinkOptions<T>
 ) : Comparable<Link<*>> {
-	override fun compareTo(other: Link<*>) = id.compareTo(other.id)
+	override fun compareTo(other: Link<*>) = uuid.compareTo(other.uuid)
 
-	val id = idAtomic.getAndIncrement()
+	//唯一标识符
+	val uuid = UUID.randomUUID()
 
+	//构造时加入列表
 	init {
 		list.add(this)
 	}
 
+	//对通过链接的事件计数
 	private val _eventCount = AtomicLong(0)
 	val eventCount get() = _eventCount.get()
 
+	//记录一个事件通过了节点
+	//若达到上限则断开链接
 	fun record() {
 		if (_eventCount.incrementAndGet() > options.eventLimit)
 			dispose()
 	}
 
-	fun dispose() {
-		source.cancel(this)
-		list.remove(this)
-	}
+	//断开链接
+	fun dispose() = list.remove(this)
 
-	override fun toString() = "$id: ${source.view()} -> ${target.view()}"
+	override fun toString() = "$[$uuid]: ${source.view()} -> ${target.view()}"
 
 	companion object {
-		private val idAtomic = AtomicLong(0)
+		//全局链接列表
 		private val list = ConcurrentSkipListSet<Link<*>>()
 
 		fun view() = list.toList()
