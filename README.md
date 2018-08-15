@@ -1,6 +1,6 @@
 # 计算图模型的JVM实现
 
-[![Download](https://api.bintray.com/packages/mechdancer/maven/dataflow-jvm/images/download.svg) ](https://bintray.com/mechdancer/maven/dataflow-jvm/_latestVersion)
+[![Download](https://api.bintray.com/packages/mechdancer/maven/dataflow-jvm/images/download.svg) ](https://bintray.com/mechdancer/maven/dataflow-jvm/_latestVersion) [![Build Status](https://www.travis-ci.org/MechDancer/dataflow-jvm.svg?branch=master)](https://www.travis-ci.org/MechDancer/dataflow-jvm)
 
 此项目模仿微软的 [数据流（任务并行库）](https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/dataflow-task-parallel-library?view=netcore-2.1)，目标是在Java虚拟机实现可用于机器人系统的并行计算网络。
 
