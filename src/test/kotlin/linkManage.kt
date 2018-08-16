@@ -2,9 +2,9 @@ import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.linkManage.treeView
 
 fun main(args: Array<String>) {
-	val i = Object()
+	val lock = Object()
 	Link.changed linkTo { list ->
-		synchronized(i) {
+		synchronized(lock) {
 			println(list.size)
 			list.forEach { println(it) }
 			println()
@@ -22,5 +22,6 @@ fun main(args: Array<String>) {
 	bridge2 linkTo source
 	source linkTo { println(link.eventCount / (System.currentTimeMillis() - begin)) }
 
+	Link.view().forEach { println(it) }
 	println(source.treeView())
 }
