@@ -4,6 +4,10 @@ import org.mechdancer.dataflow.blocks.BroadcastBlock
 import org.mechdancer.dataflow.blocks.BufferBlock
 import org.mechdancer.dataflow.blocks.TransformBlock
 
+//-------------------------------
+// post
+//-------------------------------
+
 infix fun <T> ITarget<T>.post(event: T) =
 		defaultSource.offer(event).let { offer(it.first, it.second) }
 

@@ -23,7 +23,10 @@ class Link<T> internal constructor(
 
 	//构造时加入列表
 	init {
-		list.add(this)
+		if (this.source !is DefaultSource<T>) {
+			list.add(this)
+			changed.post(list.toList())
+		}
 	}
 
 	//对通过链接的事件计数
@@ -38,13 +41,16 @@ class Link<T> internal constructor(
 			}
 
 	//断开链接
-	fun dispose() = list.remove(this)
+	fun dispose() = list.remove(this).also { if (it) changed.post(list.toList()) }
 
 	override fun toString() = "[$uuid]: ${source.view()} -> ${target.view()}"
 
 	companion object {
 		//全局链接列表
 		private val list = ConcurrentSkipListSet<Link<*>>()
+
+		//拓扑改变事件
+		val changed = broadcast<List<Link<*>>>("LinkInfo")
 
 		fun view() = list.toList()
 
