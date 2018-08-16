@@ -23,42 +23,47 @@ private fun IBlock.treeView(
 		builder: StringBuilder,
 		already: MutableList<IBlock>,
 		indent: Long) {
+	//显示自己
 	builder.append("$name[$uuid]")
+	//判断环路
 	if (this in already) {
-		builder.append("[Loop!]\n")
-	} else {
-		builder.append("\n")
-		already.add(this)
-		val branch = this as? ISource<*>
-		if (branch != null) {
-			val format = { block: Link<*>, last: Boolean ->
-				val list = mutableListOf<Boolean>()
-				var copy = indent
-				while (copy > 1) {
-					list.add(copy % 2 > 0)
-					copy /= 2
-				}
-				list.reverse()
-				list.forEach { builder.append(if (it) " │" else "  ") }
-				if (!last) {
-					builder.append(" ├─")
-					block.target.treeView(
-							builder,
-							already,
-							2 * indent + 1)
-				} else {
-					builder.append(" └─")
-					block.target.treeView(
-							builder,
-							already,
-							2 * indent + 0)
-				}
-			}
-			val list = Link.find(branch)
-			if (list.isNotEmpty()) {
-				list.dropLast(1).forEach { format(it, false) }
-				format(list.last(), true)
-			}
+		builder.append("[Loop!!!]\n")
+		return
+	}
+	already.add(this)
+	builder.append("\n")
+	//判断子树
+	val branch = (this as? ISource<*>)
+			?.let { Link.find(it) }
+			?.takeIf { it.isNotEmpty() }
+			?: return
+	//画图函数
+	val format = { block: Link<*>, last: Boolean ->
+		//画缩进
+		val list = mutableListOf<Boolean>()
+		var copy = indent
+		while (copy > 1) {
+			list.add(copy % 2 > 0)
+			copy /= 2
+		}
+		list.reverse()
+		list.forEach { builder.append(if (it) " │ " else "   ") }
+		//画子树
+		if (!last) {
+			builder.append(" ├─")
+			block.target.treeView(
+					builder,
+					already,
+					2 * indent + 1)
+		} else {
+			builder.append(" └─")
+			block.target.treeView(
+					builder,
+					already,
+					2 * indent + 0)
 		}
 	}
+	//画图
+	branch.dropLast(1).forEach { format(it, false) }
+	format(branch.last(), true)
 }

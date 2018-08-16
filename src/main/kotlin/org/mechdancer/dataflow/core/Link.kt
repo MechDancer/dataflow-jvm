@@ -52,6 +52,7 @@ class Link<T> internal constructor(
 		//拓扑改变事件
 		val changed = broadcast<List<Link<*>>>("LinkInfo")
 
+		//查看当前拓扑
 		fun view() = list.toList()
 
 		//按源从列表中查找

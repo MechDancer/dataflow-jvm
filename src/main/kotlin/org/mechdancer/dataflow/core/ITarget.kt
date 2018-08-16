@@ -1,11 +1,12 @@
 package org.mechdancer.dataflow.core
 
+
 interface ITarget<T> : IBlock {
     /**
      * 默认源
      * 储存来自外部的事件
      */
-    val defaultSource: org.mechdancer.dataflow.core.DefaultSource<T>
+    val defaultSource: DefaultSource<T>
 
     /**
      * 通知目标节点，链接了该节点的某个源有事件到来
