@@ -18,7 +18,7 @@ class Link<T> internal constructor(
 ) : Comparable<Link<*>> {
 	override fun compareTo(other: Link<*>) = uuid.compareTo(other.uuid)
 
-	//唯一标识符
+	/** 唯一标识符 */
 	val uuid = UUID.randomUUID()!!
 
 	//构造时加入列表
@@ -30,17 +30,22 @@ class Link<T> internal constructor(
 	}
 
 	//对通过链接的事件计数
-	private val _eventCount = AtomicLong(0)
-	val eventCount get() = _eventCount.get()
+	private val _count = AtomicLong(0)
+
+	/** 消息计数 */
+	val count get() = _count.get()
+
+	/** 剩余消息数 */
+	val rest get() = options.eventLimit - count
 
 	fun offer(id: Long) = target.offer(id, this)
 	fun consume(id: Long) =
 		source.consume(id).apply {
-			if (this.first && _eventCount.incrementAndGet() > options.eventLimit)
+			if (this.first && _count.incrementAndGet() > options.eventLimit)
 				dispose()
 		}
 
-	//断开链接
+	/** 断开链接 */
 	fun dispose() = list.remove(this).also { if (it) changed.post(list.toList()) }
 
 	override fun toString() = "[$uuid]: ${source.view()} -> ${target.view()}"

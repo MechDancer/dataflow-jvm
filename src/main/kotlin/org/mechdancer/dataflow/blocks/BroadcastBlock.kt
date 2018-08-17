@@ -16,6 +16,7 @@ class BroadcastBlock<T>(
 	: IPropagatorBlock<T, T>, IReceivable<T> {
 	override val uuid = UUID.randomUUID()!!
 	override val defaultSource = DefaultSource(this)
+	override val snapshot get() = targetCore.snapshot
 
 	/**
 	 * 唯一Id分配器

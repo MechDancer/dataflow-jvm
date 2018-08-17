@@ -14,15 +14,16 @@ class BufferBlock<T>(override val name: String = "buffer")
 	: IPropagatorBlock<T, T>, IReceivable<T> {
 	override val uuid = UUID.randomUUID()!!
 	override val defaultSource = DefaultSource(this)
+	override val snapshot get() = targetCore.snapshot
 
 	private val receiveLock = Object()
 	private val sourceCore = SourceCore<T>()
 	private val targetCore = TargetCore<T> { event ->
 		val newId = sourceCore.offer(event)
 		Link.find(this)
-				.filter { it.options.predicate(event) }
-				.any { it.target.offer(newId, it).positive }
-				.otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
+			.filter { it.options.predicate(event) }
+			.any { it.target.offer(newId, it).positive }
+			.otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
 	}
 
 	val count get() = sourceCore.bufferCount
@@ -31,7 +32,7 @@ class BufferBlock<T>(override val name: String = "buffer")
 	override fun consume(id: Long) = sourceCore.consume(id)
 
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-			Link(this, target, options)
+		Link(this, target, options)
 
 	override fun receive(): T {
 		synchronized(receiveLock) {

@@ -11,7 +11,7 @@ fun main(args: Array<String>) {
 	source - { it > 0 } - { println(if (it) "+" else "-") }
 	bridge1 linkTo source
 	bridge2 linkTo source
-	source linkTo { println(link.eventCount / (System.currentTimeMillis() - begin)) }
+	source linkTo { println(link.count / (System.currentTimeMillis() - begin)) }
 	source post 100
 	while (true) {
 		readLine()

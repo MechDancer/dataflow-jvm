@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
 	source - { it > 0 } - { println(if (it) "+" else "-") }
 	bridge1 linkTo source
 	bridge2 linkTo source
-	source linkTo { println(link.eventCount / (System.currentTimeMillis() - begin)) }
+	source linkTo { println(link.count / (System.currentTimeMillis() - begin)) }
 
 	Link.all().forEach { println(it) }
 	println(source.treeView())
