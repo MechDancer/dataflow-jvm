@@ -10,7 +10,9 @@ import java.util.concurrent.atomic.AtomicLong
  * 广播节点
  * 堆中的事件只会被新事件顶替，不会因为接收而消耗
  */
-class BroadcastBlock<T>(override val name: String = "broadcast")
+class BroadcastBlock<T>(
+	override val name: String = "broadcast",
+	private val clone: ((T?) -> T)? = null)
 	: IPropagatorBlock<T, T>, IReceivable<T> {
 	override val uuid = UUID.randomUUID()!!
 	override val defaultSource = DefaultSource(this)
@@ -43,8 +45,8 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 			buffer[newId] = event
 		}
 		Link.find(this)
-				.filter { it.options.predicate(event) }
-				.forEach { it.offer(newId) }
+			.filter { it.options.predicate(event) }
+			.forEach { it.offer(newId) }
 		synchronized(receiveLock) {
 			receivable = true
 			value = event
@@ -54,17 +56,17 @@ class BroadcastBlock<T>(override val name: String = "broadcast")
 
 	override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
 	override fun consume(id: Long): Pair<Boolean, T?> =
-			synchronized(buffer) {
-				buffer.containsKey(id).zip { buffer[id] }
-			}
+		synchronized(buffer) {
+			buffer.containsKey(id).zip { buffer[id].let { clone?.invoke(it) ?: it } }
+		}
 
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-			Link(this, target, options)
+		Link(this, target, options)
 
 	override fun receive(): T =
-			synchronized(receiveLock) {
-				while (!receivable) receiveLock.wait()
-				@Suppress("UNCHECKED_CAST")
-				value as T
-			}
+		synchronized(receiveLock) {
+			while (!receivable) receiveLock.wait()
+			@Suppress("UNCHECKED_CAST")
+			value as T
+		}
 }
