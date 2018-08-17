@@ -22,6 +22,6 @@ fun main(args: Array<String>) {
 	bridge2 linkTo source
 	source linkTo { println(link.eventCount / (System.currentTimeMillis() - begin)) }
 
-	Link.view().forEach { println(it) }
+	Link.all().forEach { println(it) }
 	println(source.treeView())
 }
