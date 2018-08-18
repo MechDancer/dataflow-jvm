@@ -12,7 +12,7 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.starProjectedType
 
-class EventBusImpl internal constructor() : EventBus {
+class EventBusImpl : EventBus {
 
 	private val stickyEvents: ConcurrentHashMap<KClass<*>, IEvent> = ConcurrentHashMap()
 
@@ -22,7 +22,9 @@ class EventBusImpl internal constructor() : EventBus {
 	fun subscribe(receiver: Any, kFunction: KFunction<Unit>) {
 		kFunction.let { f ->
 			links[f] = broadcast linkTo {
-				kFunction.call(receiver, it)
+				if (it::class.starProjectedType ==
+						f.parameters[1].type)
+					f.call(receiver, it)
 			}
 		}
 	}
@@ -40,7 +42,9 @@ class EventBusImpl internal constructor() : EventBus {
 				subscribe(receiver, f as KFunction<Unit>)
 				if (it.sticky)
 					stickyEvents.forEach { _, e ->
-						f.call(receiver, e)
+						if (it::class.starProjectedType ==
+								f.parameters[1].type)
+							f.call(receiver, e)
 					}
 			}
 		}

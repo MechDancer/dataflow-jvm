@@ -10,10 +10,13 @@ interface EventBus {
 	fun post(event: IEvent)
 	fun postSticky(event: IEvent)
 
-	fun getStickyEvent(kClass: KClass<*>):IEvent?
+	fun getStickyEvent(kClass: KClass<*>): IEvent?
 	fun removeStickyEvent(kClass: KClass<*>): Boolean
 	fun removeAllStickyEvents()
+
 	companion object {
-		val getDefault: EventBus by lazy { EventBusImpl() }
+		private val defaultInstance: EventBus by lazy { EventBusImpl() }
+
+		fun getDefault() = defaultInstance
 	}
 }

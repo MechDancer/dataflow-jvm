@@ -7,8 +7,9 @@ class EventBusTest {
 	@Test
 	fun test() {
 		val e = ShitEvent(233)
-		EventBus.getDefault.postSticky(e)
+		EventBus.getDefault().postSticky(e)
 		val a = A()
+		EventBus.getDefault().removeAllStickyEvents()
 		Thread.sleep(100)
 		println(a.a)
 
@@ -21,13 +22,11 @@ class A {
 	var a = 1
 
 	init {
-		EventBus.getDefault.register(this)
+		EventBus.getDefault().register(this)
 	}
 
 	@Subscribe(sticky = true)
-	fun onShit(e: IEvent) {
-		when (e) {
-			is ShitEvent -> a = e.id
-		}
+	fun onShit(e: ShitEvent) {
+		a = e.id
 	}
 }
