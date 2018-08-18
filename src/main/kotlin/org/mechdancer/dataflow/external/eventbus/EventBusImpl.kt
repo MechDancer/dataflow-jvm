@@ -23,6 +23,8 @@ class EventBusImpl : EventBus {
 		kFunction.let { f ->
 			links[f] = broadcast linkTo {
 				if (it::class.starProjectedType ==
+						f.parameters[1].type ||
+						IEvent::class.starProjectedType ==
 						f.parameters[1].type)
 					f.call(receiver, it)
 			}
@@ -43,8 +45,10 @@ class EventBusImpl : EventBus {
 				if (it.sticky)
 					stickyEvents.forEach { _, e ->
 						if (it::class.starProjectedType ==
+								f.parameters[1].type ||
+								IEvent::class.starProjectedType ==
 								f.parameters[1].type)
-							f.call(receiver, e)
+							f.call(receiver, it)
 					}
 			}
 		}
