@@ -48,7 +48,7 @@ class EventBusImpl : EventBus {
 								f.parameters[1].type ||
 								IEvent::class.starProjectedType ==
 								f.parameters[1].type)
-							f.call(receiver, it)
+							f.call(receiver, e)
 					}
 			}
 		}
