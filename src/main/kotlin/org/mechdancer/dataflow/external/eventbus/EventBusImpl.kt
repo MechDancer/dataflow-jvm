@@ -31,7 +31,7 @@ class EventBusImpl : EventBus {
 		}
 	}
 
-	fun unSubscribe(kFunction: KFunction<Unit>) {
+	fun unsubscribe(kFunction: KFunction<Unit>) {
 		links.remove(kFunction)?.dispose()
 	}
 
@@ -39,16 +39,12 @@ class EventBusImpl : EventBus {
 		receiver::class.memberFunctions.filter {
 			it.returnType == Unit::class.starProjectedType
 		}.forEach { f ->
-			f.findAnnotation<Subscribe>()?.let {
+			f.findAnnotation<Subscribe>()?.let { subscribe ->
 				@Suppress("UNCHECKED_CAST")
 				subscribe(receiver, f as KFunction<Unit>)
-				if (it.sticky)
+				if (subscribe.sticky)
 					stickyEvents.forEach { _, e ->
-						if (it::class.starProjectedType ==
-								f.parameters[1].type ||
-								IEvent::class.starProjectedType ==
-								f.parameters[1].type)
-							f.call(receiver, e)
+						links[f]?.target?.post(e)
 					}
 			}
 		}
@@ -60,7 +56,7 @@ class EventBusImpl : EventBus {
 		}.forEach { f ->
 			f.annotations.find { it is Subscribe }?.let {
 				@Suppress("UNCHECKED_CAST")
-				unSubscribe(f as KFunction<Unit>)
+				unsubscribe(f as KFunction<Unit>)
 			}
 		}
 	}
@@ -74,9 +70,9 @@ class EventBusImpl : EventBus {
 		post(event)
 	}
 
-	override fun getStickyEvent(kClass: KClass<*>): IEvent? = stickyEvents[kClass]
+	override fun getStickyEvent(kClass: KClass<out IEvent>): IEvent? = stickyEvents[kClass]
 
-	override fun removeStickyEvent(kClass: KClass<*>): Boolean =
+	override fun removeStickyEvent(kClass: KClass<out IEvent>): Boolean =
 			stickyEvents.remove(kClass)?.run { true } ?: false
 
 
