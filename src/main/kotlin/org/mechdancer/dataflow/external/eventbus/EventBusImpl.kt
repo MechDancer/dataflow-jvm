@@ -6,6 +6,7 @@ import org.mechdancer.dataflow.core.linkTo
 import org.mechdancer.dataflow.core.post
 import org.mechdancer.dataflow.external.eventbus.annotations.Subscribe
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executor
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
@@ -17,7 +18,7 @@ class EventBusImpl : EventBus {
 	private val stickyEvents: ConcurrentHashMap<KClass<*>, IEvent> = ConcurrentHashMap()
 
 	private val broadcast = BroadcastBlock<IEvent>()
-	private val links = hashMapOf<KFunction<Unit>, Link<IEvent>>()
+	private val links = hashMapOf<KFunction<Unit>, Pair<Link<IEvent>, Executor?>>()
 
 	fun subscribe(receiver: Any, kFunction: KFunction<Unit>) {
 		kFunction.let { f ->
@@ -26,13 +27,21 @@ class EventBusImpl : EventBus {
 						f.parameters[1].type ||
 						IEvent::class.starProjectedType ==
 						f.parameters[1].type)
-					f.call(receiver, it)
-			}
+					links[f]?.second?.execute {
+						f.call(receiver, it)
+					} ?: f.call(receiver, it)
+			} to null
 		}
 	}
 
 	fun unsubscribe(kFunction: KFunction<Unit>) {
-		links.remove(kFunction)?.dispose()
+		links.remove(kFunction)?.first?.dispose()
+	}
+
+	fun setDispatcher(kFunction: KFunction<Unit>, dispatcher: Executor?) {
+		links[kFunction]?.let {
+			links[kFunction] = it.copy(second = dispatcher)
+		}
 	}
 
 	override fun register(receiver: Any) {
@@ -44,7 +53,7 @@ class EventBusImpl : EventBus {
 				subscribe(receiver, f as KFunction<Unit>)
 				if (subscribe.sticky)
 					stickyEvents.forEach { _, e ->
-						links[f]?.target?.post(e)
+						links[f]?.first?.target?.post(e)
 					}
 			}
 		}

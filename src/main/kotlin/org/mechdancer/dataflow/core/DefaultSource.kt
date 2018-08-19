@@ -10,7 +10,7 @@ import java.util.*
  * 为来自外部的事件提供堆
  */
 class DefaultSource<T>(owner: ITarget<T>) : ISource<T> {
-	override val uuid = UUID.randomUUID()!!
+	override val uuid: UUID = UUID.randomUUID()
 	private val link = Link(this, owner, linkOptions())
 	override val name = "default source of ${owner.view()}"
 

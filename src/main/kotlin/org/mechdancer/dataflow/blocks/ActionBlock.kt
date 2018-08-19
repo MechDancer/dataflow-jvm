@@ -9,7 +9,7 @@ class ActionBlock<T>(
 	options: ExecutableOptions = executableOptions(),
 	action: (T) -> Unit
 ) : ITarget<T> {
-	override val uuid = UUID.randomUUID()!!
+	override val uuid: UUID = UUID.randomUUID()
 	override val defaultSource = DefaultSource(this)
 	override val snapshot get() = core.snapshot
 	private val core = TargetCore(options, action)

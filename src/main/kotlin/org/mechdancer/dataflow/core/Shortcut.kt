@@ -1,5 +1,6 @@
 package org.mechdancer.dataflow.core
 
+import org.mechdancer.dataflow.blocks.ActionBlock
 import org.mechdancer.dataflow.blocks.BroadcastBlock
 import org.mechdancer.dataflow.blocks.BufferBlock
 import org.mechdancer.dataflow.blocks.TransformBlock
@@ -47,7 +48,7 @@ fun <T> action(
 		name: String = "action",
 		options: ExecutableOptions = executableOptions(),
 		action: (T) -> Unit
-) = org.mechdancer.dataflow.blocks.ActionBlock(name, options, action)
+) = ActionBlock(name, options, action)
 
 fun <T> broadcast(name: String = "broadcast") = BroadcastBlock<T>(name)
 

@@ -15,7 +15,7 @@ class TransformBlock<TIn, TOut>(
 	options: ExecutableOptions = executableOptions(),
 	private val map: (TIn) -> TOut
 ) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut> {
-	override val uuid = UUID.randomUUID()!!
+	override val uuid: UUID = UUID.randomUUID()
 	override val defaultSource = DefaultSource(this)
 	override val snapshot get() = targetCore.snapshot
 

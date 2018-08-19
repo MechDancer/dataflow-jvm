@@ -1,15 +1,20 @@
 import org.junit.Test
 import org.mechdancer.dataflow.external.eventbus.EventBus
+import org.mechdancer.dataflow.external.eventbus.EventBusImpl
 import org.mechdancer.dataflow.external.eventbus.IEvent
 import org.mechdancer.dataflow.external.eventbus.annotations.Subscribe
+import java.util.concurrent.ForkJoinPool
 
 class EventBusTest {
 	@Test
 	fun test() {
-		val e = ShitEvent(233)
-		EventBus.getDefault().postSticky(e)
+
 		val a = A()
-		EventBus.getDefault().removeAllStickyEvents()
+		val e = ShitEvent(233)
+
+		(EventBus.getDefault() as EventBusImpl).setDispatcher(A::onShit, ForkJoinPool.commonPool())
+
+		EventBus.getDefault().post(e)
 		Thread.sleep(100)
 		println(a.a)
 
@@ -25,7 +30,7 @@ class A {
 		EventBus.getDefault().register(this)
 	}
 
-	@Subscribe(sticky = true)
+	@Subscribe
 	fun onShit(e: ShitEvent) {
 		a = e.id
 	}
