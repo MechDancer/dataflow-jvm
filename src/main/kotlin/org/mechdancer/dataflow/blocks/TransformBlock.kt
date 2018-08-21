@@ -11,9 +11,9 @@ import java.util.*
  * @param map 转换函数
  */
 class TransformBlock<TIn, TOut>(
-	override val name: String = "transform",
-	options: ExecutableOptions = executableOptions(),
-	private val map: (TIn) -> TOut
+		override val name: String = "transform",
+		options: ExecutableOptions = ExecutableOptions(),
+		private val map: (TIn) -> TOut
 ) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut> {
 	override val uuid: UUID = UUID.randomUUID()
 	override val defaultSource = DefaultSource(this)

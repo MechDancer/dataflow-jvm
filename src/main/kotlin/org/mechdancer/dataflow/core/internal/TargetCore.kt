@@ -1,11 +1,10 @@
 package org.mechdancer.dataflow.core.internal
 
-import org.mechdancer.dataflow.annotations.ThreadSafe
+import org.mechdancer.dataflow.annotations.ThreadSafety
 import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.Feedback.*
 import org.mechdancer.dataflow.core.Link
-import org.mechdancer.dataflow.core.executableOptions
 import org.mechdancer.dataflow.core.monitor.TargetSnapshot
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.ForkJoinPool
@@ -15,10 +14,10 @@ import java.util.concurrent.atomic.AtomicInteger
  * 目的节点的通用内核
  * @param action 目的节点接收事件后的动作
  */
-@ThreadSafe
+@ThreadSafety
 internal class TargetCore<T>(
-	private val options: ExecutableOptions = executableOptions(),
-	private val action: (T) -> Unit
+		private val options: ExecutableOptions = ExecutableOptions(),
+		private val action: (T) -> Unit
 ) {
 	private companion object {
 		val defaultDispatcher = ForkJoinPool()

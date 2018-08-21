@@ -12,5 +12,5 @@ interface ISource<T> : IBlock {
 	/**
 	 * 链接到宿
 	 */
-	fun linkTo(target: ITarget<T>, options: LinkOptions<T> = linkOptions()): Link<T>
+	fun linkTo(target: ITarget<T>, options: LinkOptions<T> = LinkOptions()): Link<T>
 }

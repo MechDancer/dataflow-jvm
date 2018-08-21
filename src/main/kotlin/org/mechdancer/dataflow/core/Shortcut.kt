@@ -10,44 +10,44 @@ import org.mechdancer.dataflow.blocks.TransformBlock
 //-------------------------------
 
 infix fun <T> ITarget<T>.post(event: T) =
-		defaultSource.offer(event).let { offer(it.first, it.second) }
+        defaultSource.offer(event).let { offer(it.first, it.second) }
 
 //-------------------------------
 // link
 //-------------------------------
 
 infix fun <T> ISource<T>.linkTo(target: ITarget<T>) =
-		linkTo(target)
+        linkTo(target)
 
 infix fun <T> ISource<T>.linkTo(target: (T) -> Unit) =
-		linkTo(org.mechdancer.dataflow.blocks.ActionBlock(action = target))
+        linkTo(org.mechdancer.dataflow.blocks.ActionBlock(action = target))
 
 fun <T> link(source: ISource<T>, target: ITarget<T>) =
-		source.linkTo(target)
+        source.linkTo(target)
 
-fun <T> link(source: ISource<T>, target: ITarget<T>, count: Int) =
-		source.linkTo(target, linkOptions(count))
+fun <T> link(source: ISource<T>, target: ITarget<T>, eventLimit: Int) =
+        source.linkTo(target, LinkOptions(eventLimit = eventLimit))
 
 fun <T> link(source: ISource<T>, target: ITarget<T>, predicate: (T) -> Boolean) =
-		source.linkTo(target, linkOptions(predicate))
+        source.linkTo(target, LinkOptions(predicate))
 
 fun <T> link(source: ISource<T>, target: ITarget<T>, options: LinkOptions<T>) =
-		source.linkTo(target, options)
+        source.linkTo(target, options)
 
 operator fun <T> ISource<T>.minus(target: ITarget<T>) =
-		linkTo(target)
+        linkTo(target)
 
 operator fun <TIn, TOut> ISource<TIn>.minus(target: (TIn) -> TOut) =
-		TransformBlock(map = target).also { linkTo(it) }
+        TransformBlock(map = target).also { linkTo(it) }
 
 //-------------------------------
 // build
 //-------------------------------
 
 fun <T> action(
-		name: String = "action",
-		options: ExecutableOptions = executableOptions(),
-		action: (T) -> Unit
+        name: String = "action",
+        options: ExecutableOptions = ExecutableOptions(),
+        action: (T) -> Unit
 ) = ActionBlock(name, options, action)
 
 fun <T> broadcast(name: String = "broadcast") = BroadcastBlock<T>(name)
@@ -55,7 +55,7 @@ fun <T> broadcast(name: String = "broadcast") = BroadcastBlock<T>(name)
 fun <T> buffer(name: String = "buffer") = BufferBlock<T>(name)
 
 fun <TIn, TOut> transform(
-		name: String = "transform",
-		options: ExecutableOptions = executableOptions(),
-		map: (TIn) -> TOut
+        name: String = "transform",
+        options: ExecutableOptions = ExecutableOptions(),
+        map: (TIn) -> TOut
 ) = TransformBlock(name, options, map)

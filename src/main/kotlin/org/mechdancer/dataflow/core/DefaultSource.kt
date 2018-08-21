@@ -11,7 +11,7 @@ import java.util.*
  */
 class DefaultSource<T>(owner: ITarget<T>) : ISource<T> {
 	override val uuid: UUID = UUID.randomUUID()
-	private val link = Link(this, owner, linkOptions())
+	private val link = Link(this, owner, LinkOptions())
 	override val name = "default source of ${owner.view()}"
 
 	override fun consume(id: Long) = core.consume(id)

@@ -1,13 +1,13 @@
 package org.mechdancer.dataflow.core.internal
 
-import org.mechdancer.dataflow.annotations.ThreadSafe
+import org.mechdancer.dataflow.annotations.ThreadSafety
 import java.util.concurrent.atomic.AtomicLong
 
 /**
  * 源节点的通用内核
  * 提供事件管理和基于散列的事件缓存
  */
-@ThreadSafe
+@ThreadSafety
 internal class SourceCore<T> {
 	/**
 	 * 原子长整型，用于生成唯一Id
