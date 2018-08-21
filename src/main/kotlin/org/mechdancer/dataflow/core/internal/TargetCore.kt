@@ -48,7 +48,7 @@ internal class TargetCore<T>(
 							while (parallelismDegree.get() < options.parallelismDegree)
 								unbind()?.let { offer(it.first, it.second) } ?: break
 						}
-						(options.dispatcher ?: defaultDispatcher).execute(task)
+                        (options.executor ?: defaultDispatcher).execute(task)
 						Accepted
 					} else {
 						parallelismDegree.decrementAndGet()
