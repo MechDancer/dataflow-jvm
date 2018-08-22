@@ -16,6 +16,19 @@ class SubNetBlock<TIn, TOut>(
     override val uuid = UUID.randomUUID()!!
     override val defaultSource = DefaultSource(this)
 
+    /**
+     * 链接信息
+     * 子网节点使用此信息构造内部拓扑
+     */
+    data class LinkInfo<T>(
+        val source: ISource<T>,
+        val target: ITarget<T>,
+        val options: LinkOptions<T> = LinkOptions()
+    )
+
+    private infix fun <T> LinkInfo<T>.buildIn(subNet: String) =
+        Link(source, target, options, subNet)
+
     init {
         assert(
             links.any { it.source === i } && links.any { it.target === o }

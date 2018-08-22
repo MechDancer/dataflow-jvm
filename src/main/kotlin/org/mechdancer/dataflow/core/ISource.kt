@@ -9,8 +9,6 @@ interface ISource<T> : IBlock {
      */
     fun consume(id: Long): Pair<Boolean, T?>
 
-    /**
-     * 链接到宿
-     */
+    /** 链接到宿 */
     fun linkTo(target: ITarget<T>, options: LinkOptions<T> = LinkOptions()): Link<T>
 }
