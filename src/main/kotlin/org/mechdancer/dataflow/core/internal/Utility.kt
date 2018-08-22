@@ -13,7 +13,7 @@ internal fun Boolean.otherwise(block: () -> Unit): Boolean {
 }
 
 internal fun <T> Boolean.zip(block: () -> T) =
-        this to if (this) block() else null
+    this to if (this) block() else null
 
 internal fun stub(message: String): Nothing = throw UnsupportedOperationException(message)
 

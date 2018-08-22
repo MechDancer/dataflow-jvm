@@ -11,9 +11,9 @@ import java.util.*
  * @param map 转换函数
  */
 class TransformBlock<TIn, TOut>(
-        override val name: String = "transform",
-        options: ExecutableOptions = ExecutableOptions(),
-        private val map: (TIn) -> TOut
+    override val name: String = "transform",
+    options: ExecutableOptions = ExecutableOptions(),
+    private val map: (TIn) -> TOut
 ) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut> {
     override val uuid: UUID = UUID.randomUUID()
     override val defaultSource by lazy { DefaultSource(this) }
@@ -28,16 +28,16 @@ class TransformBlock<TIn, TOut>(
         val out = map(event)
         val newId = sourceCore.offer(out)
         Link[this]
-                .filter { it.options.predicate(out) }
-                .any { it.target.offer(newId, it).positive }
-                .otherwise {
-                    sourceCore.drop(newId)
-                    synchronized(receiveLock) {
-                        receivable = true
-                        value = out
-                        receiveLock.notifyAll()
-                    }
+            .filter { it.options.predicate(out) }
+            .any { it.target.offer(newId, it).positive }
+            .otherwise {
+                sourceCore.drop(newId)
+                synchronized(receiveLock) {
+                    receivable = true
+                    value = out
+                    receiveLock.notifyAll()
                 }
+            }
     }
 
     //--------------------------
@@ -56,13 +56,13 @@ class TransformBlock<TIn, TOut>(
     override fun consume(id: Long) = sourceCore.consume(id)
 
     override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
-            Link(this, target, options)
+        Link(this, target, options)
 
     override fun receive(): TOut =
-            synchronized(receiveLock) {
-                while (!receivable) receiveLock.wait()
-                receivable = false
-                @Suppress("UNCHECKED_CAST")
-                value as TOut
-            }
+        synchronized(receiveLock) {
+            while (!receivable) receiveLock.wait()
+            receivable = false
+            @Suppress("UNCHECKED_CAST")
+            value as TOut
+        }
 }

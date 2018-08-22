@@ -12,11 +12,17 @@ import java.util.concurrent.atomic.AtomicLong
  * @param options 链接选项
  */
 class Link<T> internal constructor(
-        val source: ISource<T>,
-        val target: ITarget<T>,
-        val options: LinkOptions<T>
+    val source: ISource<T>,
+    val target: ITarget<T>,
+    val options: LinkOptions<T>,
+    val subNet: String
 ) : Comparable<Link<*>> {
     override fun compareTo(other: Link<*>) = uuid.compareTo(other.uuid)
+
+    constructor(source: ISource<T>,
+                target: ITarget<T>,
+                options: LinkOptions<T>
+    ) : this(source, target, options, "")
 
     /** 唯一标识符 */
     val uuid: UUID = UUID.randomUUID()
@@ -40,10 +46,10 @@ class Link<T> internal constructor(
 
     fun offer(id: Long) = target.offer(id, this)
     fun consume(id: Long) =
-            source.consume(id).apply {
-                if (this.first && _count.incrementAndGet() > options.eventLimit)
-                    dispose()
-            }
+        source.consume(id).apply {
+            if (this.first && _count.incrementAndGet() > options.eventLimit)
+                dispose()
+        }
 
     /** 断开链接 */
     fun dispose() = list.remove(this).also { if (it) changed.post(list.toList()) }
@@ -58,18 +64,18 @@ class Link<T> internal constructor(
         val changed = broadcast<List<Link<*>>>("LinkInfo")
 
         /** 查看全部拓扑 */
-        fun all() = list.filter { it.options.subNet != "INNER" }.toList()
+        fun all() = list.toList()
 
         /** 查看用户拓扑 */
-        fun user() = list.filter { it.options.subNet.isEmpty() }.toList()
+        fun user() = list.filter { it.subNet.isEmpty() }.toList()
 
         /** 查找子网链接 */
         operator fun get(subNet: String) =
-                list.filter { it.options.subNet == subNet }
+            list.filter { it.subNet == subNet }
 
         /** 按源从列表中查找 */
         operator fun <T> get(source: ISource<T>) =
-                @Suppress("UNCHECKED_CAST")
-                list.filter { it.source === source }.map { it as Link<T> }
+            @Suppress("UNCHECKED_CAST")
+            list.filter { it.source === source }.map { it as Link<T> }
     }
 }

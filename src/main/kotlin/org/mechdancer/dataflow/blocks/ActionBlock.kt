@@ -8,9 +8,9 @@ import org.mechdancer.dataflow.core.internal.TargetCore
 import java.util.*
 
 class ActionBlock<T>(
-        override val name: String = "action",
-        options: ExecutableOptions = ExecutableOptions(),
-        action: (T) -> Unit
+    override val name: String = "action",
+    options: ExecutableOptions = ExecutableOptions(),
+    action: (T) -> Unit
 ) : ITarget<T> {
     override val uuid: UUID = UUID.randomUUID()
     override val defaultSource by lazy { DefaultSource(this) }

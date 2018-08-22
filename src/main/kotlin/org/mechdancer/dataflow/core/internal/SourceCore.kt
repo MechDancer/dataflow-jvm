@@ -33,7 +33,7 @@ internal class SourceCore<T>(private val size: Int = Int.MAX_VALUE) {
     fun consume(id: Long): Pair<Boolean, T?> {
         synchronized(buffer) {
             return buffer.containsKey(id)
-                    .zip { buffer.remove(id) }
+                .zip { buffer.remove(id) }
         }
     }
 
@@ -41,7 +41,7 @@ internal class SourceCore<T>(private val size: Int = Int.MAX_VALUE) {
     fun consume(): Pair<Boolean, T?> {
         synchronized(buffer) {
             return buffer.isNotEmpty()
-                    .zip { buffer.remove(buffer.keys.min()) }
+                .zip { buffer.remove(buffer.keys.min()) }
         }
     }
 

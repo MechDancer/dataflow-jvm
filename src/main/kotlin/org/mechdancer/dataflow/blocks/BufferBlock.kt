@@ -11,8 +11,8 @@ import java.util.*
  * 未消耗的数据将保留，直到被消费
  */
 class BufferBlock<T>(
-        override val name: String = "buffer",
-        size: Int = Int.MAX_VALUE)
+    override val name: String = "buffer",
+    size: Int = Int.MAX_VALUE)
     : IPropagatorBlock<T, T>, IReceivable<T> {
     override val uuid: UUID = UUID.randomUUID()
     override val defaultSource by lazy { DefaultSource(this) }
@@ -22,9 +22,9 @@ class BufferBlock<T>(
     private val targetCore = TargetCore<T> { event ->
         val newId = sourceCore.offer(event)
         Link[this]
-                .filter { it.options.predicate(event) }
-                .any { it.target.offer(newId, it).positive }
-                .otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
+            .filter { it.options.predicate(event) }
+            .any { it.target.offer(newId, it).positive }
+            .otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
     }
 
     val count get() = sourceCore.bufferCount
@@ -34,7 +34,8 @@ class BufferBlock<T>(
     override fun consume(id: Long) = sourceCore.consume(id)
 
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-            Link(this, target, options)
+        Link(this, target, options)
+
 
     override fun receive(): T {
         synchronized(receiveLock) {

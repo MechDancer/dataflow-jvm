@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 @ThreadSafety
 internal class TargetCore<T>(
-        private val options: ExecutableOptions = ExecutableOptions(),
-        private val action: (T) -> Unit
+    private val options: ExecutableOptions = ExecutableOptions(),
+    private val action: (T) -> Unit
 ) {
     private companion object {
         val defaultDispatcher = ForkJoinPool()
@@ -29,26 +29,26 @@ internal class TargetCore<T>(
     private fun unbind(): Pair<Long, Link<T>>? = waitingQueue.poll()
 
     fun offer(id: Long, link: Link<T>): Feedback =
-            if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
-                bind(id, link)
-                parallelismDegree.decrementAndGet()
-                Postponed
-            } else
-                link.consume(id)
-                        .let { pair ->
-                            if (pair.first) {
-                                val task = {
-                                    @Suppress("UNCHECKED_CAST")
-                                    action(pair.second as T)
-                                    parallelismDegree.decrementAndGet()
-                                    while (parallelismDegree.get() < options.parallelismDegree)
-                                        unbind()?.let { offer(it.first, it.second) } ?: break
-                                }
-                                (options.executor ?: defaultDispatcher).execute(task)
-                                Accepted
-                            } else {
-                                parallelismDegree.decrementAndGet()
-                                NotAvailable
-                            }
+        if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
+            bind(id, link)
+            parallelismDegree.decrementAndGet()
+            Postponed
+        } else
+            link.consume(id)
+                .let { pair ->
+                    if (pair.first) {
+                        val task = {
+                            @Suppress("UNCHECKED_CAST")
+                            action(pair.second as T)
+                            parallelismDegree.decrementAndGet()
+                            while (parallelismDegree.get() < options.parallelismDegree)
+                                unbind()?.let { offer(it.first, it.second) } ?: break
                         }
+                        (options.executor ?: defaultDispatcher).execute(task)
+                        Accepted
+                    } else {
+                        parallelismDegree.decrementAndGet()
+                        NotAvailable
+                    }
+                }
 }

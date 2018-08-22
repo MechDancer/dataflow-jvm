@@ -6,6 +6,6 @@ import org.mechdancer.dataflow.external.eventbus.EventBus
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 annotation class Subscribe(
-        val sticky: Boolean = false,
-        val executor: String = EventBus.DefaultExecutor
+    val sticky: Boolean = false,
+    val executor: String = EventBus.DefaultExecutor
 )

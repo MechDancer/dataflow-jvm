@@ -12,7 +12,7 @@ plugins {
 apply plugin: 'com.novoda.bintray-release'
 
 group 'org.mechdancer'
-version '0.1.1-RELEASE'
+version '0.1.9-RELEASE'
 
 sourceCompatibility = 1.8
 
@@ -46,7 +46,7 @@ publish {
     userOrg = 'mechdancer'
     groupId = 'org.mechdancer'
     artifactId = 'dataflow-jvm'
-    publishVersion = '0.1.0'
+    publishVersion = '0.1.9'
     desc = 'from @Microsoft .Net Core: "System.threading.tasks.dataflow"'
     website = 'https://github.com/MechDancer/dataflow-jvm'
 }

@@ -1,19 +1,23 @@
-import org.mechdancer.dataflow.blocks.BufferBlock
-import org.mechdancer.dataflow.core.post
-import kotlin.concurrent.thread
+import org.mechdancer.dataflow.blocks.SubNetBlock
+import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.linkManage.treeView
 
 fun main(args: Array<String>) {
-    val buffer = BufferBlock<Int>("buffer")
-    thread {
-        var i = 0
-        while (true) {
-            buffer post i++
-            println("插入: $i, 计数: ${buffer.count}")
-            Thread.sleep(500)
-        }
-    }
-    while (true) {
-        readLine()
-        println("接收: ${buffer.receive()}")
-    }
+    val source = broadcast<Int>()
+    val bridge1 = transform { x: Int -> x - 1 }
+    val bridge2 = transform { x: Int -> -x }
+    val sub = SubNetBlock(
+        i = source, o = source,
+        links = listOf(
+            LinkInfo(source, bridge1),
+            LinkInfo(source, bridge2),
+            LinkInfo(bridge1, source),
+            LinkInfo(bridge2, source)
+        )
+    )
+    sub linkTo { println(it) }
+    sub post 0
+
+    println(sub.treeView())//TODO 无法找到子网出口
+    while (true);
 }
