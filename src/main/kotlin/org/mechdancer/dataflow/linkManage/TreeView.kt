@@ -34,7 +34,7 @@ private fun IBlock.treeView(
     builder.append("\n")
     //判断子树
     val branch = (this as? ISource<*>)
-            ?.let { Link.find(it) }
+            ?.let { Link[it] }
             ?.takeIf { it.isNotEmpty() }
             ?: return
     //画图函数

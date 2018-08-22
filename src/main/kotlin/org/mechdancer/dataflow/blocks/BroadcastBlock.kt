@@ -44,7 +44,7 @@ class BroadcastBlock<T>(
             buffer.clear()
             buffer[newId] = event
         }
-        Link.find(this)
+        Link[this]
                 .filter { it.options.predicate(event) }
                 .forEach { it.offer(newId) }
         synchronized(receiveLock) {

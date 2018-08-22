@@ -27,7 +27,7 @@ class TransformBlock<TIn, TOut>(
     { event ->
         val out = map(event)
         val newId = sourceCore.offer(out)
-        Link.find(this)
+        Link[this]
                 .filter { it.options.predicate(out) }
                 .any { it.target.offer(newId, it).positive }
                 .otherwise {

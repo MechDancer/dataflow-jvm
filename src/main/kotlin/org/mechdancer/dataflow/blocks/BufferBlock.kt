@@ -21,7 +21,7 @@ class BufferBlock<T>(
     private val sourceCore = SourceCore<T>(size)
     private val targetCore = TargetCore<T> { event ->
         val newId = sourceCore.offer(event)
-        Link.find(this)
+        Link[this]
                 .filter { it.options.predicate(event) }
                 .any { it.target.offer(newId, it).positive }
                 .otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
