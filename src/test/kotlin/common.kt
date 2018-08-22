@@ -1,5 +1,8 @@
 import org.mechdancer.dataflow.blocks.SubNetBlock
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.LinkInfo
+import org.mechdancer.dataflow.core.broadcast
+import org.mechdancer.dataflow.core.linkTo
+import org.mechdancer.dataflow.core.transform
 import org.mechdancer.dataflow.linkManage.treeView
 
 fun main(args: Array<String>) {
@@ -16,8 +19,8 @@ fun main(args: Array<String>) {
         )
     )
     sub linkTo { println(it) }
-    sub post 0
+    //sub post 0
 
-    println(sub.treeView())//TODO 无法找到子网出口
+    println(sub.treeView())
     while (true);
 }

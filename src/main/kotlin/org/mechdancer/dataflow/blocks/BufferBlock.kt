@@ -14,7 +14,7 @@ class BufferBlock<T>(
     override val name: String = "buffer",
     size: Int = Int.MAX_VALUE)
     : IPropagatorBlock<T, T>, IReceivable<T> {
-    override val uuid: UUID = UUID.randomUUID()
+    override val uuid = UUID.randomUUID()!!
     override val defaultSource by lazy { DefaultSource(this) }
 
     private val receiveLock = Object()

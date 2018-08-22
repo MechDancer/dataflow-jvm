@@ -1,5 +1,6 @@
 package org.mechdancer.dataflow.core
 
+import org.mechdancer.dataflow.blocks.SubNetBlock
 import org.mechdancer.dataflow.core.internal.view
 import java.util.*
 import java.util.concurrent.ConcurrentSkipListSet
@@ -25,7 +26,7 @@ class Link<T> internal constructor(
     ) : this(source, target, options, "")
 
     /** 唯一标识符 */
-    val uuid: UUID = UUID.randomUUID()
+    val uuid: UUID = UUID.randomUUID()!!
 
     //构造时加入列表
     init {
@@ -76,6 +77,11 @@ class Link<T> internal constructor(
         /** 按源从列表中查找 */
         operator fun <T> get(source: ISource<T>) =
             @Suppress("UNCHECKED_CAST")
-            list.filter { it.source === source }.map { it as Link<T> }
+            list.filter(
+                if (source is SubNetBlock<*, T>)
+                    { link -> link.source === source.o && link.subNet != source.view() }
+                else
+                    { link -> link.source === source }
+            ).map { it as Link<T> }
     }
 }

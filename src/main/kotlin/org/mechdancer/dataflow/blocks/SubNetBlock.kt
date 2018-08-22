@@ -4,13 +4,16 @@ import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.internal.view
 import java.util.*
 
+/**
+ * 子网节点
+ */
 class SubNetBlock<TIn, TOut>(
     override val name: String = "SubNetBlock",
     private val i: ITarget<TIn>,
-    private val o: ISource<TOut>,
+    internal val o: ISource<TOut>,
     links: List<LinkInfo<*>>
 ) : IPropagatorBlock<TIn, TOut> {
-    override val uuid = UUID.randomUUID()
+    override val uuid = UUID.randomUUID()!!
     override val defaultSource = DefaultSource(this)
 
     init {

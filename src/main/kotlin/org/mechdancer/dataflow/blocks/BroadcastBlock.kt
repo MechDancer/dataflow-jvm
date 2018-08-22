@@ -14,17 +14,13 @@ class BroadcastBlock<T>(
     override val name: String = "broadcast",
     private val clone: ((T?) -> T)? = null)
     : IPropagatorBlock<T, T>, IReceivable<T> {
-    override val uuid: UUID = UUID.randomUUID()
+    override val uuid = UUID.randomUUID()!!
     override val defaultSource by lazy { DefaultSource(this) }
 
-    /**
-     * 唯一Id分配器
-     */
+    /** 唯一Id分配器 */
     private val id = AtomicLong(0)
 
-    /**
-     * 堆
-     */
+    /** 堆 */
     private val buffer = hashMapOf<Long, T>()
 
     //--------------------------
