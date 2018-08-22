@@ -10,15 +10,15 @@ import java.util.*
  * 为来自外部的事件提供堆
  */
 class DefaultSource<T>(owner: ITarget<T>) : ISource<T> {
-	override val uuid: UUID = UUID.randomUUID()
-	private val link = Link(this, owner, LinkOptions())
-	override val name = "default source of ${owner.view()}"
+    override val uuid: UUID = UUID.randomUUID()
+    private val link = Link(this, owner, LinkOptions())
+    override val name = "default source of ${owner.view()}"
 
-	override fun consume(id: Long) = core.consume(id)
+    override fun consume(id: Long) = core.consume(id)
 
-	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = stub("这个方法没有任何作用")
+    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = stub("这个方法没有任何作用")
 
-	private val core = SourceCore<T>()
+    private val core = SourceCore<T>()
 
-	fun offer(event: T) = core.offer(event) to link
+    fun offer(event: T) = core.offer(event) to link
 }
