@@ -1,5 +1,5 @@
 import org.mechdancer.dataflow.blocks.SubNetBlock
-import org.mechdancer.dataflow.core.LinkInfo
+import org.mechdancer.dataflow.blocks.SubNetBlock.LinkInfo
 import org.mechdancer.dataflow.core.broadcast
 import org.mechdancer.dataflow.core.linkTo
 import org.mechdancer.dataflow.core.transform
