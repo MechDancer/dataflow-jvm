@@ -85,6 +85,10 @@ dependencies {
 * 变换节点 TransformBlock
 * 动作节点 ActionBlock
 
+此外，还可以通过子网节点来封装子网拓扑：
+
+* 子网节点 SubNetBlock
+
 建议使用简写函数构造节点，可以在构造时指定名字，也可以使用默认的名字：
 
 ```kotlin
