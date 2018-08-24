@@ -4,6 +4,7 @@ import org.mechdancer.dataflow.core.DefaultSource
 import org.mechdancer.dataflow.core.IPropagatorBlock
 import org.mechdancer.dataflow.core.IReceivable
 import org.mechdancer.dataflow.core.Link
+import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
 import java.util.*
@@ -22,7 +23,7 @@ class BroadcastBlock<T>(
     //--------------------------
     // IReceivable
     //--------------------------
-    private val receiveLock = Object()
+    private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<T>(1)
     private val targetCore = TargetCore<T> { event ->
         sourceCore.offer(event).let { newId ->
@@ -30,23 +31,10 @@ class BroadcastBlock<T>(
                 .filter { it.options.predicate(event) }
                 .forEach { it.offer(newId) }
         }
-        synchronized(receiveLock) { receiveLock.notifyAll() }
+        receiveCore.call()
     }
 
     override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
-    override fun consume(id: Long): Pair<Boolean, T?> = sourceCore.get(id)
-
-    override fun receive(): T {
-        while (true) {
-            synchronized(receiveLock) {
-                sourceCore.get().let {
-                    if (it.first)
-                        @Suppress("UNCHECKED_CAST")
-                        return it.second as T
-                    else
-                        receiveLock.wait()
-                }
-            }
-        }
-    }
+    override fun consume(id: Long): Pair<Boolean, T?> = sourceCore[id]
+    override fun receive() = receiveCore getFrom sourceCore
 }

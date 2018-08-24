@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.dataflow.annotations.ThreadSafety
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 /**
@@ -10,11 +11,16 @@ import java.util.concurrent.atomic.AtomicLong
  */
 @ThreadSafety
 internal class SourceCore<T>(private val size: Int) {
+    private data class Holder<T>(val value: T)
+
+    private val Holder<T>?.format
+        get() = this?.let { x -> true to x.value } ?: false to null
+
     /** 原子长整型，用于生成事件的唯一Id */
     private val id = AtomicLong(0)
 
     /** 事件堆 */
-    private val buffer = hashMapOf<Long, T>()
+    private val buffer = ConcurrentHashMap<Long, Holder<T>>()
 
     /** 缓存存量 */
     val bufferCount get() = buffer.size
@@ -22,47 +28,29 @@ internal class SourceCore<T>(private val size: Int) {
     /** 将一个事件放入堆 */
     fun offer(event: T): Long {
         val newId = id.incrementAndGet()
+        buffer[newId] = Holder(event)
         synchronized(buffer) {
-            buffer[newId] = event
             while (buffer.size > size) buffer.remove(buffer.keys.min())
         }
         return newId
     }
 
-    /** 从堆中获取第一个事件 */
-    fun get(id: Long): Pair<Boolean, T?> {
-        synchronized(buffer) {
-            return buffer.containsKey(id)
-                .zip { buffer[id] }
-        }
-    }
+    /** 从堆中获取一个事件 */
+    operator fun get(id: Long) = buffer[id].format
 
     /** 从堆中获取第一个事件 */
-    fun get(): Pair<Boolean, T?> {
-        synchronized(buffer) {
-            return buffer.isNotEmpty()
-                .zip { buffer[buffer.keys.min()] }
-        }
-    }
+    tailrec fun get(): Pair<Boolean, T?> =
+        if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.format ?: get()
+        else null.format
 
     /** 从堆中消费一个事件 */
-    fun consume(id: Long): Pair<Boolean, T?> {
-        synchronized(buffer) {
-            return buffer.containsKey(id)
-                .zip { buffer.remove(id) }
-        }
-    }
+    fun consume(id: Long) = buffer.remove(id).format
 
     /** 从堆中消费第一个事件 */
-    fun consume(): Pair<Boolean, T?> {
-        synchronized(buffer) {
-            return buffer.isNotEmpty()
-                .zip { buffer.remove(buffer.keys.min()) }
-        }
-    }
+    tailrec fun consume(): Pair<Boolean, T?> =
+        if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.format ?: consume()
+        else null.format
 
     /** 从堆中丢弃所有事件 */
-    fun clear() {
-        synchronized(buffer) { buffer.clear() }
-    }
+    fun clear() = buffer.clear()
 }

@@ -4,9 +4,9 @@ import org.mechdancer.dataflow.core.DefaultSource
 import org.mechdancer.dataflow.core.IBridgeBlock
 import org.mechdancer.dataflow.core.IReceivable
 import org.mechdancer.dataflow.core.Link
+import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
-import org.mechdancer.dataflow.core.internal.otherwise
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
@@ -32,34 +32,19 @@ class StateMachine<T>(override val name: String) :
     val running get() = runningFlag.get()
     val ending = State(this) { it }
 
-    private val receiveLock = Object()
+    private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<MachineState<T>>(1)
     private val targetCore = TargetCore<MachineState<T>> { s ->
         runningFlag.set(!(s.current === ending))
-        val newId = sourceCore.offer(s)
-        Link[this]
-            .filter { it.options.predicate(s) }
-            .any { it.target.offer(newId, it).positive }
-            .otherwise { synchronized(receiveLock) { receiveLock.notifyAll() } }
-    }
-
-    override fun offer(id: Long, link: Link<MachineState<T>>) =
-        targetCore.offer(id, link)
-
-    override fun consume(id: Long): Pair<Boolean, MachineState<T>?> =
-        sourceCore.get(id)
-
-    override fun receive(): MachineState<T> {
-        while (true) {
-            synchronized(receiveLock) {
-                sourceCore.get().let {
-                    if (it.first)
-                        @Suppress("UNCHECKED_CAST")
-                        return it.second as MachineState<T>
-                    else
-                        receiveLock.wait()
-                }
-            }
+        sourceCore.offer(s).let { newId ->
+            Link[this]
+                .filter { it.options.predicate(s) }
+                .forEach { it.offer(newId) }
         }
+        receiveCore.call()
     }
+
+    override fun offer(id: Long, link: Link<MachineState<T>>) = targetCore.offer(id, link)
+    override fun consume(id: Long): Pair<Boolean, MachineState<T>?> = sourceCore[id]
+    override fun receive() = receiveCore getFrom sourceCore
 }

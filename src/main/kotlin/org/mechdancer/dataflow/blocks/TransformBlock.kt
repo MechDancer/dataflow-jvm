@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
 import java.util.*
@@ -17,47 +18,20 @@ class TransformBlock<TIn, TOut>(
     override val uuid = UUID.randomUUID()!!
     override val defaultSource by lazy { DefaultSource(this) }
 
-    //--------------------------
-    // ITarget & ISource
-    //--------------------------
-
+    private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<TOut>(Int.MAX_VALUE)
     private val targetCore = TargetCore<TIn>(options)
     { event ->
-        map(event).let { out ->
-            sourceCore.offer(out).let { newId ->
-                Link[this]
-                    .filter { it.options.predicate(out) }
-                    .forEach { it.target.offer(newId, it) }
-            }
-        }
-        synchronized(receiveLock) { receiveLock.notifyAll() }
+        val out = map(event)
+        val newId = sourceCore.offer(out)
+        val valuable = Link[this]
+            .filter { it.options.predicate(out) }
+            .any { it.offer(newId).positive }
+        receiveCore.call()
+        if (!valuable) sourceCore.consume(newId)
     }
-
-    //--------------------------
-    // IReceivable
-    //--------------------------
-
-    private val receiveLock = Object()
-
-    //--------------------------
-    // Methods
-    //--------------------------
 
     override fun offer(id: Long, link: Link<TIn>) = targetCore.offer(id, link)
     override fun consume(id: Long) = sourceCore.consume(id)
-
-    override fun receive(): TOut {
-        while (true) {
-            synchronized(receiveLock) {
-                sourceCore.consume().let {
-                    if (it.first)
-                        @Suppress("UNCHECKED_CAST")
-                        return it.second as TOut
-                    else
-                        receiveLock.wait()
-                }
-            }
-        }
-    }
+    override fun receive() = receiveCore consumeFrom sourceCore
 }
