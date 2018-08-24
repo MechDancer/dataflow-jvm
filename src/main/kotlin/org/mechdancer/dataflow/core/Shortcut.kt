@@ -6,6 +6,12 @@ import org.mechdancer.dataflow.blocks.BufferBlock
 import org.mechdancer.dataflow.blocks.TransformBlock
 
 //-------------------------------
+// type
+//-------------------------------
+
+typealias IBridgeBlock<T> = IPropagatorBlock<T, T>
+
+//-------------------------------
 // post
 //-------------------------------
 
