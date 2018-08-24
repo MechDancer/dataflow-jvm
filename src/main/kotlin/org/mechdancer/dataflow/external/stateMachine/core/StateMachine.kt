@@ -1,4 +1,4 @@
-package org.mechdancer.dataflow.external.stateMachine
+package org.mechdancer.dataflow.external.stateMachine.core
 
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.internal.ReceiveCore
@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * 广播方式收发状态转移记录
  */
 class StateMachine<T>(override val name: String) :
-    IBridgeBlock<MachineState<T>>,
-    IReceivable<MachineState<T>> {
+    IBridgeBlock<MachineSnapshot<T>>,
+    IReceivable<MachineSnapshot<T>> {
     override val uuid = UUID.randomUUID()!!
     override val defaultSource by lazy { DefaultSource(this) }
 
@@ -27,11 +27,11 @@ class StateMachine<T>(override val name: String) :
 
     private val runningFlag = AtomicBoolean(false)
     val running get() = runningFlag.get()
-    val ending = State(this) { it }
+    val ending = StateMember(this) { it }
 
     private val receiveCore = ReceiveCore()
-    private val sourceCore = SourceCore<MachineState<T>>(1)
-    private val targetCore = TargetCore<MachineState<T>> { s ->
+    private val sourceCore = SourceCore<MachineSnapshot<T>>(1)
+    private val targetCore = TargetCore<MachineSnapshot<T>> { s ->
         runningFlag.set(!(s.current === ending))
         sourceCore.offer(s).let { newId ->
             Link[this]
@@ -41,7 +41,7 @@ class StateMachine<T>(override val name: String) :
         receiveCore.call()
     }
 
-    override fun offer(id: Long, link: Link<MachineState<T>>) = targetCore.offer(id, link)
-    override fun consume(id: Long): Message<out MachineState<T>> = sourceCore[id]
+    override fun offer(id: Long, link: Link<MachineSnapshot<T>>) = targetCore.offer(id, link)
+    override fun consume(id: Long): Message<out MachineSnapshot<T>> = sourceCore[id]
     override fun receive() = receiveCore getFrom sourceCore
 }

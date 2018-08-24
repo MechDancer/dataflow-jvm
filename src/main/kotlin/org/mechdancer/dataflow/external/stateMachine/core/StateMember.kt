@@ -1,4 +1,4 @@
-package org.mechdancer.dataflow.external.stateMachine
+package org.mechdancer.dataflow.external.stateMachine.core
 
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.internal.SourceCore
@@ -10,10 +10,10 @@ import java.util.*
  * 状态
  * 连接到状态机的状态节点
  */
-class State<T>(
+class StateMember<T>(
     private val owner: StateMachine<T>,
     loop: Boolean = false,
-    override val name: String = "State",
+    override val name: String = "StateMember",
     private val action: (T) -> T)
     : IBridgeBlock<T> {
     override val uuid = UUID.randomUUID()!!
@@ -26,7 +26,7 @@ class State<T>(
         ExecutableOptions(executor = owner.dispatcher)
     ) { event ->
         val out = action(event)
-        owner post MachineState(this, out)
+        owner post MachineSnapshot(this, out)
         sourceCore.offer(out).let { newId ->
             Link[this]
                 .filter { it.options.predicate(out) }
