@@ -6,7 +6,6 @@ import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.Feedback.*
 import org.mechdancer.dataflow.core.Link
 import java.util.concurrent.ConcurrentLinkedQueue
-import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -18,9 +17,7 @@ internal class TargetCore<T>(
     private val options: ExecutableOptions = ExecutableOptions(),
     private val action: (T) -> Unit
 ) {
-    private companion object {
-        val defaultDispatcher = ForkJoinPool()
-    }
+    private companion object;
 
     private val parallelismDegree = AtomicInteger(0)
     private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, Link<T>>>()
@@ -36,10 +33,9 @@ internal class TargetCore<T>(
         } else
             link.consume(id)
                 .let { pair ->
-                    if (pair.first) {
+                    if (pair.hasValue) {
                         val task = {
-                            @Suppress("UNCHECKED_CAST")
-                            action(pair.second as T)
+                            action(pair.value)
                             parallelismDegree.decrementAndGet()
                             while (parallelismDegree.get() < options.parallelismDegree)
                                 unbind()?.let { offer(it.first, it.second) } ?: break

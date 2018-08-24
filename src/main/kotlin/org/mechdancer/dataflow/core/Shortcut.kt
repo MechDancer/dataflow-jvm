@@ -1,15 +1,16 @@
 package org.mechdancer.dataflow.core
 
-import org.mechdancer.dataflow.blocks.ActionBlock
-import org.mechdancer.dataflow.blocks.BroadcastBlock
-import org.mechdancer.dataflow.blocks.BufferBlock
-import org.mechdancer.dataflow.blocks.TransformBlock
+import org.mechdancer.dataflow.blocks.*
+import java.util.concurrent.TimeUnit
 
 //-------------------------------
 // type
 //-------------------------------
 
 typealias IBridgeBlock<T> = IPropagatorBlock<T, T>
+
+fun <T> message(value: T) = Message(true, value)
+fun message() = Message(false, null)
 
 //-------------------------------
 // post
@@ -68,3 +69,16 @@ fun <TIn, TOut> transform(
     options: ExecutableOptions = ExecutableOptions(),
     map: (TIn) -> TOut
 ) = TransformBlock(name, options, map)
+
+fun <T> delay(
+    delay: Long,
+    unit: TimeUnit = TimeUnit.MILLISECONDS,
+    name: String = "delay"
+) = DelayBlock<T>(name, delay, unit)
+
+fun interval(
+    period: Long,
+    unit: TimeUnit = TimeUnit.MILLISECONDS,
+    immediately: Boolean = true,
+    name: String = "interval"
+) = IntervalBlock(name, period, unit, immediately)

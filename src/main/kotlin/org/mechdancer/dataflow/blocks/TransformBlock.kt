@@ -28,10 +28,10 @@ class TransformBlock<TIn, TOut>(
             .filter { it.options.predicate(out) }
             .any { it.offer(newId).positive }
         receiveCore.call()
-        if (!valuable) sourceCore.consume(newId)
+        if (!valuable) sourceCore consume newId
     }
 
     override fun offer(id: Long, link: Link<TIn>) = targetCore.offer(id, link)
-    override fun consume(id: Long) = sourceCore.consume(id)
+    override fun consume(id: Long) = sourceCore consume id
     override fun receive() = receiveCore consumeFrom sourceCore
 }

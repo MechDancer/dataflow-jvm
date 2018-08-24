@@ -27,12 +27,13 @@ class State<T>(
     ) { event ->
         val out = action(event)
         owner post MachineState(this, out)
-        val newId = sourceCore.offer(out)
-        Link[this]
-            .filter { it.options.predicate(out) }
-            .dropWhile { it === loopLink }
-            .all { !it.target.offer(newId, it).positive }
-            .then { loopLink?.offer(newId) }
+        sourceCore.offer(out).let { newId ->
+            Link[this]
+                .filter { it.options.predicate(out) }
+                .dropWhile { it === loopLink }
+                .all { it.target.offer(newId, it).negative }
+                .then { loopLink?.offer(newId) }
+        }
     }
 
     override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)

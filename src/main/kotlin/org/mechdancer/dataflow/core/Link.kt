@@ -48,7 +48,7 @@ class Link<T> internal constructor(
     fun offer(id: Long) = target.offer(id, this)
     fun consume(id: Long) =
         source.consume(id).apply {
-            if (this.first && _count.incrementAndGet() > options.eventLimit)
+            if (this.hasValue && _count.incrementAndGet() > options.eventLimit)
                 dispose()
         }
 

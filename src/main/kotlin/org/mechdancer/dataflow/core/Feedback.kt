@@ -9,5 +9,7 @@ enum class Feedback(val positive: Boolean) {
     Accepted(true),
     Declined(false),
     Postponed(true),
-    NotAvailable(false)
+    NotAvailable(false);
+
+    val negative get() = !positive
 }

@@ -7,5 +7,5 @@ interface ISource<T> : IBlock {
      * 由得到源通知的宿调用
      * @param id 事件的标识
      */
-    fun consume(id: Long): Pair<Boolean, T?>
+    infix fun consume(id: Long): Message<out T>
 }

@@ -38,7 +38,7 @@ class SubNetBlock<TIn, TOut>(
 
     override fun offer(id: Long, link: Link<TIn>) = i.offer(id, link)
 
-    override fun consume(id: Long) = o.consume(id)
+    override fun consume(id: Long) = o consume id
 
     //TODO 如何隐藏子网出口？
     fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =

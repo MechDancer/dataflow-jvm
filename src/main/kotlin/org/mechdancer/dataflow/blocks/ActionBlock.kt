@@ -16,6 +16,5 @@ class ActionBlock<T>(
     override val uuid = UUID.randomUUID()!!
     override val defaultSource by lazy { DefaultSource(this) }
     private val core = TargetCore(options, action)
-
     override fun offer(id: Long, link: Link<T>) = core.offer(id, link)
 }

@@ -1,6 +1,8 @@
 package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.dataflow.annotations.ThreadSafety
+import org.mechdancer.dataflow.core.Message
+import org.mechdancer.dataflow.core.message
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
@@ -14,7 +16,7 @@ internal class SourceCore<T>(private val size: Int) {
     private data class Holder<T>(val value: T)
 
     private val Holder<T>?.format
-        get() = this?.let { x -> true to x.value } ?: false to null
+        get() = this?.let { x -> message(x.value) } ?: message()
 
     /** 原子长整型，用于生成事件的唯一Id */
     private val id = AtomicLong(0)
@@ -27,7 +29,7 @@ internal class SourceCore<T>(private val size: Int) {
 
     /** 将一个事件放入堆 */
     fun offer(event: T): Long {
-        val newId = id.incrementAndGet()
+        val newId = id.getAndIncrement()
         buffer[newId] = Holder(event)
         synchronized(buffer) {
             while (buffer.size > size) buffer.remove(buffer.keys.min())
@@ -39,15 +41,15 @@ internal class SourceCore<T>(private val size: Int) {
     operator fun get(id: Long) = buffer[id].format
 
     /** 从堆中获取第一个事件 */
-    tailrec fun get(): Pair<Boolean, T?> =
+    tailrec fun get(): Message<out T> =
         if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.format ?: get()
         else null.format
 
     /** 从堆中消费一个事件 */
-    fun consume(id: Long) = buffer.remove(id).format
+    infix fun consume(id: Long) = buffer.remove(id).format
 
     /** 从堆中消费第一个事件 */
-    tailrec fun consume(): Pair<Boolean, T?> =
+    tailrec fun consume(): Message<out T> =
         if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.format ?: consume()
         else null.format
 
