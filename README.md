@@ -78,12 +78,14 @@ dependencies {
 
 ### 1. 使用标准节点
 
-库现在提供四种标准节点：
+库现在提供6种标准节点：
 
 * 广播节点 BroadcastBlock
 * 缓冲节点 BufferBlock
 * 变换节点 TransformBlock
 * 动作节点 ActionBlock
+* 延时节点 DelayBlock
+* 周期节点 IntervalBlock
 
 此外，还可以通过子网节点来封装子网拓扑：
 
