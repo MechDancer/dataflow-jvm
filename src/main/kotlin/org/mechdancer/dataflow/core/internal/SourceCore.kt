@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong
  * @param size 缓存容量（超过则丢弃最旧的）
  */
 @ThreadSafety
-internal class SourceCore<T>(private val size: Int = Int.MAX_VALUE) {
+internal class SourceCore<T>(private val size: Int) {
     /** 原子长整型，用于生成事件的唯一Id */
     private val id = AtomicLong(0)
 
@@ -29,6 +29,22 @@ internal class SourceCore<T>(private val size: Int = Int.MAX_VALUE) {
         return newId
     }
 
+    /** 从堆中获取第一个事件 */
+    fun get(id: Long): Pair<Boolean, T?> {
+        synchronized(buffer) {
+            return buffer.containsKey(id)
+                .zip { buffer[id] }
+        }
+    }
+
+    /** 从堆中获取第一个事件 */
+    fun get(): Pair<Boolean, T?> {
+        synchronized(buffer) {
+            return buffer.isNotEmpty()
+                .zip { buffer[buffer.keys.min()] }
+        }
+    }
+
     /** 从堆中消费一个事件 */
     fun consume(id: Long): Pair<Boolean, T?> {
         synchronized(buffer) {
@@ -43,11 +59,6 @@ internal class SourceCore<T>(private val size: Int = Int.MAX_VALUE) {
             return buffer.isNotEmpty()
                 .zip { buffer.remove(buffer.keys.min()) }
         }
-    }
-
-    /** 从堆中丢弃一个事件 */
-    fun drop(id: Long) {
-        synchronized(buffer) { buffer.remove(id) }
     }
 
     /** 从堆中丢弃所有事件 */

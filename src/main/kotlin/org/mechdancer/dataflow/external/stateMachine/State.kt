@@ -21,7 +21,7 @@ class State<T>(
 
     private val loopLink = if (loop) Link(this, this, LinkOptions()) else null
 
-    private val sourceCore = SourceCore<T>()
+    private val sourceCore = SourceCore<T>(Int.MAX_VALUE)
     private val targetCore = TargetCore<T>(
         ExecutableOptions(executor = owner.dispatcher)
     ) { event ->
@@ -37,6 +37,4 @@ class State<T>(
 
     override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
     override fun consume(id: Long) = sourceCore.consume(id)
-    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-        Link(this, target, options)
 }

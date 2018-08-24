@@ -22,8 +22,11 @@ infix fun <T> ITarget<T>.post(event: T) =
 // link
 //-------------------------------
 
+fun <T> ISource<T>.linkTo(target: ITarget<T>, options: LinkOptions<T>) =
+    Link(this, target, options)
+
 infix fun <T> ISource<T>.linkTo(target: ITarget<T>) =
-    linkTo(target)
+    linkTo(target, LinkOptions())
 
 infix fun <T> ISource<T>.linkTo(target: (T) -> Unit) =
     linkTo(org.mechdancer.dataflow.blocks.ActionBlock(action = target))

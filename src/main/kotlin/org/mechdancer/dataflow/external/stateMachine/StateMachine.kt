@@ -1,6 +1,9 @@
 package org.mechdancer.dataflow.external.stateMachine
 
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.DefaultSource
+import org.mechdancer.dataflow.core.IBridgeBlock
+import org.mechdancer.dataflow.core.IReceivable
+import org.mechdancer.dataflow.core.Link
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
 import org.mechdancer.dataflow.core.internal.otherwise
@@ -30,7 +33,7 @@ class StateMachine<T>(override val name: String) :
     val ending = State(this) { it }
 
     private val receiveLock = Object()
-    private val sourceCore = SourceCore<MachineState<T>>()
+    private val sourceCore = SourceCore<MachineState<T>>(1)
     private val targetCore = TargetCore<MachineState<T>> { s ->
         runningFlag.set(!(s.current === ending))
         val newId = sourceCore.offer(s)
@@ -44,20 +47,19 @@ class StateMachine<T>(override val name: String) :
         targetCore.offer(id, link)
 
     override fun consume(id: Long): Pair<Boolean, MachineState<T>?> =
-        sourceCore.consume(id)
-
-    override fun linkTo(target: ITarget<MachineState<T>>, options: LinkOptions<MachineState<T>>) =
-        Link(this, target, options)
+        sourceCore.get(id)
 
     override fun receive(): MachineState<T> {
-        synchronized(receiveLock) {
-            var pair = sourceCore.consume()
-            while (!pair.first) {
-                receiveLock.wait()
-                pair = sourceCore.consume()
+        while (true) {
+            synchronized(receiveLock) {
+                sourceCore.get().let {
+                    if (it.first)
+                        @Suppress("UNCHECKED_CAST")
+                        return it.second as MachineState<T>
+                    else
+                        receiveLock.wait()
+                }
             }
-            @Suppress("UNCHECKED_CAST")
-            return pair.second as MachineState<T>
         }
     }
 }

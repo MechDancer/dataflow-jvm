@@ -3,7 +3,6 @@ package org.mechdancer.dataflow.blocks
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
-import org.mechdancer.dataflow.core.internal.otherwise
 import java.util.*
 
 /**
@@ -22,22 +21,17 @@ class TransformBlock<TIn, TOut>(
     // ITarget & ISource
     //--------------------------
 
-    private val sourceCore = SourceCore<TOut>()
+    private val sourceCore = SourceCore<TOut>(Int.MAX_VALUE)
     private val targetCore = TargetCore<TIn>(options)
     { event ->
-        val out = map(event)
-        val newId = sourceCore.offer(out)
-        Link[this]
-            .filter { it.options.predicate(out) }
-            .any { it.target.offer(newId, it).positive }
-            .otherwise {
-                sourceCore.drop(newId)
-                synchronized(receiveLock) {
-                    receivable = true
-                    value = out
-                    receiveLock.notifyAll()
-                }
+        map(event).let { out ->
+            sourceCore.offer(out).let { newId ->
+                Link[this]
+                    .filter { it.options.predicate(out) }
+                    .forEach { it.target.offer(newId, it) }
             }
+        }
+        synchronized(receiveLock) { receiveLock.notifyAll() }
     }
 
     //--------------------------
@@ -45,8 +39,6 @@ class TransformBlock<TIn, TOut>(
     //--------------------------
 
     private val receiveLock = Object()
-    private var receivable = false
-    private var value: TOut? = null
 
     //--------------------------
     // Methods
@@ -55,14 +47,17 @@ class TransformBlock<TIn, TOut>(
     override fun offer(id: Long, link: Link<TIn>) = targetCore.offer(id, link)
     override fun consume(id: Long) = sourceCore.consume(id)
 
-    override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
-        Link(this, target, options)
-
-    override fun receive(): TOut =
-        synchronized(receiveLock) {
-            while (!receivable) receiveLock.wait()
-            receivable = false
-            @Suppress("UNCHECKED_CAST")
-            value as TOut
+    override fun receive(): TOut {
+        while (true) {
+            synchronized(receiveLock) {
+                sourceCore.consume().let {
+                    if (it.first)
+                        @Suppress("UNCHECKED_CAST")
+                        return it.second as TOut
+                    else
+                        receiveLock.wait()
+                }
+            }
         }
+    }
 }

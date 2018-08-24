@@ -12,5 +12,4 @@ fun main(args: Array<String>) {
     link(print, add)
     print post 0
     while (!machine.running);
-    while (machine.running);
 }

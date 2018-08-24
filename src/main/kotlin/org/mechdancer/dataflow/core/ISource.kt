@@ -8,7 +8,4 @@ interface ISource<T> : IBlock {
      * @param id 事件的标识
      */
     fun consume(id: Long): Pair<Boolean, T?>
-
-    /** 链接到宿 */
-    fun linkTo(target: ITarget<T>, options: LinkOptions<T> = LinkOptions()): Link<T>
 }

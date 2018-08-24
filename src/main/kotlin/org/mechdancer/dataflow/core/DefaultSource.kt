@@ -1,7 +1,6 @@
 package org.mechdancer.dataflow.core
 
 import org.mechdancer.dataflow.core.internal.SourceCore
-import org.mechdancer.dataflow.core.internal.stub
 import org.mechdancer.dataflow.core.internal.view
 import java.util.*
 
@@ -15,9 +14,7 @@ class DefaultSource<T>(owner: ITarget<T>) : ISource<T> {
 
     override fun consume(id: Long) = core.consume(id)
 
-    override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) = stub("这个方法没有任何作用")
-
-    private val core = SourceCore<T>()
+    private val core = SourceCore<T>(Int.MAX_VALUE)
     private val link = Link(this, owner, LinkOptions())
 
     fun offer(event: T) = core.offer(event) to link
