@@ -32,7 +32,7 @@ class BroadcastBlock<T>(
     override fun receive() = receiveCore getFrom sourceCore
     override fun consume(id: Long) = sourceCore[id]
         .let {
-            if (it.hasValue && clone != null) message(clone!!(it.value))
+            if (it.hasValue && clone != null) message(clone.invoke(it.value))
             else it
         }
 }
