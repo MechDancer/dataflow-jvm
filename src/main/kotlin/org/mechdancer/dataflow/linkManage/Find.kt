@@ -3,7 +3,7 @@ package org.mechdancer.dataflow.linkManage
 import org.mechdancer.dataflow.core.IBlock
 import org.mechdancer.dataflow.core.ISource
 import org.mechdancer.dataflow.core.ITarget
-import org.mechdancer.dataflow.core.Link
+import org.mechdancer.dataflow.core.internal.Link
 
 /** 查找一级前驱节点 */
 fun ITarget<*>.prior() =

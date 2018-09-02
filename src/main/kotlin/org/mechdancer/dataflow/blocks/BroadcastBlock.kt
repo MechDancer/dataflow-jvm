@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
@@ -28,7 +29,7 @@ class BroadcastBlock<T>(
         receiveCore.call()
     }
 
-    override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
+    override fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)
     override fun receive() = receiveCore getFrom sourceCore
     override fun consume(id: Long) = sourceCore[id]
         .let {

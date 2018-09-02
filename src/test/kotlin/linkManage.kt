@@ -1,4 +1,5 @@
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.linkManage.treeView
 
 fun main(args: Array<String>) {

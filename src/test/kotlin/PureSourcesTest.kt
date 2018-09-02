@@ -1,6 +1,10 @@
 import org.junit.Assert
 import org.junit.Test
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.action
+import org.mechdancer.dataflow.core.broadcast
+import org.mechdancer.dataflow.core.internal.Link
+import org.mechdancer.dataflow.core.minus
+import org.mechdancer.dataflow.core.transform
 import org.mechdancer.dataflow.linkManage.next
 import org.mechdancer.dataflow.linkManage.prior
 import org.mechdancer.dataflow.linkManage.pureSources

@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.external.stateMachine.core
 
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
 import org.mechdancer.dataflow.core.internal.then
@@ -36,6 +37,6 @@ class StateMember<T>(
         }
     }
 
-    override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
+    override fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)
     override fun consume(id: Long) = sourceCore.consume(id)
 }

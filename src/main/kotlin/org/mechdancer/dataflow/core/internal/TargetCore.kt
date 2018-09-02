@@ -4,7 +4,8 @@ import org.mechdancer.dataflow.annotations.ThreadSafety
 import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.Feedback.*
-import org.mechdancer.dataflow.core.Link
+import org.mechdancer.dataflow.core.IEgress
+import org.mechdancer.dataflow.core.IIngress
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -14,37 +15,37 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 @ThreadSafety
 internal class TargetCore<T>(
-    private val options: ExecutableOptions = ExecutableOptions(),
-    private val action: (T) -> Unit
-) {
-    private companion object;
+	private val options: ExecutableOptions = ExecutableOptions(),
+	private val action: (T) -> Unit
+) : IIngress<T> {
+	private companion object;
 
-    private val parallelismDegree = AtomicInteger(0)
-    private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, Link<T>>>()
+	private val parallelismDegree = AtomicInteger(0)
+	private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, IEgress<T>>>()
 
-    private fun bind(id: Long, link: Link<T>) = waitingQueue.add(id to link)
-    private fun unbind(): Pair<Long, Link<T>>? = waitingQueue.poll()
+	private fun bind(id: Long, link: IEgress<T>) = waitingQueue.add(id to link)
+	private fun unbind(): Pair<Long, IEgress<T>>? = waitingQueue.poll()
 
-    fun offer(id: Long, link: Link<T>): Feedback =
-        if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
-            bind(id, link)
-            parallelismDegree.decrementAndGet()
-            Postponed
-        } else
-            link.consume(id)
-                .let { pair ->
-                    if (pair.hasValue) {
-                        val task = {
-                            action(pair.value)
-                            parallelismDegree.decrementAndGet()
-                            while (parallelismDegree.get() < options.parallelismDegree)
-                                unbind()?.let { offer(it.first, it.second) } ?: break
-                        }
-                        (options.executor ?: defaultDispatcher).execute(task)
-                        Accepted
-                    } else {
-                        parallelismDegree.decrementAndGet()
-                        NotAvailable
-                    }
-                }
+	override fun offer(id: Long, egress: IEgress<T>): Feedback =
+		if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
+			bind(id, egress)
+			parallelismDegree.decrementAndGet()
+			Postponed
+		} else
+			egress.consume(id)
+				.let { pair ->
+					if (pair.hasValue) {
+						val task = {
+							action(pair.value)
+							parallelismDegree.decrementAndGet()
+							while (parallelismDegree.get() < options.parallelismDegree)
+								unbind()?.let { offer(it.first, it.second) } ?: break
+						}
+						(options.executor ?: defaultDispatcher).execute(task)
+						Accepted
+					} else {
+						parallelismDegree.decrementAndGet()
+						NotAvailable
+					}
+				}
 }

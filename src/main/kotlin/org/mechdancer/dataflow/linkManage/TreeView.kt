@@ -2,7 +2,7 @@ package org.mechdancer.dataflow.linkManage
 
 import org.mechdancer.dataflow.core.IBlock
 import org.mechdancer.dataflow.core.ISource
-import org.mechdancer.dataflow.core.Link
+import org.mechdancer.dataflow.core.internal.Link
 
 /**
  * 按树状图显示从源出发的拓扑

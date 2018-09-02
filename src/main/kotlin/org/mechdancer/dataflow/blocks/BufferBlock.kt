@@ -1,9 +1,10 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.DefaultSource
+import org.mechdancer.dataflow.core.IEgress
 import org.mechdancer.dataflow.core.IPropagatorBlock
 import org.mechdancer.dataflow.core.IReceivable
-import org.mechdancer.dataflow.core.Link
+import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
@@ -34,7 +35,7 @@ class BufferBlock<T>(
     val count get() = sourceCore.bufferCount
     fun clear() = sourceCore.clear()
 
-    override fun offer(id: Long, link: Link<T>) = targetCore.offer(id, link)
+    override fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)
     override fun consume(id: Long) = sourceCore consume id
     override fun receive() = receiveCore consumeFrom sourceCore
 }

@@ -1,5 +1,6 @@
 package org.mechdancer.dataflow.core
 
+import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.view
 import java.util.*

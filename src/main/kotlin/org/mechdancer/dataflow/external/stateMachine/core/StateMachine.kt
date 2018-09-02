@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.external.stateMachine.core
 
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
@@ -41,7 +42,7 @@ class StateMachine<T>(override val name: String) :
         receiveCore.call()
     }
 
-    override fun offer(id: Long, link: Link<MachineSnapshot<T>>) = targetCore.offer(id, link)
+    override fun offer(id: Long, egress: IEgress<MachineSnapshot<T>>) = targetCore.offer(id, egress)
     override fun consume(id: Long): Message<out MachineSnapshot<T>> = sourceCore[id]
     override fun receive() = receiveCore getFrom sourceCore
 }

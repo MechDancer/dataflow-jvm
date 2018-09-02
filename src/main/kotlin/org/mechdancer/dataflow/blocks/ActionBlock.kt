@@ -2,8 +2,8 @@ package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.DefaultSource
 import org.mechdancer.dataflow.core.ExecutableOptions
+import org.mechdancer.dataflow.core.IEgress
 import org.mechdancer.dataflow.core.ITarget
-import org.mechdancer.dataflow.core.Link
 import org.mechdancer.dataflow.core.internal.TargetCore
 import java.util.*
 
@@ -16,5 +16,5 @@ class ActionBlock<T>(
     override val uuid = UUID.randomUUID()!!
     override val defaultSource by lazy { DefaultSource(this) }
     private val core = TargetCore(options, action)
-    override fun offer(id: Long, link: Link<T>) = core.offer(id, link)
+	override fun offer(id: Long, egress: IEgress<T>) = core.offer(id, egress)
 }
