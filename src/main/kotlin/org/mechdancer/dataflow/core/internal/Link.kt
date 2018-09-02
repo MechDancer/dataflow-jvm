@@ -15,7 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger
 internal class Link<T>(
 	override val source: ISource<T>,
 	override val target: ITarget<T>,
-	override val options: LinkOptions<T>
+	override val options: LinkOptions<T>,
+	private val holder: LinkManager<T>
 ) : ILink<T> {
 	override val uuid: UUID = UUID.randomUUID()!!
 
@@ -37,6 +38,7 @@ internal class Link<T>(
 		}
 
 	override fun dispose() {
+		holder.remove(this)
 		list.remove(this).also { if (it) changed.post(list.toList()) }
 	}
 

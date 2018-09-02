@@ -1,7 +1,6 @@
 package org.mechdancer.dataflow.core
 
 import org.mechdancer.dataflow.blocks.*
-import org.mechdancer.dataflow.core.internal.Link
 import java.util.concurrent.TimeUnit
 
 //-------------------------------
@@ -22,9 +21,6 @@ infix fun <T> IPostable<T>.post(event: T) = defaultSource(event)
 //-------------------------------
 // link
 //-------------------------------
-
-fun <T> ISource<T>.linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-	Link(this, target, options) as ILink<T>
 
 infix fun <T> ISource<T>.linkTo(target: ITarget<T>) =
 	linkTo(target, LinkOptions())

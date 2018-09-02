@@ -23,10 +23,5 @@ interface ILink<T> : IWithUUID, IEgress<T> {
 
 		/** 查看全部拓扑 */
 		fun all() = list.toList()
-
-		/** 按源从列表中查找 */
-		operator fun <T> get(source: ISource<T>) =
-			@Suppress("UNCHECKED_CAST")
-			list.asSequence().filter { link -> link.source === source }.map { it as ILink<T> }.toList()
 	}
 }
