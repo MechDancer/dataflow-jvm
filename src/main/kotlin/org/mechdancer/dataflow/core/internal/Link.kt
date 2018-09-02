@@ -27,10 +27,8 @@ class Link<T> internal constructor(
 
 	//构造时加入列表
 	init {
-		if (this.source !is DefaultSource<T>) {
-			list.add(this)
-			changed.post(list.toList())
-		}
+		list.add(this)
+		changed.post(list.toList())
 	}
 
 	//对通过链接的事件计数

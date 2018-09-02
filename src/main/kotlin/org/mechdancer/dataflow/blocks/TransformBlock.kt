@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
@@ -15,7 +16,7 @@ class TransformBlock<TIn, TOut>(
 	override val name: String = "transform",
 	options: ExecutableOptions = ExecutableOptions(),
 	private val map: (TIn) -> TOut
-) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut> {
+) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut>, IPostable<TIn> {
 	override val uuid = UUID.randomUUID()!!
 	override val defaultSource by lazy { DefaultSource(this) }
 

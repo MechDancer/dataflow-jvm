@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
@@ -14,7 +15,7 @@ import java.util.*
 class BroadcastBlock<T>(
     override val name: String = "broadcast",
     private val clone: ((T) -> T)? = null)
-    : IPropagatorBlock<T, T>, IReceivable<T> {
+    : IPropagatorBlock<T, T>, IReceivable<T>, IPostable<T> {
     override val uuid = UUID.randomUUID()!!
     override val defaultSource by lazy { DefaultSource(this) }
 

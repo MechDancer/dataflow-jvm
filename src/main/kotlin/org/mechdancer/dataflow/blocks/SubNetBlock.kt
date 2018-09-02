@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.view
 import java.util.*
@@ -13,7 +14,7 @@ class SubNetBlock<TIn, TOut>(
 	private val i: ITarget<TIn>,
 	internal val o: ISource<TOut>,
 	links: List<LinkInfo<*>>
-) : IPropagatorBlock<TIn, TOut> {
+) : IPropagatorBlock<TIn, TOut>, IPostable<TIn> {
 	override val uuid = UUID.randomUUID()!!
 	override val defaultSource = DefaultSource(this)
 
