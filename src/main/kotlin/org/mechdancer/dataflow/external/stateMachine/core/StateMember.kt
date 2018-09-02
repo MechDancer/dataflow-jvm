@@ -30,7 +30,7 @@ class StateMember<T>(
 		val out = action(event)
 		owner post MachineSnapshot(this, out)
 		sourceCore.offer(out).let { newId ->
-			Link[this]
+			ILink[this]
 				.filter { it.options.predicate(out) }
 				.dropWhile { it === loopLink }
 				.all { it.target.offer(newId, it).negative }

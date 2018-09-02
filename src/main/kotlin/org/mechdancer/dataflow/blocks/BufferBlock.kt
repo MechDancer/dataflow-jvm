@@ -1,11 +1,7 @@
 package org.mechdancer.dataflow.blocks
 
-import org.mechdancer.dataflow.core.IEgress
-import org.mechdancer.dataflow.core.IPostable
+import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
-import org.mechdancer.dataflow.core.IPropagatorBlock
-import org.mechdancer.dataflow.core.IReceivable
-import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
@@ -26,7 +22,7 @@ class BufferBlock<T>(
 	private val sourceCore = SourceCore<T>(size)
 	private val targetCore = TargetCore<T> { event ->
 		sourceCore.offer(event).let { newId ->
-			Link[this]
+			ILink[this]
 				.filter { it.options.predicate(event) }
 				.forEach { it.offer(newId) }
 		}

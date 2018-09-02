@@ -2,7 +2,6 @@ package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
-import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
@@ -23,7 +22,7 @@ class BroadcastBlock<T>(
     private val sourceCore = SourceCore<T>(1)
     private val targetCore = TargetCore<T> { event ->
         sourceCore.offer(event).let { newId ->
-            Link[this]
+            ILink[this]
                 .filter { it.options.predicate(event) }
                 .forEach { it.offer(newId) }
         }

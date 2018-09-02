@@ -2,7 +2,6 @@ package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
-import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.TargetCore
@@ -26,7 +25,7 @@ class TransformBlock<TIn, TOut>(
 	{ event ->
 		val out = map(event)
 		val newId = sourceCore.offer(out)
-		val valuable = Link[this]
+		val valuable = ILink[this]
 			.filter { it.options.predicate(out) }
 			.any { it.offer(newId).positive }
 		receiveCore.call()

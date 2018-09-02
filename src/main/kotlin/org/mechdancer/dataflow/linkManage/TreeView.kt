@@ -1,8 +1,8 @@
 package org.mechdancer.dataflow.linkManage
 
 import org.mechdancer.dataflow.core.IBlock
+import org.mechdancer.dataflow.core.ILink
 import org.mechdancer.dataflow.core.ISource
-import org.mechdancer.dataflow.core.internal.Link
 
 /**
  * 按树状图显示从源出发的拓扑
@@ -34,11 +34,11 @@ private fun IBlock.treeView(
     builder.append("\n")
     //判断子树
     val branch = (this as? ISource<*>)
-        ?.let { Link[it] }
+        ?.let { ILink[it] }
         ?.takeIf { it.isNotEmpty() }
         ?: return
     //画图函数
-    val format = { block: Link<*>, last: Boolean ->
+    val format = { block: ILink<*>, last: Boolean ->
         //画缩进
         val list = mutableListOf<Boolean>()
         var copy = indent

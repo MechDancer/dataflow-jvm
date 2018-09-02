@@ -1,10 +1,6 @@
 import org.junit.Assert
 import org.junit.Test
-import org.mechdancer.dataflow.core.action
-import org.mechdancer.dataflow.core.broadcast
-import org.mechdancer.dataflow.core.internal.Link
-import org.mechdancer.dataflow.core.minus
-import org.mechdancer.dataflow.core.transform
+import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.linkManage.next
 import org.mechdancer.dataflow.linkManage.prior
 import org.mechdancer.dataflow.linkManage.pureSources
@@ -22,7 +18,7 @@ class PureSourcesTest {
 			b2 - b4
 			b4 - b2
 
-			Link.user().forEach {
+			ILink.all().forEach {
 				println(it)
 			}
 		}
@@ -30,7 +26,7 @@ class PureSourcesTest {
 
 	@Test
 	fun findPureSources() {
-		val sources = Link.user().pureSources()
+		val sources = ILink.all().pureSources()
 		Assert.assertEquals(1, sources.size)
 		Assert.assertEquals("1", sources.first().name)
 	}

@@ -1,19 +1,19 @@
 package org.mechdancer.dataflow.linkManage
 
 import org.mechdancer.dataflow.core.IBlock
+import org.mechdancer.dataflow.core.ILink
 import org.mechdancer.dataflow.core.ISource
 import org.mechdancer.dataflow.core.ITarget
-import org.mechdancer.dataflow.core.internal.Link
 
 /** 查找一级前驱节点 */
 fun ITarget<*>.prior() =
-    Link.all()
+    ILink.all()
         .filter { it.target === this }
         .map { it.source as IBlock }
 
 /** 查找一级后继节点 */
 fun ISource<*>.next() =
-    Link.all()
+    ILink.all()
         .filter { it.source === this }
         .map { it.target as IBlock }
 
@@ -52,7 +52,7 @@ fun ISource<*>.allNext() =
         .toList()
 
 /** 根据链接集找到所有纯源 */
-fun List<Link<*>>.pureSources() =
+fun List<ILink<*>>.pureSources() =
     this.map { it.target as IBlock }
         .distinct()
         .let { targets ->

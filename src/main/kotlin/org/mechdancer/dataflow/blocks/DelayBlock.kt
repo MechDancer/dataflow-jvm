@@ -1,11 +1,11 @@
 package org.mechdancer.dataflow.blocks
 
-import org.mechdancer.dataflow.core.IBridgeBlock
-import org.mechdancer.dataflow.core.IEgress
-import org.mechdancer.dataflow.core.IPostable
+import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
-import org.mechdancer.dataflow.core.IReceivable
-import org.mechdancer.dataflow.core.internal.*
+import org.mechdancer.dataflow.core.internal.ReceiveCore
+import org.mechdancer.dataflow.core.internal.SourceCore
+import org.mechdancer.dataflow.core.internal.TargetCore
+import org.mechdancer.dataflow.core.internal.scheduler
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -22,7 +22,7 @@ class DelayBlock<T>(
 	private val targetCore = TargetCore<T> { event ->
 		scheduler.schedule({
 			sourceCore.offer(event).let { newId ->
-				Link[this]
+				ILink[this]
 					.filter { it.options.predicate(event) }
 					.forEach { it.offer(newId) }
 			}

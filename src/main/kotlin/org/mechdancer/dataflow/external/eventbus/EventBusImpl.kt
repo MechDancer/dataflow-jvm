@@ -2,7 +2,6 @@ package org.mechdancer.dataflow.external.eventbus
 
 import org.mechdancer.dataflow.blocks.BroadcastBlock
 import org.mechdancer.dataflow.core.*
-import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.external.eventbus.annotations.Subscribe
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
@@ -16,7 +15,7 @@ class EventBusImpl : EventBus {
 	private val stickyEvents = ConcurrentHashMap<KClass<*>, IEvent>()
 
 	private val broadcast = BroadcastBlock<IEvent>()
-	private val links = hashMapOf<KFunction<Unit>, Link<IEvent>>()
+	private val links = hashMapOf<KFunction<Unit>, ILink<IEvent>>()
 
 	private fun subscribe(receiver: Any, kFunction: KFunction<Unit>, executor: Executor?) {
 		kFunction.let { f ->

@@ -1,8 +1,8 @@
 package org.mechdancer.dataflow.blocks
 
+import org.mechdancer.dataflow.core.ILink
 import org.mechdancer.dataflow.core.IReceivable
 import org.mechdancer.dataflow.core.ISource
-import org.mechdancer.dataflow.core.internal.Link
 import org.mechdancer.dataflow.core.internal.ReceiveCore
 import org.mechdancer.dataflow.core.internal.SourceCore
 import org.mechdancer.dataflow.core.internal.scheduler
@@ -31,7 +31,7 @@ class IntervalBlock(
     fun start() {
         task = scheduler.scheduleAtFixedRate({
             t = sourceCore.offer(t)
-            Link[this]
+            ILink[this]
                 .filter { it.options.predicate(t) }
                 .forEach { it.offer(t) }
             receiveCore.call()

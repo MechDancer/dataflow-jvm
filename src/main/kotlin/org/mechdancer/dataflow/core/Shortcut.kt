@@ -24,7 +24,7 @@ infix fun <T> IPostable<T>.post(event: T) = defaultSource(event)
 //-------------------------------
 
 fun <T> ISource<T>.linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-	Link(this, target, options)
+	Link(this, target, options) as ILink<T>
 
 infix fun <T> ISource<T>.linkTo(target: ITarget<T>) =
 	linkTo(target, LinkOptions())
