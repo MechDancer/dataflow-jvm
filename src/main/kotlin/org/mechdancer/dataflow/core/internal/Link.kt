@@ -3,7 +3,6 @@ package org.mechdancer.dataflow.core.internal
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.ILink.Companion.changed
 import org.mechdancer.dataflow.core.ILink.Companion.list
-import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -18,7 +17,7 @@ internal class Link<T>(
 	override val options: LinkOptions<T>,
 	private val holder: LinkManager<T>
 ) : ILink<T> {
-	override val uuid: UUID = UUID.randomUUID()!!
+	override val uuid = randomUUID()
 
 	//构造时加入列表
 	init {

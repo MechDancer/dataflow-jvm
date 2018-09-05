@@ -6,7 +6,7 @@ import org.mechdancer.dataflow.core.IPostable
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.ITarget
 import org.mechdancer.dataflow.core.internal.TargetCore
-import java.util.*
+import org.mechdancer.dataflow.core.internal.randomUUID
 
 /** 动作节点 */
 class ActionBlock<T>(
@@ -14,7 +14,7 @@ class ActionBlock<T>(
 	options: ExecutableOptions = ExecutableOptions(),
 	action: (T) -> Unit
 ) : ITarget<T>, IPostable<T> {
-	override val uuid = UUID.randomUUID()!!
+	override val uuid = randomUUID()
 	override val defaultSource by lazy { DefaultSource(this) }
 	private val core = TargetCore(options, action)
 	override fun offer(id: Long, egress: IEgress<T>) = core.offer(id, egress)

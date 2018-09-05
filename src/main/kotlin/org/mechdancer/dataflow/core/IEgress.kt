@@ -1,5 +1,9 @@
 package org.mechdancer.dataflow.core
 
+/**
+ * 事件出口
+ * 可从中消费事件的端口
+ */
 interface IEgress<T> {
 	/**
 	 * 消费一个事件

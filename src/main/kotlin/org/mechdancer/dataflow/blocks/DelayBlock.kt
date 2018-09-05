@@ -3,9 +3,12 @@ package org.mechdancer.dataflow.blocks
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.internal.*
-import java.util.*
 import java.util.concurrent.TimeUnit
 
+/**
+ * 延时模块
+ * 接收到消息后延迟指定的时间再发射
+ */
 class DelayBlock<T>(
 	override val name: String = "delay",
 	delay: Long,
@@ -21,14 +24,13 @@ class DelayBlock<T>(
 		}, delay, unit)
 	}
 
-	override val uuid = UUID.randomUUID()!!
+	override val uuid = randomUUID()
 	override val defaultSource by lazy { DefaultSource(this) }
 	override val targets get() = linkManager.targets
 
 	override fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)
 	override fun consume(id: Long) = sourceCore consume id
 	override fun receive() = receiveCore consumeFrom sourceCore
-
 	override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
 		linkManager.linkTo(target, options)
 }

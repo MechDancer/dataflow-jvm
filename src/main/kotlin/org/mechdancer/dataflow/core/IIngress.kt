@@ -1,5 +1,9 @@
 package org.mechdancer.dataflow.core
 
+/**
+ * 事件入口
+ * 可通知其事件到达的端口
+ */
 interface IIngress<T> {
 	/**
 	 * 通知目标节点，链接了该节点的某个源有事件到来

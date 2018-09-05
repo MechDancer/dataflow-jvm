@@ -4,14 +4,14 @@ import org.mechdancer.dataflow.core.IReceivable
 import org.mechdancer.dataflow.core.ISource
 import org.mechdancer.dataflow.core.ITarget
 import org.mechdancer.dataflow.core.LinkOptions
-import org.mechdancer.dataflow.core.internal.LinkManager
-import org.mechdancer.dataflow.core.internal.ReceiveCore
-import org.mechdancer.dataflow.core.internal.SourceCore
-import org.mechdancer.dataflow.core.internal.scheduler
-import java.util.*
+import org.mechdancer.dataflow.core.internal.*
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
+/**
+ * 定时模块
+ * 一个纯源模块，间隔指定的时间发射递增的长整型
+ */
 class IntervalBlock(
 	override val name: String = "interval",
 	private val period: Long,
@@ -25,7 +25,7 @@ class IntervalBlock(
 	private var t = 0L
 	private var task: ScheduledFuture<*>? = null
 
-	override val uuid = UUID.randomUUID()!!
+	override val uuid = randomUUID()
 	override val targets get() = linkManager.targets
 
 	init {

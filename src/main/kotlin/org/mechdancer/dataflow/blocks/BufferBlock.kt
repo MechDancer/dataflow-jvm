@@ -2,11 +2,7 @@ package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
-import org.mechdancer.dataflow.core.internal.LinkManager
-import org.mechdancer.dataflow.core.internal.ReceiveCore
-import org.mechdancer.dataflow.core.internal.SourceCore
-import org.mechdancer.dataflow.core.internal.TargetCore
-import java.util.*
+import org.mechdancer.dataflow.core.internal.*
 
 /**
  * 缓冲模块
@@ -24,7 +20,7 @@ class BufferBlock<T>(
 		receiveCore.call()
 	}
 
-	override val uuid = UUID.randomUUID()!!
+	override val uuid = randomUUID()
 	override val defaultSource by lazy { DefaultSource(this) }
 	override val targets get() = linkManager.targets
 
