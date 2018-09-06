@@ -19,6 +19,7 @@ interface ILink<T> : IWithUUID, IEgress<T> {
 	 */
 	infix fun offer(id: Long): Feedback
 
+	/** 取消链接 */
 	fun dispose()
 
 	companion object {

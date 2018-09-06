@@ -17,24 +17,22 @@ fun ISource<*>.next(): List<IBlock> =
 		.filter { it.source === this }
 		.map { it.target }
 
-/** 递归查找前驱节点 */
-private infix fun ITarget<*>.recordPrior(list: MutableList<IBlock>) {
+private infix fun ITarget<*>.recordPriorTo(list: MutableList<IBlock>) {
 	if (this in list) return
 	this.prior().forEach {
 		if (it !in list) {
 			list.add(it)
-			(it as? ITarget<*>)?.recordPrior(list)
+			(it as? ITarget<*>)?.recordPriorTo(list)
 		}
 	}
 }
 
-/** 递归查找后继节点 */
-private infix fun ISource<*>.recordNext(list: MutableList<IBlock>) {
+private infix fun ISource<*>.recordNextTo(list: MutableList<IBlock>) {
 	if (this in list) return
 	this.next().forEach {
 		if (it !in list) {
 			list.add(it)
-			(it as? ISource<*>)?.recordNext(list)
+			(it as? ISource<*>)?.recordNextTo(list)
 		}
 	}
 }
@@ -42,13 +40,13 @@ private infix fun ISource<*>.recordNext(list: MutableList<IBlock>) {
 /** 列出所有前驱 */
 fun ITarget<*>.allPrior() =
 	mutableListOf<IBlock>()
-		.also { this recordPrior it }
+		.also { this recordPriorTo it }
 		.toList()
 
 /** 列出所有后继 */
 fun ISource<*>.allNext() =
 	mutableListOf<IBlock>()
-		.also { this recordNext it }
+		.also { this recordNextTo it }
 		.toList()
 
 /** 根据链接集找到所有纯源 */

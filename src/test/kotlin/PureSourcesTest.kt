@@ -24,6 +24,7 @@ class PureSourcesTest {
 		}
 	}
 
+	/** 测试查找纯源节点 */
 	@Test
 	fun findPureSources() {
 		val sources = ILink.all().pureSources()
@@ -31,6 +32,7 @@ class PureSourcesTest {
 		Assert.assertEquals("1", sources.first().name)
 	}
 
+	/** 测试查找前驱 */
 	@Test
 	fun findPrior() {
 		val prior = b3.prior()
@@ -38,6 +40,7 @@ class PureSourcesTest {
 		Assert.assertEquals("1", prior.first().name)
 	}
 
+	/** 测试查找后继 */
 	@Test
 	fun findNext() {
 		val next = b4.next()

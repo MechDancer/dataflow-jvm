@@ -3,6 +3,11 @@ import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.linkManage.treeView
 
 class LinkManageTest {
+	/**
+	 * 测试链接管理
+	 * 树状图只能人看
+	 */
+
 	@Test
 	fun test() {
 		val lock = Object()

@@ -24,7 +24,10 @@ class BufferBlock<T>(
 	override val defaultSource by lazy { DefaultSource(this) }
 	override val targets get() = linkManager.targets
 
+	/** @return 缓存存量 */
 	val count get() = sourceCore.bufferCount
+
+	/** 清空缓存 */
 	fun clear() = sourceCore.clear()
 
 	override fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)

@@ -32,6 +32,7 @@ class IntervalBlock(
 		if (immediately) start()
 	}
 
+	/** 启动 */
 	fun start() {
 		task = scheduler.scheduleAtFixedRate({
 			t = sourceCore.offer(t)
@@ -40,6 +41,7 @@ class IntervalBlock(
 		}, 0, period, unit)
 	}
 
+	/** 暂停 */
 	fun pause() = task?.cancel(false)
 
 	override fun consume(id: Long) = sourceCore consume id
