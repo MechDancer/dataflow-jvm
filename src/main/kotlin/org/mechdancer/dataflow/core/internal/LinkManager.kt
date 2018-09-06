@@ -11,8 +11,8 @@ internal class LinkManager<T>(private val owner: ISource<T>) {
 
 	val targets get() = list.map { it.target }.distinct()
 
-	fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-		Link(owner, target, options, this).also { list += it } as ILink<T>
+	fun linkTo(target: ITarget<T>, options: LinkOptions<T>): ILink<T> =
+		Link(owner, target, options, this).also { list += it }
 
 	fun remove(link: ILink<T>) {
 		list -= link

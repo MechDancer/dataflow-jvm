@@ -11,6 +11,7 @@ import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.starProjectedType
 
+@Suppress("UNCHECKED_CAST")
 class EventBusImpl : EventBus {
 	private val stickyEvents = ConcurrentHashMap<KClass<*>, IEvent>()
 

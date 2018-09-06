@@ -25,7 +25,7 @@ class StateMember<T>(
 	) { event ->
 		val out = action(event)
 		owner post MachineSnapshot(this, out)
-		sourceCore.offer(out).let { newId ->
+		sourceCore.offer(out).let {
 			//			ILink[this]
 //				.filter { it.options.predicate(out) }
 //				.dropWhile { it === loopLink }

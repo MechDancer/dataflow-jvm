@@ -46,10 +46,8 @@ class StateMachine<T>(override val name: String) :
 	override val targets get() = linkManager.targets
 
 	override fun offer(id: Long, egress: IEgress<MachineSnapshot<T>>) = targetCore.offer(id, egress)
-	override fun consume(id: Long): Message<out MachineSnapshot<T>> = sourceCore[id]
+	override fun consume(id: Long) = sourceCore[id]
 	override fun receive() = receiveCore getFrom sourceCore
-	override fun linkTo(target: ITarget<MachineSnapshot<T>>,
-	                    options: LinkOptions<MachineSnapshot<T>>)
-		: ILink<MachineSnapshot<T>> =
+	override fun linkTo(target: ITarget<MachineSnapshot<T>>, options: LinkOptions<MachineSnapshot<T>>) =
 		linkManager.linkTo(target, options)
 }
