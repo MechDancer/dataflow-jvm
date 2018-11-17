@@ -1,3 +1,5 @@
+package org.mechdancer.dataflow
+
 import org.junit.Test
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.util.treeView

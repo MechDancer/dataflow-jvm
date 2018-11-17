@@ -1,3 +1,5 @@
+package org.mechdancer.dataflow
+
 import org.mechdancer.dataflow.core.broadcast
 import org.mechdancer.dataflow.core.minus
 import org.mechdancer.dataflow.core.post

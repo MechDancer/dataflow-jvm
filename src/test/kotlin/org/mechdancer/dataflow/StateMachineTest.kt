@@ -1,3 +1,5 @@
+package org.mechdancer.dataflow
+
 import org.mechdancer.dataflow.external.statemachine.machines.linearStateMachine
 
 /** 测试状态机 */
