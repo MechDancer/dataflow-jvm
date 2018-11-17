@@ -1,9 +1,9 @@
-package org.mechdancer.dataflow.external.stateMachine.machines
+package org.mechdancer.dataflow.external.statemachine.machines
 
 import org.mechdancer.dataflow.core.link
 import org.mechdancer.dataflow.core.post
-import org.mechdancer.dataflow.external.stateMachine.core.StateMachine
-import org.mechdancer.dataflow.external.stateMachine.core.StateMember
+import org.mechdancer.dataflow.external.statemachine.core.StateMachine
+import org.mechdancer.dataflow.external.statemachine.core.StateMember
 
 class StateList<T> {
     private val list = mutableListOf<Pair<Int, (T) -> T>>()
@@ -22,7 +22,7 @@ class StateList<T> {
     }
 
     private infix fun Pair<Int, (T) -> T>.buildIn(
-        machine: StateMachine<Pair<Int, T>>
+            machine: StateMachine<Pair<Int, T>>
     ) = StateMember(machine, first > 1) {
         it.first + 1 to second(it.second)
     }
@@ -44,4 +44,4 @@ class StateList<T> {
 }
 
 fun <T> linearStateMachine(block: StateList<T>.() -> Unit) =
-    StateList<T>().apply(block).build()
+        StateList<T>().apply(block).build()

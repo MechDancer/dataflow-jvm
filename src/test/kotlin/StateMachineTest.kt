@@ -1,4 +1,4 @@
-import org.mechdancer.dataflow.external.stateMachine.machines.linearStateMachine
+import org.mechdancer.dataflow.external.statemachine.machines.linearStateMachine
 
 /** 测试状态机 */
 fun main(args: Array<String>) {

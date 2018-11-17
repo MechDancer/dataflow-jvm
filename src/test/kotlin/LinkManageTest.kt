@@ -1,6 +1,6 @@
 import org.junit.Test
 import org.mechdancer.dataflow.core.*
-import org.mechdancer.dataflow.linkManage.treeView
+import org.mechdancer.dataflow.util.treeView
 
 class LinkManageTest {
 	/**

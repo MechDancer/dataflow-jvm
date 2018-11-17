@@ -1,4 +1,4 @@
-package org.mechdancer.dataflow.linkManage
+package org.mechdancer.dataflow.util
 
 import org.mechdancer.dataflow.core.IBlock
 import org.mechdancer.dataflow.core.ILink

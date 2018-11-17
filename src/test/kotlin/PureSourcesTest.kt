@@ -1,9 +1,9 @@
 import org.junit.Assert
 import org.junit.Test
 import org.mechdancer.dataflow.core.*
-import org.mechdancer.dataflow.linkManage.next
-import org.mechdancer.dataflow.linkManage.prior
-import org.mechdancer.dataflow.linkManage.pureSources
+import org.mechdancer.dataflow.util.next
+import org.mechdancer.dataflow.util.prior
+import org.mechdancer.dataflow.util.pureSources
 
 class PureSourcesTest {
 	companion object {
