@@ -5,7 +5,7 @@ import org.mechdancer.dataflow.core.minus
 import org.mechdancer.dataflow.core.post
 
 /** 使用案例 */
-fun main(args: Array<String>) {
+fun main() {
     val source = broadcast<Int>()
     val link = source - { it - 1 } - source
     source - { it + 1 } - source

@@ -5,7 +5,6 @@ import org.junit.Test
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.util.next
 import org.mechdancer.dataflow.util.prior
-import org.mechdancer.dataflow.util.pureSources
 
 class PureSourcesTest {
     companion object {
@@ -24,13 +23,13 @@ class PureSourcesTest {
         }
     }
 
-    /** 测试查找纯源节点 */
-    @Test
-    fun findPureSources() {
-        val sources = ILink.list.pureSources()
-        Assert.assertEquals(1, sources.size)
-        Assert.assertEquals("1", sources.first().name)
-    }
+//    /** 测试查找纯源节点 */
+//    @Test
+//    fun findPureSources() {
+//        val sources = ILink.list.pureSources()
+//        Assert.assertEquals(1, sources.size)
+//        Assert.assertEquals("1", sources.first().name)
+//    }
 
     /** 测试查找前驱 */
     @Test
