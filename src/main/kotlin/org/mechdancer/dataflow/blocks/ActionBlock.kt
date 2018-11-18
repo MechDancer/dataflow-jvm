@@ -7,6 +7,7 @@ import org.mechdancer.dataflow.core.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.ITarget
 import org.mechdancer.dataflow.core.internal.TargetCore
 import org.mechdancer.dataflow.core.internal.randomUUID
+import org.mechdancer.dataflow.core.internal.view
 
 /** 动作节点 */
 class ActionBlock<T>(
@@ -18,4 +19,5 @@ class ActionBlock<T>(
     override val defaultSource by lazy { DefaultSource(this) }
     private val core = TargetCore(options, action)
     override suspend fun offer(id: Long, egress: IEgress<T>) = core.offer(id, egress)
+    override fun toString() = view()
 }

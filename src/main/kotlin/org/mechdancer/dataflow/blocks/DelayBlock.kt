@@ -24,8 +24,7 @@ class DelayBlock<T>(
                 runBlocking { linkManager.offer(sourceCore.offer(event), event) }
                 receiveCore.call()
             },
-            delay,
-            unit
+            delay, unit
         )
     }
 
@@ -38,4 +37,6 @@ class DelayBlock<T>(
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
         linkManager.linkTo(target, options)
+
+    override fun toString() = view()
 }

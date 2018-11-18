@@ -35,4 +35,6 @@ class BufferBlock<T>(
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
         linkManager.linkTo(target, options)
+
+    override fun toString() = view()
 }

@@ -1,7 +1,9 @@
 package org.mechdancer.dataflow.core
 
-import org.mechdancer.dataflow.blocks.*
-import java.util.concurrent.TimeUnit
+import org.mechdancer.dataflow.blocks.ActionBlock
+import org.mechdancer.dataflow.blocks.BroadcastBlock
+import org.mechdancer.dataflow.blocks.BufferBlock
+import org.mechdancer.dataflow.blocks.TransformBlock
 
 //-------------------------------
 // type
@@ -74,7 +76,10 @@ fun <T> action(
 fun <T> broadcast(name: String = "broadcast") = BroadcastBlock<T>(name)
 
 /** 构造节点 */
-fun <T> buffer(name: String = "buffer") = BufferBlock<T>(name)
+fun <T> buffer(
+    name: String = "buffer",
+    size: Int = Int.MAX_VALUE
+) = BufferBlock<T>(name, size)
 
 /** 构造节点 */
 fun <TIn, TOut> transform(
@@ -82,18 +87,3 @@ fun <TIn, TOut> transform(
     options: ExecutableOptions = ExecutableOptions(),
     map: (TIn) -> TOut
 ) = TransformBlock(name, options, map)
-
-/** 构造节点 */
-fun <T> delay(
-    delay: Long,
-    unit: TimeUnit = TimeUnit.MILLISECONDS,
-    name: String = "delay"
-) = DelayBlock<T>(name, delay, unit)
-
-/** 构造节点 */
-fun interval(
-    period: Long,
-    unit: TimeUnit = TimeUnit.MILLISECONDS,
-    immediately: Boolean = true,
-    name: String = "interval"
-) = IntervalBlock(name, period, unit, immediately)

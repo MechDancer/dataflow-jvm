@@ -34,4 +34,6 @@ class TransformBlock<TIn, TOut>(
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
         linkManager.linkTo(target, options)
+
+    override fun toString() = view()
 }

@@ -22,7 +22,7 @@ class BroadcastBlock<T>(
 
     override val uuid = randomUUID()
     override val defaultSource by lazy { DefaultSource(this) }
-    override val targets = linkManager.targets
+    override val targets get() = linkManager.targets
 
     override suspend fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)
     override fun receive() = receiveCore getFrom sourceCore
@@ -34,4 +34,6 @@ class BroadcastBlock<T>(
 
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
         linkManager.linkTo(target, options)
+
+    override fun toString() = view()
 }

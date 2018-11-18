@@ -41,5 +41,5 @@ internal class Link<T>(
 		list.remove(this).also { if (it) changed.post(list.toList()) }
 	}
 
-	override fun toString() = "[$uuid]: ${source.view()} -> ${target.view()}"
+	override fun toString() = "$source -> $target"
 }

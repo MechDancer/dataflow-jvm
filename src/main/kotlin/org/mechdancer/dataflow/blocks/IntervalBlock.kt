@@ -53,4 +53,6 @@ class IntervalBlock(
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<Long>, options: LinkOptions<Long>) =
         linkManager.linkTo(target, options)
+
+    override fun toString() = view()
 }
