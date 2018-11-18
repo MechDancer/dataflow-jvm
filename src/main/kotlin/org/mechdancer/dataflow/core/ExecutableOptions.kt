@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.core
 
-import java.util.concurrent.Executor
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 
 /**
  * 执行可选项
@@ -8,6 +9,6 @@ import java.util.concurrent.Executor
  * @param executor          调度器
  */
 data class ExecutableOptions(
-    val parallelismDegree: Int = Int.MAX_VALUE,
-    val executor: Executor? = null
+    val parallelismDegree: Int = 2,
+    val executor: CoroutineDispatcher = Dispatchers.Default
 )

@@ -33,6 +33,7 @@ class LinkManageTest {
 		source linkTo { println(link.count / (System.currentTimeMillis() - begin)) }
 
 		ILink.all().forEach { println(it) }
+        println()
 		println(source.treeView())
 	}
 }

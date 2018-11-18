@@ -18,7 +18,7 @@ internal class LinkManager<T>(private val owner: ISource<T>) {
 		list -= link
 	}
 
-	operator fun get(id: Long, value: T) =
+	suspend fun offer(id: Long, value: T) =
 		list.filter { it.options.predicate(value) }
 			.map { it.offer(id) }
 }

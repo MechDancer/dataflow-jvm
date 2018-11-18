@@ -29,7 +29,7 @@ internal class Link<T>(
 	override val count get() = _count.get()
 	override val rest get() = options.eventLimit - _count.get()
 
-	override infix fun offer(id: Long) = target.offer(id, this)
+	override suspend infix fun offer(id: Long) = target.offer(id, this)
 	override infix fun consume(id: Long) =
 		source.consume(id).apply {
 			if (this.hasValue && _count.incrementAndGet() > options.eventLimit)

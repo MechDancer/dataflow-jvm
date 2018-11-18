@@ -7,15 +7,13 @@ buildscript {
 
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.3.10'
-    id("org.jetbrains.dokka") version "0.9.17"
+    id 'org.jetbrains.dokka' version '0.9.17'
 }
 
 apply plugin: 'com.novoda.bintray-release'
 
 group 'org.mechdancer'
 version '0.2.0-dev-0'
-
-sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -24,9 +22,10 @@ repositories {
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-reflect', version: '+'
+    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-jdk8', version: '+'
 
     testCompile group: 'junit', name: 'junit', version: '+'
-    compile "org.jetbrains.kotlin:kotlin-reflect:1.3.10"
 }
 
 compileKotlin {
@@ -37,7 +36,6 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-
 publish {
     userOrg = 'mechdancer'
     groupId = 'org.mechdancer'
@@ -46,11 +44,3 @@ publish {
     desc = 'from @Microsoft .Net Core: "System.threading.tasks.dataflow"'
     website = 'https://github.com/MechDancer/dataflow-jvm'
 }
-
-task fatJar(group: 'build', type: Jar) {
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with(jar)
-}
-
-jar.dependsOn(fatJar)

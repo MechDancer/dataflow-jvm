@@ -12,5 +12,5 @@ interface IIngress<T> {
 	 * @param egress 事件到来的出口
 	 * @return 入口对事件的态度
 	 */
-	fun offer(id: Long, egress: IEgress<T>): Feedback
+    suspend fun offer(id: Long, egress: IEgress<T>): Feedback
 }
