@@ -3,7 +3,7 @@ package org.mechdancer.dataflow.core.internal
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.mechdancer.dataflow.annotations.ThreadSafety
 import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.Feedback
@@ -21,8 +21,8 @@ import kotlin.coroutines.CoroutineContext
  */
 @ThreadSafety
 internal class TargetCore<T>(
-    private val options: ExecutableOptions = ExecutableOptions(),
-    private val action: suspend (T) -> Unit
+        private val options: ExecutableOptions = ExecutableOptions(),
+        private val action: suspend (T) -> Unit
 ) : IIngress<T>, CoroutineScope, Closeable {
     private val job = Job()
     override val coroutineContext: CoroutineContext
@@ -37,23 +37,23 @@ internal class TargetCore<T>(
     override fun close() = job.cancel()
 
     override suspend fun offer(id: Long, egress: IEgress<T>): Feedback =
-        if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
-            bind(id, egress)
-            parallelismDegree.decrementAndGet()
-            Postponed
-        } else {
-            val message = egress.consume(id)
-            if (message.hasValue) {
-                launch {
-                    action(message.value)
-                    parallelismDegree.decrementAndGet()
-                    while (parallelismDegree.get() < options.parallelismDegree)
-                        unbind()?.let { (id, egress) -> offer(id, egress) } ?: break
-                }
-                Accepted
-            } else {
+            if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
+                bind(id, egress)
                 parallelismDegree.decrementAndGet()
-                NotAvailable
+                Postponed
+            } else {
+                val message = egress.consume(id)
+                if (message.hasValue) {
+                    runBlocking {
+                        action(message.value)
+                        parallelismDegree.decrementAndGet()
+                        while (parallelismDegree.get() < options.parallelismDegree)
+                            unbind()?.let { (id, egress) -> offer(id, egress) } ?: break
+                    }
+                    Accepted
+                } else {
+                    parallelismDegree.decrementAndGet()
+                    NotAvailable
+                }
             }
-        }
 }
