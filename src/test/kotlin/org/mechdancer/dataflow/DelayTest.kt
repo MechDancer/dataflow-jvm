@@ -13,12 +13,12 @@ class DelayTest {
         val delay = DelayBlock<Int>(delay = 2000, unit = TimeUnit.MILLISECONDS)
         delay post 10
         System.nanoTime()
-            .also { delay.receive() }
-            .let {
-                val time = (System.nanoTime() - it) / 1E9
-                println(time)
-                Assert.assertEquals(2.0, time, 0.1)
-            }
+                .also { delay.receive() }
+                .let {
+                    val time = (System.nanoTime() - it) / 1E9
+                    println(time)
+                    Assert.assertEquals(2.0, time, 0.1)
+                }
     }
 }
 

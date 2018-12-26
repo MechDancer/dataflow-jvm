@@ -18,8 +18,8 @@ internal class ReceiveCore {
     }
 
     infix fun <T> consumeFrom(sourceCore: SourceCore<T>) =
-        get { sourceCore.consume() }
+            get { sourceCore.consume() }
 
     infix fun <T> getFrom(sourceCore: SourceCore<T>) =
-        get { sourceCore.get() }
+            get { sourceCore.get() }
 }

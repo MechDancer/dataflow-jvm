@@ -1,7 +1,5 @@
 package org.mechdancer.dataflow.core
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.mechdancer.dataflow.core.internal.SourceCore
 
 /**
@@ -17,6 +15,6 @@ interface IPostable<T> : IIngress<T> {
      */
     class DefaultSource<T>(private val owner: IPostable<T>) {
         private val core = SourceCore<T>(Int.MAX_VALUE)
-        operator fun invoke(event: T) = GlobalScope.launch { owner.offer(core.offer(event), core) }
+        operator fun invoke(event: T) = owner.offer(core.offer(event), core)
     }
 }

@@ -9,8 +9,8 @@ import org.mechdancer.dataflow.core.internal.*
  * 未消耗的数据将保留，直到被消费
  */
 class BufferBlock<T>(
-    override val name: String = "buffer",
-    size: Int = Int.MAX_VALUE
+        override val name: String = "buffer",
+        size: Int = Int.MAX_VALUE
 ) : IPropagatorBlock<T, T>, IReceivable<T>, IPostable<T> {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
@@ -30,11 +30,11 @@ class BufferBlock<T>(
     /** 清空缓存 */
     fun clear() = sourceCore.clear()
 
-    override suspend fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)
+    override fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)
     override fun consume(id: Long) = sourceCore consume id
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-        linkManager.linkTo(target, options)
+            linkManager.linkTo(target, options)
 
     override fun toString() = view()
 }

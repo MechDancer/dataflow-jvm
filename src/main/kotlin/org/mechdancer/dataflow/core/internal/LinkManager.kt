@@ -23,7 +23,7 @@ internal class LinkManager<T>(private val owner: ISource<T>) {
      * @return 新链接的引用
      */
     fun linkTo(target: ITarget<T>, options: LinkOptions<T>): ILink<T> =
-        Link(owner, target, options, this).also(_set::plusAssign)
+            Link(owner, target, options, this).also(_set::plusAssign)
 
     /**
      * 移除一个链接
@@ -35,8 +35,8 @@ internal class LinkManager<T>(private val owner: ISource<T>) {
     /**
      * 向所有链接发送值
      */
-    suspend fun offer(id: Long, value: T) =
-        _set
-            .filter { it.options.predicate(value) }
-            .map { it offer id }
+    fun offer(id: Long, value: T) =
+            _set
+                    .filter { it.options.predicate(value) }
+                    .map { it offer id }
 }

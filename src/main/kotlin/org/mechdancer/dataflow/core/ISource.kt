@@ -7,6 +7,6 @@ package org.mechdancer.dataflow.core
 interface ISource<T> : IBlock, IEgress<T> {
     val targets: Set<ITarget<T>>
 
-	/** 添加到指定宿的链接 */
-	fun linkTo(target: ITarget<T>, options: LinkOptions<T> = LinkOptions()): ILink<T>
+    /** 添加到指定宿的链接 */
+    fun linkTo(target: ITarget<T>, options: LinkOptions<T> = LinkOptions()): ILink<T>
 }

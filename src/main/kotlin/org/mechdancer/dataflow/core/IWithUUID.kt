@@ -7,7 +7,7 @@ import java.util.*
  * 即可供人类区分、可存于集合的实体
  */
 interface IWithUUID : Comparable<IWithUUID> {
-	val uuid: UUID
-	override fun compareTo(other: IWithUUID) =
-		uuid.compareTo(other.uuid)
+    val uuid: UUID
+    override fun compareTo(other: IWithUUID) =
+            uuid.compareTo(other.uuid)
 }

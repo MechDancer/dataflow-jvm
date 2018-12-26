@@ -17,7 +17,7 @@ interface ILink<T> : IWithUUID, IEgress<T> {
      * 通知事件到来
      * 必然由源来通知，不必再指定源，也不接受其他源的消息
      */
-    suspend infix fun offer(id: Long): Feedback
+    infix fun offer(id: Long): Feedback
 
     /** 取消链接 */
     fun dispose()

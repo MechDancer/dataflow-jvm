@@ -5,5 +5,5 @@ package org.mechdancer.dataflow.core
  * 有名字和唯一ID
  */
 interface IBlock : IWithUUID {
-	val name: String
+    val name: String
 }

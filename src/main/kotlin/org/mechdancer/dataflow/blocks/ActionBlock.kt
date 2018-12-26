@@ -11,13 +11,13 @@ import org.mechdancer.dataflow.core.internal.view
 
 /** 动作节点 */
 class ActionBlock<T>(
-    override val name: String = "action",
-    options: ExecutableOptions = ExecutableOptions(),
-    action: suspend (T) -> Unit
+        override val name: String = "action",
+        options: ExecutableOptions = ExecutableOptions(),
+        action: suspend (T) -> Unit
 ) : ITarget<T>, IPostable<T> {
     override val uuid = randomUUID()
     override val defaultSource by lazy { DefaultSource(this) }
     private val core = TargetCore(options, action)
-    override suspend fun offer(id: Long, egress: IEgress<T>) = core.offer(id, egress)
+    override fun offer(id: Long, egress: IEgress<T>) = core.offer(id, egress)
     override fun toString() = view()
 }
