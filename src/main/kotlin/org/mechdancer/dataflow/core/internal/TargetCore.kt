@@ -3,7 +3,6 @@ package org.mechdancer.dataflow.core.internal
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.runBlocking
 import org.mechdancer.dataflow.annotations.ThreadSafety
 import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.Feedback
@@ -44,12 +43,10 @@ internal class TargetCore<T>(
             } else {
                 val message = egress.consume(id)
                 if (message.hasValue) {
-                    runBlocking {
                         action(message.value)
                         parallelismDegree.decrementAndGet()
                         while (parallelismDegree.get() < options.parallelismDegree)
                             unbind()?.let { (id, egress) -> offer(id, egress) } ?: break
-                    }
                     Accepted
                 } else {
                     parallelismDegree.decrementAndGet()
