@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 /**
  * 源节点的通用内核
+ *
  * 提供事件管理和基于散列的事件缓存
  * @param size 缓存容量（超过则丢弃最旧的）
  */

@@ -6,6 +6,7 @@ import org.mechdancer.dataflow.core.internal.*
 
 /**
  * 缓冲模块
+ *
  * 未消耗的数据将保留，直到被消费
  */
 class BufferBlock<T>(

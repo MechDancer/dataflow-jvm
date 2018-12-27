@@ -1,6 +1,5 @@
 package org.mechdancer.dataflow.blocks
 
-import kotlinx.coroutines.runBlocking
 import org.mechdancer.dataflow.core.IReceivable
 import org.mechdancer.dataflow.core.ISource
 import org.mechdancer.dataflow.core.ITarget
@@ -11,13 +10,14 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 定时模块
+ *
  * 一个纯源模块，间隔指定的时间发射递增的长整型
  */
 class IntervalBlock(
-        override val name: String = "interval",
-        private val period: Long,
-        private val unit: TimeUnit,
-        immediately: Boolean
+    override val name: String = "interval",
+    private val period: Long,
+    private val unit: TimeUnit,
+    immediately: Boolean
 ) : ISource<Long>, IReceivable<Long> {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
@@ -35,15 +35,11 @@ class IntervalBlock(
 
     /** 启动 */
     fun start() {
-        task = scheduler.scheduleAtFixedRate(
-                {
-                    t = sourceCore.offer(t)
-                    runBlocking { linkManager.offer(sourceCore.offer(t), t) }
-
-                    receiveCore.call()
-                },
-                0, period, unit
-        )
+        task = scheduler.scheduleAtFixedRate({
+            t = sourceCore.offer(t)
+            linkManager.offer(sourceCore.offer(t), t)
+            receiveCore.call()
+        }, 0, period, unit)
     }
 
     /** 暂停 */
@@ -52,7 +48,7 @@ class IntervalBlock(
     override fun consume(id: Long) = sourceCore consume id
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<Long>, options: LinkOptions<Long>) =
-            linkManager.linkTo(target, options)
+        linkManager.linkTo(target, options)
 
     override fun toString() = view()
 }

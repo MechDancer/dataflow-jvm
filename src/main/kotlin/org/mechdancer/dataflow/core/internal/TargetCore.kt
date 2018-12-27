@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * 目的节点的通用内核
+ *
  * @param action 目的节点接收事件后的动作
  */
 @ThreadSafety

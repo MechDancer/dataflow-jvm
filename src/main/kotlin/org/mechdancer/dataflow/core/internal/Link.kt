@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * 链接信息
+ *
  * @param source 事件源
  * @param target 事件宿
  * @param options 链接选项

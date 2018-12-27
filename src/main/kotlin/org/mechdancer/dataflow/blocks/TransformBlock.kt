@@ -6,6 +6,7 @@ import org.mechdancer.dataflow.core.internal.*
 
 /**
  * 转换模块
+ *
  * @param map 转换函数
  */
 class TransformBlock<TIn, TOut>(

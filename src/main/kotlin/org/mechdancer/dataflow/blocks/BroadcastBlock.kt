@@ -6,6 +6,7 @@ import org.mechdancer.dataflow.core.internal.*
 
 /**
  * 广播节点
+ *
  * 堆中的事件只会被新事件顶替，不会因为接收而消耗
  */
 class BroadcastBlock<T>(

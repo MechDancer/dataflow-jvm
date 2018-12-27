@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentSkipListSet
 
 /**
  * 链接管理
+ *
  * @param owner 管理器从属的源
  */
 internal class LinkManager<T>(private val owner: ISource<T>) {
@@ -18,6 +19,7 @@ internal class LinkManager<T>(private val owner: ISource<T>) {
 
     /**
      * 建立一个新的链接
+     *
      * @param target  目标宿
      * @param options 链接选项
      * @return 新链接的引用
