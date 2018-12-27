@@ -11,7 +11,7 @@ import org.mechdancer.dataflow.core.internal.*
 class TransformBlock<TIn, TOut>(
         override val name: String = "transform",
         options: ExecutableOptions = ExecutableOptions(),
-        private val map: (TIn) -> TOut
+        private val map: suspend (TIn) -> TOut
 ) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut>, IPostable<TIn> {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
