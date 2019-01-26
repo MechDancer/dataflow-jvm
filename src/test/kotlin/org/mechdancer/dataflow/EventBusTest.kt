@@ -4,8 +4,7 @@ import org.junit.Assert
 import org.junit.Test
 import org.mechdancer.dataflow.external.eventbus.EventBus
 import org.mechdancer.dataflow.external.eventbus.EventBus.Companion.DefaultExecutor
-import org.mechdancer.dataflow.external.eventbus.IEvent
-import org.mechdancer.dataflow.external.eventbus.annotations.Subscribe
+import org.mechdancer.dataflow.external.eventbus.Subscribe
 
 class EventBusTest {
     @Test
@@ -18,7 +17,7 @@ class EventBusTest {
     }
 }
 
-data class ShitEvent(val id: Int) : IEvent
+data class ShitEvent(val id: Int)
 
 class A {
     var a = 1

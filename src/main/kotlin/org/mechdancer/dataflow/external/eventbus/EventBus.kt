@@ -10,14 +10,14 @@ import kotlin.reflect.KClass
  */
 interface EventBus {
     /**
-     * 注册一个类中所有具有 [org.mechdancer.dataflow.external.eventbus.annotations.Subscribe] 标记的函数
+     * 注册一个类中所有具有 [Subscribe] 标记的函数
      *
      *  @param receiver 类的实例
      */
     fun register(receiver: Any)
 
     /**
-     * 取消注册一个类中所有具有 [org.mechdancer.dataflow.external.eventbus.annotations.Subscribe] 标记的函数
+     * 取消注册一个类中所有具有 [Subscribe] 标记的函数
      *
      * @param receiver 类的实例
      */
@@ -28,7 +28,7 @@ interface EventBus {
      *
      * @param event 事件
      */
-    fun post(event: IEvent)
+    fun post(event: Event)
 
     /**
      * 发布一个粘性事件
@@ -39,7 +39,7 @@ interface EventBus {
      *
      * 每种类型的粘性事件是唯一的，在系统中只会留下一个。
      */
-    fun postSticky(event: IEvent)
+    fun postSticky(event: Event)
 
     /**
      * 通过事件类型获取一个粘性事件
@@ -47,7 +47,7 @@ interface EventBus {
      * @param kClass 事件类型
      * @return 如果未找到，则返回 `null`
      */
-    fun getStickyEvent(kClass: KClass<out IEvent>): IEvent?
+    fun getStickyEvent(kClass: KClass<out Event>): Event?
 
     /**
      * 通过事件类型移除一个粘性事件
@@ -55,7 +55,7 @@ interface EventBus {
      * @param kClass 事件类型
      * @return 是否移除成功
      */
-    fun removeStickyEvent(kClass: KClass<out IEvent>): Boolean
+    fun removeStickyEvent(kClass: KClass<out Event>): Boolean
 
     /**
      * 移除全部粘性事件
@@ -69,7 +69,7 @@ interface EventBus {
          * 调度器
          *
          * 可使用 [String] 作为标识传入，
-         * 在订阅 [org.mechdancer.dataflow.external.eventbus.annotations.Subscribe]
+         * 在订阅 [Subscribe]
          * 中通过标识指定调度器
          */
         val executors = mutableMapOf<String, Executor?>()

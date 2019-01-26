@@ -15,8 +15,8 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version "1.3.11"
-    id("org.jetbrains.dokka") version "0.9.16"
+    kotlin("jvm") version "1.3.20"
+    id("org.jetbrains.dokka") version "0.9.17"
 }
 
 apply {
@@ -24,7 +24,7 @@ apply {
 }
 
 group = "org.mechdancer"
-version = "0.2.0-dev-2"
+version = "0.2.0-dev-4"
 
 repositories {
     mavenCentral()
@@ -33,7 +33,7 @@ repositories {
 dependencies {
     compile(kotlin("stdlib-jdk8"))
     compile(kotlin("reflect"))
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.0")
+    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
     testCompile("junit", "junit", "+")
 }
 

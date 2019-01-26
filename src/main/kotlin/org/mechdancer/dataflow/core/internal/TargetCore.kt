@@ -15,8 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 @ThreadSafety
 internal class TargetCore<T>(
-    private val options: ExecutableOptions = ExecutableOptions(),
-    private val action: suspend (T) -> Unit
+        private val options: ExecutableOptions = ExecutableOptions(),
+        private val action: suspend (T) -> Unit
 ) : IIngress<T> {
 
     private val parallelismDegree = AtomicInteger(0)
@@ -47,9 +47,9 @@ internal class TargetCore<T>(
                 action(msg!!.value)
                 while (true)
                     (waitingQueue.poll() ?: break)
-                        .let { (id, egress) -> egress.consume(id) }
-                        .takeIf { it.hasValue }
-                        ?.let { action(it.value) }
+                            .let { (id, egress) -> egress.consume(id) }
+                            .takeIf { it.hasValue }
+                            ?.let { action(it.value) }
                 parallelismDegree.decrementAndGet()
             }
             Postponed    -> waitingQueue.add(id to egress)

@@ -1,6 +1,4 @@
-package org.mechdancer.dataflow.external.eventbus.annotations
-
-import org.mechdancer.dataflow.external.eventbus.EventBus
+package org.mechdancer.dataflow.external.eventbus
 
 @MustBeDocumented
 @Retention(AnnotationRetention.RUNTIME)
@@ -14,6 +12,6 @@ import org.mechdancer.dataflow.external.eventbus.EventBus
  * @param executor 执行该函数调用的调度器
  **/
 annotation class Subscribe(
-    val sticky: Boolean = false,
-    val executor: String = EventBus.DefaultExecutor
+        val sticky: Boolean = false,
+        val executor: String = EventBus.DefaultExecutor
 )

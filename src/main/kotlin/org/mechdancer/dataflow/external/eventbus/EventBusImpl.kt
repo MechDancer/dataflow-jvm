@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import org.mechdancer.dataflow.blocks.BroadcastBlock
 import org.mechdancer.dataflow.core.*
-import org.mechdancer.dataflow.external.eventbus.annotations.Subscribe
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import kotlin.reflect.KClass
@@ -15,10 +14,10 @@ import kotlin.reflect.full.starProjectedType
 
 @Suppress("UNCHECKED_CAST")
 class EventBusImpl : EventBus {
-    private val stickyEvents = ConcurrentHashMap<KClass<*>, IEvent>()
+    private val stickyEvents = ConcurrentHashMap<KClass<*>, Event>()
 
-    private val broadcast = BroadcastBlock<IEvent>()
-    private val links = hashMapOf<KFunction<Unit>, ILink<IEvent>>()
+    private val broadcast = BroadcastBlock<Event>()
+    private val links = hashMapOf<KFunction<Unit>, ILink<Event>>()
 
     private fun subscribe(receiver: Any, kFunction: KFunction<Unit>, executor: Executor?) {
         kFunction.let { f ->
@@ -27,7 +26,7 @@ class EventBusImpl : EventBus {
                             ?: Dispatchers.Default)
             ) {
                 if (it::class.starProjectedType == f.parameters[1].type ||
-                        IEvent::class.starProjectedType == f.parameters[1].type)
+                        Event::class.starProjectedType == f.parameters[1].type)
                     f.call(receiver, it)
             }
         }
@@ -49,7 +48,7 @@ class EventBusImpl : EventBus {
                         EventBus.executors[subscribe.executor])
                 if (subscribe.sticky)
                     stickyEvents.forEach { _, e ->
-                        (links[f]?.target as? IPostable<IEvent>)?.post(e)
+                        (links[f]?.target as? IPostable<Event>)?.post(e)
                     }
             }
         }
@@ -66,18 +65,18 @@ class EventBusImpl : EventBus {
         }
     }
 
-    override fun post(event: IEvent) {
+    override fun post(event: Event) {
         broadcast post event
     }
 
-    override fun postSticky(event: IEvent) {
+    override fun postSticky(event: Event) {
         stickyEvents[event::class] = event
         post(event)
     }
 
-    override fun getStickyEvent(kClass: KClass<out IEvent>): IEvent? = stickyEvents[kClass]
+    override fun getStickyEvent(kClass: KClass<out Event>): Event? = stickyEvents[kClass]
 
-    override fun removeStickyEvent(kClass: KClass<out IEvent>): Boolean =
+    override fun removeStickyEvent(kClass: KClass<out Event>): Boolean =
             stickyEvents.remove(kClass)?.run { true } ?: false
 
     override fun removeAllStickyEvents() {

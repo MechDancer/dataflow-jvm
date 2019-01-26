@@ -1,18 +1,15 @@
 package org.mechdancer.dataflow.blocks
 
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.IEgress
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
+import org.mechdancer.dataflow.core.ITarget
+import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.internal.*
 
-/**
- * 缓冲模块
- *
- * 未消耗的数据将保留，直到被消费
- */
 class BufferBlock<T>(
         override val name: String = "buffer",
         size: Int = Int.MAX_VALUE
-) : IPropagatorBlock<T, T>, IReceivable<T>, IPostable<T> {
+) : IBufferBlock<T> {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<T>(size)

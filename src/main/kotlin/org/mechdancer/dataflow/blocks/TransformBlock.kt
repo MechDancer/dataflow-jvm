@@ -1,7 +1,10 @@
 package org.mechdancer.dataflow.blocks
 
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.ExecutableOptions
+import org.mechdancer.dataflow.core.IEgress
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
+import org.mechdancer.dataflow.core.ITarget
+import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.internal.*
 
 /**
@@ -13,7 +16,7 @@ class TransformBlock<TIn, TOut>(
         override val name: String = "transform",
         options: ExecutableOptions = ExecutableOptions(),
         private val map: suspend (TIn) -> TOut
-) : IPropagatorBlock<TIn, TOut>, IReceivable<TOut>, IPostable<TIn> {
+) : ITransformBlock<TIn, TOut> {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<TOut>(Int.MAX_VALUE)

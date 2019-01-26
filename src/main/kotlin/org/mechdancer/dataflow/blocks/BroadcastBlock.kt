@@ -1,18 +1,17 @@
 package org.mechdancer.dataflow.blocks
 
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.IEgress
 import org.mechdancer.dataflow.core.IPostable.DefaultSource
+import org.mechdancer.dataflow.core.ITarget
+import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.internal.*
+import org.mechdancer.dataflow.core.message
 
-/**
- * 广播节点
- *
- * 堆中的事件只会被新事件顶替，不会因为接收而消耗
- */
+
 class BroadcastBlock<T>(
         override val name: String = "broadcast",
         private val clone: ((T) -> T)? = null
-) : IPropagatorBlock<T, T>, IReceivable<T>, IPostable<T> {
+) : IBroadcastBlock<T> {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<T>(1)

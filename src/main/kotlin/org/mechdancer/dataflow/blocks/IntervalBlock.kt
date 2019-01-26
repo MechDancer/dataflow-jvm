@@ -1,24 +1,18 @@
 package org.mechdancer.dataflow.blocks
 
-import org.mechdancer.dataflow.core.IReceivable
-import org.mechdancer.dataflow.core.ISource
 import org.mechdancer.dataflow.core.ITarget
 import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.internal.*
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-/**
- * 定时模块
- *
- * 一个纯源模块，间隔指定的时间发射递增的长整型
- */
+
 class IntervalBlock(
-    override val name: String = "interval",
-    private val period: Long,
-    private val unit: TimeUnit,
-    immediately: Boolean
-) : ISource<Long>, IReceivable<Long> {
+        override val name: String = "interval",
+        private val period: Long,
+        private val unit: TimeUnit,
+        immediately: Boolean
+) : IIntervalBlock {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<Long>(Int.MAX_VALUE)
@@ -48,7 +42,7 @@ class IntervalBlock(
     override fun consume(id: Long) = sourceCore consume id
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<Long>, options: LinkOptions<Long>) =
-        linkManager.linkTo(target, options)
+            linkManager.linkTo(target, options)
 
     override fun toString() = view()
 }
