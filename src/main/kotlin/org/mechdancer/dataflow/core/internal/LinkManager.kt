@@ -1,9 +1,9 @@
 package org.mechdancer.dataflow.core.internal
 
-import org.mechdancer.dataflow.core.ILink
-import org.mechdancer.dataflow.core.ISource
-import org.mechdancer.dataflow.core.ITarget
 import org.mechdancer.dataflow.core.LinkOptions
+import org.mechdancer.dataflow.core.intefaces.ILink
+import org.mechdancer.dataflow.core.intefaces.ISource
+import org.mechdancer.dataflow.core.intefaces.ITarget
 import java.util.concurrent.ConcurrentSkipListSet
 
 /**
@@ -25,7 +25,7 @@ internal class LinkManager<T>(private val owner: ISource<T>) {
      * @return 新链接的引用
      */
     fun linkTo(target: ITarget<T>, options: LinkOptions<T>): ILink<T> =
-            Link(owner, target, options, this).also(_set::plusAssign)
+        Link(owner, target, options, this).also(_set::plusAssign)
 
     /**
      * 移除一个链接
@@ -38,7 +38,7 @@ internal class LinkManager<T>(private val owner: ISource<T>) {
      * 向所有链接发送值
      */
     fun offer(id: Long, value: T) =
-            _set
-                    .filter { it.options.predicate(value) }
-                    .map { it offer id }
+        _set
+            .filter { it.options.predicate(value) }
+            .map { it offer id }
 }

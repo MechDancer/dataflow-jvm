@@ -1,8 +1,8 @@
 package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.dataflow.annotations.ThreadSafety
-import org.mechdancer.dataflow.core.IEgress
 import org.mechdancer.dataflow.core.Message
+import org.mechdancer.dataflow.core.intefaces.IEgress
 import org.mechdancer.dataflow.core.message
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
@@ -44,16 +44,16 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
 
     /** 从堆中获取第一个事件 */
     tailrec fun get(): Message<out T> =
-            if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.pack ?: get()
-            else null.pack
+        if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.pack ?: get()
+        else null.pack
 
     /** 从堆中消费一个事件 */
     override infix fun consume(id: Long) = buffer.remove(id).pack
 
     /** 从堆中消费第一个事件 */
     tailrec fun consume(): Message<out T> =
-            if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.pack ?: consume()
-            else null.pack
+        if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.pack ?: consume()
+        else null.pack
 
     /** 从堆中丢弃所有事件 */
     fun clear() = buffer.clear()

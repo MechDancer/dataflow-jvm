@@ -1,15 +1,18 @@
 package org.mechdancer.dataflow.blocks
 
-import org.mechdancer.dataflow.core.IEgress
-import org.mechdancer.dataflow.core.IPostable.DefaultSource
-import org.mechdancer.dataflow.core.ITarget
+import org.mechdancer.dataflow.core.BlockBase
 import org.mechdancer.dataflow.core.LinkOptions
+import org.mechdancer.dataflow.core.intefaces.IBlock
+import org.mechdancer.dataflow.core.intefaces.IEgress
+import org.mechdancer.dataflow.core.intefaces.IFullyBlock
+import org.mechdancer.dataflow.core.intefaces.IPostable.DefaultSource
+import org.mechdancer.dataflow.core.intefaces.ITarget
 import org.mechdancer.dataflow.core.internal.*
 
 class BufferBlock<T>(
-        override val name: String = "buffer",
-        size: Int = Int.MAX_VALUE
-) : IBufferBlock<T> {
+    name: String = "buffer",
+    size: Int = Int.MAX_VALUE
+) : IFullyBlock<T, T>, IBlock by BlockBase(name) {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<T>(size)
@@ -18,7 +21,6 @@ class BufferBlock<T>(
         receiveCore.call()
     }
 
-    override val uuid = randomUUID()
     override val defaultSource by lazy { DefaultSource(this) }
     override val targets get() = linkManager.targets
 
@@ -32,7 +34,5 @@ class BufferBlock<T>(
     override fun consume(id: Long) = sourceCore consume id
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
-            linkManager.linkTo(target, options)
-
-    override fun toString() = view()
+        linkManager.linkTo(target, options)
 }

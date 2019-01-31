@@ -1,4 +1,4 @@
-package org.mechdancer.dataflow.core
+package org.mechdancer.dataflow.core.intefaces
 
 import java.util.*
 
@@ -9,6 +9,5 @@ import java.util.*
  */
 interface IWithUUID : Comparable<IWithUUID> {
     val uuid: UUID
-    override fun compareTo(other: IWithUUID) =
-            uuid.compareTo(other.uuid)
+    override fun compareTo(other: IWithUUID): Int
 }

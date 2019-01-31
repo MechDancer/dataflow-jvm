@@ -2,6 +2,7 @@ package org.mechdancer.dataflow
 
 import org.junit.Test
 import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.util.treeView
 
 class LinkManageTest {

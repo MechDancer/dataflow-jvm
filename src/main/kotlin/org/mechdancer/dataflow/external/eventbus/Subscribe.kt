@@ -12,6 +12,6 @@ package org.mechdancer.dataflow.external.eventbus
  * @param executor 执行该函数调用的调度器
  **/
 annotation class Subscribe(
-        val sticky: Boolean = false,
-        val executor: String = EventBus.DefaultExecutor
+    val sticky: Boolean = false,
+    val executor: String = EventBus.DefaultExecutor
 )

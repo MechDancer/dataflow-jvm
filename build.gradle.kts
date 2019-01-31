@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    compile(kotlin("stdlib-jdk8"))
+    compile(kotlin("stdlib"))
     compile(kotlin("reflect"))
     compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
     testCompile("junit", "junit", "+")
@@ -45,7 +45,6 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
-
 configure<PublishExtension> {
     userOrg = "mechdancer"
     groupId = "org.mechdancer"
@@ -55,7 +54,6 @@ configure<PublishExtension> {
     website = "https://github.com/MechDancer/dataflow-jvm"
     setLicences("WTFPL")
 }
-
 
 task<Jar>("sourceJar") {
     classifier = "sources"

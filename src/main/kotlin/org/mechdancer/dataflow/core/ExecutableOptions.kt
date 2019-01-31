@@ -10,6 +10,6 @@ import kotlinx.coroutines.Dispatchers
  * @param executor          调度器
  */
 data class ExecutableOptions(
-        val parallelismDegree: Int = 2,
-        val executor: CoroutineDispatcher = Dispatchers.Default
+    val parallelismDegree: Int = 2,
+    val executor: CoroutineDispatcher = Dispatchers.Default
 )

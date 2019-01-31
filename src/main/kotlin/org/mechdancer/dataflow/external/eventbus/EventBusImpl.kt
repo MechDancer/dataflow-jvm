@@ -3,7 +3,12 @@ package org.mechdancer.dataflow.external.eventbus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import org.mechdancer.dataflow.blocks.BroadcastBlock
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.ExecutableOptions
+import org.mechdancer.dataflow.core.action
+import org.mechdancer.dataflow.core.intefaces.ILink
+import org.mechdancer.dataflow.core.intefaces.IPostable
+import org.mechdancer.dataflow.core.linkTo
+import org.mechdancer.dataflow.core.post
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
 import kotlin.reflect.KClass
@@ -22,11 +27,12 @@ class EventBusImpl : EventBus {
     private fun subscribe(receiver: Any, kFunction: KFunction<Unit>, executor: Executor?) {
         kFunction.let { f ->
             links[f] = broadcast linkTo action(
-                    options = ExecutableOptions(Int.MAX_VALUE, executor?.asCoroutineDispatcher()
-                            ?: Dispatchers.Default)
+                options = ExecutableOptions(Int.MAX_VALUE, executor?.asCoroutineDispatcher()
+                                                           ?: Dispatchers.Default)
             ) {
                 if (it::class.starProjectedType == f.parameters[1].type ||
-                        Event::class.starProjectedType == f.parameters[1].type)
+                    Event::class.starProjectedType == f.parameters[1].type
+                )
                     f.call(receiver, it)
             }
         }
@@ -43,9 +49,9 @@ class EventBusImpl : EventBus {
             f.findAnnotation<Subscribe>()?.let { subscribe ->
                 @Suppress("UNCHECKED_CAST")
                 subscribe(
-                        receiver,
-                        f as KFunction<Unit>,
-                        EventBus.executors[subscribe.executor])
+                    receiver,
+                    f as KFunction<Unit>,
+                    EventBus.executors[subscribe.executor])
                 if (subscribe.sticky)
                     stickyEvents.forEach { _, e ->
                         (links[f]?.target as? IPostable<Event>)?.post(e)
@@ -77,7 +83,7 @@ class EventBusImpl : EventBus {
     override fun getStickyEvent(kClass: KClass<out Event>): Event? = stickyEvents[kClass]
 
     override fun removeStickyEvent(kClass: KClass<out Event>): Boolean =
-            stickyEvents.remove(kClass)?.run { true } ?: false
+        stickyEvents.remove(kClass)?.run { true } ?: false
 
     override fun removeAllStickyEvents() {
         stickyEvents.clear()

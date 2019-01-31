@@ -1,7 +1,7 @@
 package org.mechdancer.dataflow.core.internal
 
-import org.mechdancer.dataflow.core.IBlock
-import org.mechdancer.dataflow.core.ILink
+import org.mechdancer.dataflow.core.intefaces.IBlock
+import org.mechdancer.dataflow.core.intefaces.ILink
 import java.util.*
 import java.util.concurrent.ScheduledThreadPoolExecutor
 

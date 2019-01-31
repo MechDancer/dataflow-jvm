@@ -3,8 +3,12 @@ package org.mechdancer.dataflow.core.internal
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.mechdancer.dataflow.annotations.ThreadSafety
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.ExecutableOptions
+import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.Feedback.*
+import org.mechdancer.dataflow.core.Message
+import org.mechdancer.dataflow.core.intefaces.IEgress
+import org.mechdancer.dataflow.core.intefaces.IIngress
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -15,8 +19,8 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 @ThreadSafety
 internal class TargetCore<T>(
-        private val options: ExecutableOptions = ExecutableOptions(),
-        private val action: suspend (T) -> Unit
+    private val options: ExecutableOptions = ExecutableOptions(),
+    private val action: suspend (T) -> Unit
 ) : IIngress<T> {
 
     private val parallelismDegree = AtomicInteger(0)
@@ -47,9 +51,9 @@ internal class TargetCore<T>(
                 action(msg!!.value)
                 while (true)
                     (waitingQueue.poll() ?: break)
-                            .let { (id, egress) -> egress.consume(id) }
-                            .takeIf { it.hasValue }
-                            ?.let { action(it.value) }
+                        .let { (id, egress) -> egress.consume(id) }
+                        .takeIf { it.hasValue }
+                        ?.let { action(it.value) }
                 parallelismDegree.decrementAndGet()
             }
             Postponed    -> waitingQueue.add(id to egress)

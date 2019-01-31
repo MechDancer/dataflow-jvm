@@ -2,7 +2,11 @@ package org.mechdancer.dataflow
 
 import org.junit.Assert
 import org.junit.Test
-import org.mechdancer.dataflow.core.*
+import org.mechdancer.dataflow.core.action
+import org.mechdancer.dataflow.core.broadcast
+import org.mechdancer.dataflow.core.intefaces.ILink
+import org.mechdancer.dataflow.core.minus
+import org.mechdancer.dataflow.core.transform
 import org.mechdancer.dataflow.util.next
 import org.mechdancer.dataflow.util.prior
 

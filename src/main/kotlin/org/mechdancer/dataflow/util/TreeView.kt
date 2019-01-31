@@ -1,8 +1,8 @@
 package org.mechdancer.dataflow.util
 
-import org.mechdancer.dataflow.core.IBlock
-import org.mechdancer.dataflow.core.ISource
-import org.mechdancer.dataflow.core.ITarget
+import org.mechdancer.dataflow.core.intefaces.IBlock
+import org.mechdancer.dataflow.core.intefaces.ISource
+import org.mechdancer.dataflow.core.intefaces.ITarget
 import org.mechdancer.dataflow.core.internal.view
 
 /**
@@ -22,9 +22,9 @@ fun IBlock.treeView(): String {
  * @param indent 缩进长度和格式
  */
 private fun IBlock.treeView(
-        builder: StringBuilder,
-        already: MutableList<IBlock>,
-        indent: Long
+    builder: StringBuilder,
+    already: MutableList<IBlock>,
+    indent: Long
 ) {
     //显示自己
     builder.append(view())
@@ -37,10 +37,10 @@ private fun IBlock.treeView(
     builder.append("\n")
     //判断子树
     val branch = (this as? ISource<*>)
-            ?.targets
-            ?.takeUnless(Set<*>::isEmpty)
-            ?.toList()
-            ?: return
+                     ?.targets
+                     ?.takeUnless(Set<*>::isEmpty)
+                     ?.toList()
+                 ?: return
     //画图函数
     val format = { block: ITarget<*>, last: Boolean ->
         //画缩进
@@ -56,16 +56,16 @@ private fun IBlock.treeView(
         if (!last) {
             builder.append(" ├─")
             block.treeView(
-                    builder,
-                    already,
-                    2 * indent + 1
+                builder,
+                already,
+                2 * indent + 1
             )
         } else {
             builder.append(" └─")
             block.treeView(
-                    builder,
-                    already,
-                    2 * indent + 0
+                builder,
+                already,
+                2 * indent + 0
             )
         }
     }

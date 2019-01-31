@@ -1,10 +1,13 @@
 package org.mechdancer.dataflow.blocks
 
+import org.mechdancer.dataflow.core.BlockBase
 import org.mechdancer.dataflow.core.ExecutableOptions
-import org.mechdancer.dataflow.core.IEgress
-import org.mechdancer.dataflow.core.IPostable.DefaultSource
-import org.mechdancer.dataflow.core.ITarget
 import org.mechdancer.dataflow.core.LinkOptions
+import org.mechdancer.dataflow.core.intefaces.IBlock
+import org.mechdancer.dataflow.core.intefaces.IEgress
+import org.mechdancer.dataflow.core.intefaces.IFullyBlock
+import org.mechdancer.dataflow.core.intefaces.IPostable.DefaultSource
+import org.mechdancer.dataflow.core.intefaces.ITarget
 import org.mechdancer.dataflow.core.internal.*
 
 /**
@@ -13,10 +16,10 @@ import org.mechdancer.dataflow.core.internal.*
  * @param map 转换函数
  */
 class TransformBlock<TIn, TOut>(
-        override val name: String = "transform",
-        options: ExecutableOptions = ExecutableOptions(),
-        private val map: suspend (TIn) -> TOut
-) : ITransformBlock<TIn, TOut> {
+    name: String = "transform",
+    options: ExecutableOptions = ExecutableOptions(),
+    private val map: suspend (TIn) -> TOut
+) : IFullyBlock<TIn, TOut>, IBlock by BlockBase(name) {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
     private val sourceCore = SourceCore<TOut>(Int.MAX_VALUE)
@@ -29,7 +32,6 @@ class TransformBlock<TIn, TOut>(
         if (!valuable) sourceCore consume newId
     }
 
-    override val uuid = randomUUID()
     override val defaultSource by lazy { DefaultSource(this) }
     override val targets get() = linkManager.targets
 
@@ -37,7 +39,5 @@ class TransformBlock<TIn, TOut>(
     override fun consume(id: Long) = sourceCore consume id
     override fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =
-            linkManager.linkTo(target, options)
-
-    override fun toString() = view()
+        linkManager.linkTo(target, options)
 }

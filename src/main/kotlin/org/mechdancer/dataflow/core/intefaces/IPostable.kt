@@ -1,4 +1,4 @@
-package org.mechdancer.dataflow.core
+package org.mechdancer.dataflow.core.intefaces
 
 import org.mechdancer.dataflow.core.internal.SourceCore
 

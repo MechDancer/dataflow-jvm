@@ -1,4 +1,4 @@
-package org.mechdancer.dataflow.core
+package org.mechdancer.dataflow.core.intefaces
 
 /**
  * 节点
