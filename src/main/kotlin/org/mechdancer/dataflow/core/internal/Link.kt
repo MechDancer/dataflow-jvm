@@ -1,11 +1,13 @@
 package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.dataflow.core.LinkOptions
+import org.mechdancer.dataflow.core.UUIDBase
 import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.core.intefaces.ILink.Companion.changed
 import org.mechdancer.dataflow.core.intefaces.ILink.Companion.list
 import org.mechdancer.dataflow.core.intefaces.ISource
 import org.mechdancer.dataflow.core.intefaces.ITarget
+import org.mechdancer.dataflow.core.intefaces.IWithUUID
 import org.mechdancer.dataflow.core.post
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -17,12 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger
  * @param options 链接选项
  */
 internal class Link<T>(
-    override val source: ISource<T>,
-    override val target: ITarget<T>,
-    override val options: LinkOptions<T>,
-    private val holder: LinkManager<T>
-) : ILink<T> {
-    override val uuid = randomUUID()
+        override val source: ISource<T>,
+        override val target: ITarget<T>,
+        override val options: LinkOptions<T>,
+        private val holder: LinkManager<T>
+) : ILink<T>, IWithUUID by UUIDBase() {
 
     //构造时加入列表
     init {
@@ -36,10 +37,10 @@ internal class Link<T>(
 
     override infix fun offer(id: Long) = target.offer(id, this)
     override infix fun consume(id: Long) =
-        source.consume(id).apply {
-            if (this.hasValue && _count.incrementAndGet() > options.eventLimit)
-                dispose()
-        }
+            source.consume(id).apply {
+                if (this.hasValue && _count.incrementAndGet() > options.eventLimit)
+                    dispose()
+            }
 
     override fun dispose() {
         holder.remove(this)

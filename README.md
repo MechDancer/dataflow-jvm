@@ -2,7 +2,7 @@
 
 [![Download](https://api.bintray.com/packages/mechdancer/maven/dataflow-jvm/images/download.svg) ](https://bintray.com/mechdancer/maven/dataflow-jvm/_latestVersion)  [![Build Status](https://www.travis-ci.org/MechDancer/dataflow-jvm.svg?branch=master)](https://www.travis-ci.org/MechDancer/dataflow-jvm) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b5a38c9a8dfe4b65a6f43cc8a6feb53c)](https://www.codacy.com/app/berberman/dataflow-jvm?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MechDancer/dataflow-jvm&amp;utm_campaign=Badge_Grade)
 
-此项目模仿微软的 [数据流（任务并行库）](https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/dataflow-task-parallel-library?view=netcore-2.1)，目标是在Java虚拟机实现可用于机器人系统的并行计算网络。
+此项目模仿微软的[数据流（任务并行库）](https://docs.microsoft.com/zh-cn/dotnet/standard/parallel-programming/dataflow-task-parallel-library?view=netcore-2.1)，目标是在Java虚拟机实现可用于机器人系统的并行计算网络。
 
 项目采用将从最简单的可用系统开始，逐步优化并添加功能。
 
@@ -47,7 +47,7 @@ repositories {
     jcenter()
 }
 dependencies {
-    compile 'org.mechdancer:dataflow-jvm:0.2.0-dev-4'
+    compile 'org.mechdancer:dataflow-jvm:0.2.0-dev-5'
 }
 ```
 
@@ -65,7 +65,7 @@ dependencies {
 <dependency>
   <groupId>org.mechdancer</groupId>
   <artifactId>dataflow-jvm</artifactId>
-  <version>0.2.0-dev-4</version>
+  <version>0.2.0-dev-5</version>
   <type>pom</type>
 </dependency>
 ```
