@@ -1,5 +1,6 @@
 package org.mechdancer.dataflow.core.internal
 
+import org.mechdancer.dataflow.core.Feedback.DecliningPermanently
 import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.core.intefaces.ISource
@@ -25,20 +26,15 @@ internal class LinkManager<T>(private val owner: ISource<T>) {
      * @return 新链接的引用
      */
     fun linkTo(target: ITarget<T>, options: LinkOptions<T>): ILink<T> =
-        Link(owner, target, options, this).also(_set::plusAssign)
-
-    /**
-     * 移除一个链接
-     */
-    fun remove(link: ILink<T>) {
-        _set -= link
-    }
+        Link(owner, target, options).also(_set::plusAssign)
 
     /**
      * 向所有链接发送值
      */
     fun offer(id: Long, value: T) =
-        _set
-            .filter { it.options.predicate(value) }
-            .map { it offer id }
+        _set.filter { it.options.predicate(value) }
+            .groupBy { it offer id }
+            .also { it[DecliningPermanently]?.let(_set::removeAll) }
+            .keys
+            .toList()
 }

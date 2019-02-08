@@ -1,5 +1,6 @@
 package org.mechdancer.dataflow.core.internal
 
+import org.mechdancer.dataflow.core.Feedback.DecliningPermanently
 import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.UUIDBase
 import org.mechdancer.dataflow.core.intefaces.ILink
@@ -21,10 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger
 internal class Link<T>(
     override val source: ISource<T>,
     override val target: ITarget<T>,
-    override val options: LinkOptions<T>,
-    private val holder: LinkManager<T>
+    override val options: LinkOptions<T>
 ) : ILink<T>, IWithUUID by UUIDBase() {
-
     //构造时加入列表
     init {
         ILink.list.add(this)
@@ -35,15 +34,18 @@ internal class Link<T>(
     override val count get() = _count.get()
     override val rest get() = options.eventLimit - _count.get()
 
-    override infix fun offer(id: Long) = target.offer(id, this)
-    override infix fun consume(id: Long) =
-        source.consume(id).apply {
-            if (this.existent && _count.incrementAndGet() > options.eventLimit)
-                dispose()
-        }
+    @Volatile
+    override var closed = false
+        private set
 
-    override fun dispose() {
-        holder.remove(this)
+    override infix fun offer(id: Long) =
+        if (closed) DecliningPermanently else target.offer(id, this)
+
+    override infix fun consume(id: Long) =
+        source.consume(id).then { if (_count.incrementAndGet() > options.eventLimit) close() }
+
+    override fun close() {
+        closed = true
         list.remove(this).also { if (it) changed.post(list.toList()) }
     }
 
