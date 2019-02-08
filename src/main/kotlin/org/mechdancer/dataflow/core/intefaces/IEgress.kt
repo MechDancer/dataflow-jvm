@@ -1,6 +1,6 @@
 package org.mechdancer.dataflow.core.intefaces
 
-import org.mechdancer.dataflow.core.Message
+import org.mechdancer.common.extension.Optional
 
 /**
  * 事件出口
@@ -16,5 +16,5 @@ interface IEgress<T> {
      * @param id 事件的标识
      * @return 事件消息
      */
-    infix fun consume(id: Long): Message<out T>
+    infix fun consume(id: Long): Optional<T>
 }

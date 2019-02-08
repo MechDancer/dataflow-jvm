@@ -1,5 +1,6 @@
 package org.mechdancer.dataflow.blocks
 
+import org.mechdancer.common.extension.toOptional
 import org.mechdancer.dataflow.core.BlockBase
 import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.intefaces.IBlock
@@ -8,7 +9,6 @@ import org.mechdancer.dataflow.core.intefaces.IFullyBlock
 import org.mechdancer.dataflow.core.intefaces.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.intefaces.ITarget
 import org.mechdancer.dataflow.core.internal.*
-import org.mechdancer.dataflow.core.message
 
 /**
  * 广播块
@@ -31,10 +31,10 @@ class BroadcastBlock<T>(
     override fun offer(id: Long, egress: IEgress<T>) = targetCore.offer(id, egress)
     override fun receive() = receiveCore getFrom sourceCore
     override fun consume(id: Long) =
-        sourceCore[id].let {
-            if (it.hasValue && clone != null) message(clone.invoke(it.value))
-            else it
-        }
+        if (clone != null)
+            sourceCore[id].then { value -> return clone.invoke(value).toOptional() }
+        else
+            sourceCore[id]
 
     override fun linkTo(target: ITarget<T>, options: LinkOptions<T>) =
         linkManager.linkTo(target, options)

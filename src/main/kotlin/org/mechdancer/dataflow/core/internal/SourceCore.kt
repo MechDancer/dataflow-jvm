@@ -1,9 +1,9 @@
 package org.mechdancer.dataflow.core.internal
 
+import org.mechdancer.common.extension.Optional
+import org.mechdancer.common.extension.toOptional
 import org.mechdancer.dataflow.annotations.ThreadSafety
-import org.mechdancer.dataflow.core.Message
 import org.mechdancer.dataflow.core.intefaces.IEgress
-import org.mechdancer.dataflow.core.message
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
@@ -15,16 +15,11 @@ import java.util.concurrent.atomic.AtomicLong
  */
 @ThreadSafety
 internal class SourceCore<T>(private val size: Int) : IEgress<T> {
-    private data class Holder<T>(val value: T)
-
-    private val Holder<T>?.pack
-        get() = this?.let { x -> message(x.value) } ?: message()
-
     /** 原子长整型，用于生成事件的唯一Id */
     private val id = AtomicLong(0)
 
     /** 事件堆 */
-    private val buffer = ConcurrentHashMap<Long, Holder<T>>()
+    private val buffer = ConcurrentHashMap<Long, Optional<T>>()
 
     /** 缓存存量 */
     val bufferCount get() = buffer.size
@@ -32,7 +27,7 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
     /** 将一个事件放入堆 */
     fun offer(event: T): Long {
         val newId = id.getAndIncrement()
-        buffer[newId] = Holder(event)
+        buffer[newId] = event.toOptional()
         synchronized(buffer) {
             while (buffer.size > size) buffer.remove(buffer.keys.min())
         }
@@ -40,20 +35,24 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
     }
 
     /** 从堆中获取一个事件 */
-    operator fun get(id: Long) = buffer[id].pack
+    operator fun get(id: Long): Optional<T> =
+        buffer[id] ?: Optional.otherwise()
 
     /** 从堆中获取第一个事件 */
-    tailrec fun get(): Message<out T> =
-        if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.pack ?: get()
-        else null.pack
+    fun get(): Optional<T> =
+        buffer.values.firstOrNull() ?: Optional.otherwise()
 
     /** 从堆中消费一个事件 */
-    override infix fun consume(id: Long) = buffer.remove(id).pack
+    override infix fun consume(id: Long): Optional<T> =
+        buffer.remove(id) ?: Optional.otherwise()
 
     /** 从堆中消费第一个事件 */
-    tailrec fun consume(): Message<out T> =
-        if (buffer.isNotEmpty()) buffer[buffer.keys.min()]?.pack ?: consume()
-        else null.pack
+    fun consume(): Optional<T> {
+        while (true) {
+            val id = buffer.keys.min() ?: return Optional.otherwise()
+            return buffer.remove(id) ?: continue
+        }
+    }
 
     /** 从堆中丢弃所有事件 */
     fun clear() = buffer.clear()

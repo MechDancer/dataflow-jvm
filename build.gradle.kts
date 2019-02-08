@@ -9,7 +9,6 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.jetbrains.dokka:dokka-gradle-plugin")
         classpath("com.novoda:bintray-release:+")
     }
 }
@@ -28,13 +27,15 @@ version = "0.2.0-dev-4"
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 dependencies {
-    compile(kotlin("stdlib"))
-    compile(kotlin("reflect"))
-    compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.1.1")
-    testCompile("junit", "junit", "+")
+    implementation(kotlin("stdlib"))
+    implementation(kotlin("reflect"))
+    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.1")
+    implementation("org.mechdancer", "common-extension", "v0.1.0-1")
+    testImplementation("junit", "junit", "+")
 }
 
 configure<JavaPluginConvention> {
@@ -73,4 +74,3 @@ tasks.withType<DokkaTask> {
 tasks["javadoc"].dependsOn("dokka")
 tasks["jar"].dependsOn("sourceJar")
 tasks["jar"].dependsOn("javadocJar")
-

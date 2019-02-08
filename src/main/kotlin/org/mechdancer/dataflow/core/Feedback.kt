@@ -10,7 +10,6 @@ enum class Feedback(val positive: Boolean) {
     Accepted(true),
     Declined(false),
     Postponed(true),
-    NotAvailable(false);
-
-    val negative get() = !positive
+    NotAvailable(false),
+    DecliningPermanently(false);
 }

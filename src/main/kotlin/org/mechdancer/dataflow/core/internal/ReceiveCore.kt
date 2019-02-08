@@ -1,6 +1,6 @@
 package org.mechdancer.dataflow.core.internal
 
-import org.mechdancer.dataflow.core.Message
+import org.mechdancer.common.extension.Optional
 
 internal class ReceiveCore {
     private val receiveLock = Object()
@@ -9,12 +9,11 @@ internal class ReceiveCore {
         synchronized(receiveLock) { receiveLock.notifyAll() }
     }
 
-    private fun <T> get(block: () -> Message<out T>): T {
-        while (true)
-            block().let {
-                if (it.hasValue) return it.value
-                else synchronized(receiveLock) { receiveLock.wait() }
-            }
+    private fun <T> get(block: () -> Optional<T>): T {
+        while (true) {
+            block().then { return it }
+            synchronized(receiveLock) { receiveLock.wait() }
+        }
     }
 
     infix fun <T> consumeFrom(sourceCore: SourceCore<T>) =

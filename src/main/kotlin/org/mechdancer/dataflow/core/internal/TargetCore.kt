@@ -2,11 +2,11 @@ package org.mechdancer.dataflow.core.internal
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import org.mechdancer.common.extension.Optional
 import org.mechdancer.dataflow.annotations.ThreadSafety
 import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.Feedback.*
-import org.mechdancer.dataflow.core.Message
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import org.mechdancer.dataflow.core.intefaces.IIngress
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -28,7 +28,7 @@ internal class TargetCore<T>(
 
     override fun offer(id: Long, egress: IEgress<T>): Feedback {
         var feedback = NotAvailable
-        var msg: Message<out T>? = null
+        var msg: Optional<T>? = null
 
         parallelismDegree.updateAndGet {
             if (it >= options.parallelismDegree) {
@@ -36,7 +36,7 @@ internal class TargetCore<T>(
                 it
             } else {
                 msg = egress.consume(id)
-                if (msg!!.hasValue) {
+                if (msg!!.existent) {
                     feedback = Accepted
                     it + 1
                 } else {
@@ -47,18 +47,20 @@ internal class TargetCore<T>(
         }
 
         when (feedback) {
-            Accepted     -> GlobalScope.launch(options.executor) {
-                action(msg!!.value)
-                while (true)
-                    (waitingQueue.poll() ?: break)
-                        .let { (id, egress) -> egress.consume(id) }
-                        .takeIf { it.hasValue }
-                        ?.let { action(it.value) }
-                parallelismDegree.decrementAndGet()
+            Accepted             -> {
+                GlobalScope.launch(options.executor) {
+                    action(msg!!.get())
+                    while (true)
+                        (waitingQueue.poll() ?: break)
+                            .let { (id, egress) -> egress.consume(id) }
+                            .then { action(it) }
+                    parallelismDegree.decrementAndGet()
+                }
             }
-            Postponed    -> waitingQueue.add(id to egress)
-            NotAvailable -> Unit
-            Declined     -> Unit
+            Postponed            -> waitingQueue.add(id to egress)
+            NotAvailable,
+            Declined,
+            DecliningPermanently -> Unit
         }
 
         return feedback

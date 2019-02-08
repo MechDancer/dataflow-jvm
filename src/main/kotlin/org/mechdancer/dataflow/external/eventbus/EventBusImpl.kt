@@ -27,13 +27,11 @@ class EventBusImpl : EventBus {
     private fun subscribe(receiver: Any, kFunction: KFunction<Unit>, executor: Executor?) {
         kFunction.let { f ->
             links[f] = broadcast linkTo action(
-                options = ExecutableOptions(Int.MAX_VALUE, executor?.asCoroutineDispatcher()
-                                                           ?: Dispatchers.Default)
+                options = ExecutableOptions(executor = executor?.asCoroutineDispatcher() ?: Dispatchers.Default)
             ) {
                 if (it::class.starProjectedType == f.parameters[1].type ||
                     Event::class.starProjectedType == f.parameters[1].type
-                )
-                    f.call(receiver, it)
+                ) f.call(receiver, it)
             }
         }
     }

@@ -8,12 +8,6 @@ import org.mechdancer.dataflow.core.intefaces.IPostable
 import org.mechdancer.dataflow.core.intefaces.ISource
 import org.mechdancer.dataflow.core.intefaces.ITarget
 
-/** 构造事件信息 */
-fun <T> message(value: T) = Message(true, value)
-
-/** 构造空信息 */
-fun message() = Message(false, null)
-
 //-------------------------------
 // post
 //-------------------------------
