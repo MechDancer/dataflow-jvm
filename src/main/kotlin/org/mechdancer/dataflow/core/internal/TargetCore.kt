@@ -2,7 +2,6 @@ package org.mechdancer.dataflow.core.internal
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.mechdancer.common.extension.Optional
 import org.mechdancer.dataflow.annotations.ThreadSafety
 import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.Feedback
@@ -24,44 +23,42 @@ internal class TargetCore<T>(
 ) : IIngress<T> {
 
     private val parallelismDegree = AtomicInteger(0)
+    private val queueSize = AtomicInteger(0)
     private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, IEgress<T>>>()
 
     override fun offer(id: Long, egress: IEgress<T>): Feedback {
         var feedback = NotAvailable
-        var msg: Optional<T>? = null
 
-        parallelismDegree.updateAndGet {
-            if (it >= options.parallelismDegree) {
-                feedback = Postponed
-                it
-            } else {
-                msg = egress.consume(id)
-                if (msg!!.existent) {
-                    feedback = Accepted
-                    it + 1
+        if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
+            parallelismDegree.decrementAndGet()
+            feedback =
+                if (queueSize.incrementAndGet() > options.queueSize) {
+                    queueSize.decrementAndGet()
+                    Declined
                 } else {
-                    feedback = NotAvailable
-                    it
+                    waitingQueue.add(id to egress)
+                    Postponed
                 }
-            }
-        }
-
-        when (feedback) {
-            Accepted             -> {
-                GlobalScope.launch(options.executor) {
-                    action(msg!!.get())
-                    while (true)
-                        (waitingQueue.poll() ?: break)
-                            .let { (id, egress) -> egress.consume(id) }
-                            .then { action(it) }
+        } else
+            egress
+                .consume(id)
+                .then {
+                    feedback = Accepted
+                    GlobalScope.launch(options.executor) {
+                        action(it)
+                        while (true)
+                            waitingQueue.poll()
+                                ?.also { queueSize.decrementAndGet() }
+                                ?.let { (id, egress) -> egress.consume(id) }
+                                ?.then { action(it) }
+                            ?: break
+                        parallelismDegree.decrementAndGet()
+                    }
+                }
+                .otherwise {
+                    feedback = NotAvailable
                     parallelismDegree.decrementAndGet()
                 }
-            }
-            Postponed            -> waitingQueue.add(id to egress)
-            NotAvailable,
-            Declined,
-            DecliningPermanently -> Unit
-        }
 
         return feedback
     }
