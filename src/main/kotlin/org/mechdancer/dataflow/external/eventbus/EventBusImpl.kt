@@ -37,7 +37,7 @@ class EventBusImpl : EventBus {
     }
 
     private fun unsubscribe(kFunction: KFunction<Unit>) {
-        links.remove(kFunction)?.dispose()
+        links.remove(kFunction)?.close()
     }
 
     override fun register(receiver: Any) {
