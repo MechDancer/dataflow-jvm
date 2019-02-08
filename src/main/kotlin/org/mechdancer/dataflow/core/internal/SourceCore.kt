@@ -49,7 +49,7 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
     /** 从堆中消费第一个事件 */
     fun consume(): Optional<T> {
         while (true) {
-            val id = buffer.keys.min() ?: return Optional.otherwise()
+            val id = buffer.keys.min() ?: return Optional.otherwise<T>()
             return buffer.remove(id) ?: continue
         }
     }

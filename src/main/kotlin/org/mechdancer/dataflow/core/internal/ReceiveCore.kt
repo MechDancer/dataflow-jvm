@@ -9,14 +9,14 @@ internal class ReceiveCore {
         synchronized(receiveLock) { receiveLock.notifyAll() }
     }
 
-    private fun <T> get(block: () -> Optional<T>): T {
+    private inline fun <T> get(block: () -> Optional<T>): T {
         while (true) {
             block().then { return it }
             synchronized(receiveLock) { receiveLock.wait() }
         }
     }
 
-    infix fun <T> consumeFrom(sourceCore: SourceCore<T>) =
+    infix fun <T> consumeFrom(sourceCore: SourceCore<T>): T =
         get { sourceCore.consume() }
 
     infix fun <T> getFrom(sourceCore: SourceCore<T>) =
