@@ -10,10 +10,10 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 class IntervalBlock(
-    name: String = "interval",
-    private val period: Long,
-    private val unit: TimeUnit,
-    immediately: Boolean
+        name: String = "interval",
+        private val period: Long,
+        private val unit: TimeUnit,
+        start: Boolean
 ) : IExitBlock<Long>, IBlock by BlockBase(name) {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
@@ -25,7 +25,7 @@ class IntervalBlock(
     override val targets get() = linkManager.targets
 
     init {
-        if (immediately) start()
+        if (start) start()
     }
 
     /** 启动 */
