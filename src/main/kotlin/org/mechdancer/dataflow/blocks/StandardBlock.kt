@@ -1,5 +1,7 @@
 package org.mechdancer.dataflow.blocks
 
+import org.mechdancer.dataflow.blocks.TargetType.Broadcast
+import org.mechdancer.dataflow.blocks.TargetType.Cold
 import org.mechdancer.dataflow.core.BlockBase
 import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.intefaces.IBlock
@@ -14,7 +16,7 @@ import org.mechdancer.dataflow.core.options.LinkOptions
 class StandardBlock<TIn, TOut>(
     name: String,
     bufferSize: Int,
-    private val broadcast: Boolean,
+    private val targetType: TargetType,
     options: ExecutableOptions,
     private val map: suspend (TIn) -> TOut
 ) : IFullyBlock<TIn, TOut>, IBlock by BlockBase(name) {
@@ -27,7 +29,8 @@ class StandardBlock<TIn, TOut>(
         val id = sourceCore.offer(out)
         val significant = linkManager.offer(id, out).none(Feedback::positive)
         receiveCore.call()
-        if (!broadcast && significant) sourceCore consume id
+        if (targetType == Cold && significant)
+            sourceCore consume id
     }
 
     override val defaultSource by lazy { DefaultSource(this) }
@@ -40,11 +43,11 @@ class StandardBlock<TIn, TOut>(
         targetCore.offer(id, egress)
 
     override fun consume(id: Long) =
-        if (broadcast) sourceCore[id]
+        if (targetType == Broadcast) sourceCore[id]
         else sourceCore consume id
 
     override fun receive() =
-        if (broadcast) receiveCore getFrom sourceCore
+        if (targetType == Broadcast) receiveCore getFrom sourceCore
         else receiveCore consumeFrom sourceCore
 
     override fun linkTo(target: ITarget<TOut>, options: LinkOptions<TOut>) =

@@ -3,6 +3,8 @@ package org.mechdancer.dataflow.core
 import kotlinx.coroutines.delay
 import org.mechdancer.dataflow.blocks.ActionBlock
 import org.mechdancer.dataflow.blocks.StandardBlock
+import org.mechdancer.dataflow.blocks.TargetType.Broadcast
+import org.mechdancer.dataflow.blocks.TargetType.Normal
 import org.mechdancer.dataflow.core.intefaces.IPostable
 import org.mechdancer.dataflow.core.intefaces.ISource
 import org.mechdancer.dataflow.core.intefaces.ITarget
@@ -52,7 +54,7 @@ operator fun <T> ISource<T>.minus(target: ITarget<T>) =
 operator fun <TIn, TOut> ISource<TIn>.minus(target: suspend (TIn) -> TOut) =
     StandardBlock(name = "transform",
                   bufferSize = Int.MAX_VALUE,
-                  broadcast = false,
+                  targetType = Normal,
                   options = ExecutableOptions(),
                   map = target
     ).also { linkTo(it) }
@@ -72,7 +74,7 @@ fun <T> action(
 fun <T> broadcast(name: String = "broadcast") =
     StandardBlock<T, T>(name = name,
                         bufferSize = 1,
-                        broadcast = true,
+                        targetType = Broadcast,
                         options = ExecutableOptions(parallelismDegree = 1),
                         map = { it })
 
@@ -81,7 +83,7 @@ fun <T> buffer(name: String = "buffer",
                size: Int = Int.MAX_VALUE) =
     StandardBlock<T, T>(name = name,
                         bufferSize = size,
-                        broadcast = false,
+                        targetType = Normal,
                         options = ExecutableOptions(parallelismDegree = 1),
                         map = { it })
 
@@ -91,7 +93,7 @@ fun <TIn, TOut> transform(name: String = "transform",
                           map: suspend (TIn) -> TOut) =
     StandardBlock(name = name,
                   bufferSize = Int.MAX_VALUE,
-                  broadcast = false,
+                  targetType = Normal,
                   options = options,
                   map = map)
 
@@ -100,6 +102,6 @@ fun <T> delayBlock(name: String = "delay",
                    time: Long) =
     StandardBlock<T, T>(name = name,
                         bufferSize = Int.MAX_VALUE,
-                        broadcast = false,
+                        targetType = Normal,
                         options = ExecutableOptions(parallelismDegree = Int.MAX_VALUE),
                         map = { delay(time); it })

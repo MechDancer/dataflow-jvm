@@ -1,6 +1,7 @@
 package org.mechdancer.dataflow.core.intefaces
 
 import org.mechdancer.dataflow.blocks.StandardBlock
+import org.mechdancer.dataflow.blocks.TargetType.Broadcast
 import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.options.ExecutableOptions
 import org.mechdancer.dataflow.core.options.LinkOptions
@@ -33,7 +34,7 @@ interface ILink<T> : IWithUUID,
         internal val changed = StandardBlock<ILink<*>, ILink<*>>(
             name = "link changed",
             bufferSize = 1024,
-            broadcast = true,
+            targetType = Broadcast,
             options = ExecutableOptions(1),
             map = { it }
         )
