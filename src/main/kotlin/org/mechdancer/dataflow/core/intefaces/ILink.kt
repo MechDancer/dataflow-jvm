@@ -1,7 +1,8 @@
 package org.mechdancer.dataflow.core.intefaces
 
+import org.mechdancer.dataflow.blocks.StandardBlock
 import org.mechdancer.dataflow.core.Feedback
-import org.mechdancer.dataflow.core.buffer
+import org.mechdancer.dataflow.core.options.ExecutableOptions
 import org.mechdancer.dataflow.core.options.LinkOptions
 import java.io.Closeable
 
@@ -29,6 +30,12 @@ interface ILink<T> : IWithUUID,
 
     companion object {
         /** 拓扑改变事件 */
-        internal val changed = buffer<ILink<*>>()
+        internal val changed = StandardBlock<ILink<*>, ILink<*>>(
+            name = "link changed",
+            bufferSize = 1024,
+            broadcast = true,
+            options = ExecutableOptions(1),
+            map = { it }
+        )
     }
 }

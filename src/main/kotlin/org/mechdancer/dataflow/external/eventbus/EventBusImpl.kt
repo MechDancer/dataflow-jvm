@@ -2,11 +2,10 @@ package org.mechdancer.dataflow.external.eventbus
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
-import org.mechdancer.dataflow.blocks.BroadcastBlock
 import org.mechdancer.dataflow.core.action
+import org.mechdancer.dataflow.core.broadcast
 import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.core.intefaces.IPostable
-import org.mechdancer.dataflow.core.linkTo
 import org.mechdancer.dataflow.core.options.ExecutableOptions
 import org.mechdancer.dataflow.core.post
 import java.util.concurrent.ConcurrentHashMap
@@ -21,19 +20,19 @@ import kotlin.reflect.full.starProjectedType
 class EventBusImpl : EventBus {
     private val stickyEvents = ConcurrentHashMap<KClass<*>, Event>()
 
-    private val broadcast = BroadcastBlock<Event>()
+    private val broadcast = broadcast<Event>()
     private val links = hashMapOf<KFunction<Unit>, ILink<Event>>()
 
     private fun subscribe(receiver: Any, kFunction: KFunction<Unit>, executor: Executor?) {
         kFunction.let { f ->
-            links[f] = broadcast linkTo action(
+            links[f] = broadcast.linkTo(action(
                 options = ExecutableOptions(executor = executor?.asCoroutineDispatcher()
                                                        ?: Dispatchers.Default)
             ) {
                 if (it::class.starProjectedType == f.parameters[1].type ||
                     Event::class.starProjectedType == f.parameters[1].type
                 ) f.call(receiver, it)
-            }
+            })
         }
     }
 

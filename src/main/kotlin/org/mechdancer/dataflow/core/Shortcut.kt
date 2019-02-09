@@ -1,9 +1,8 @@
 package org.mechdancer.dataflow.core
 
+import kotlinx.coroutines.delay
 import org.mechdancer.dataflow.blocks.ActionBlock
-import org.mechdancer.dataflow.blocks.BroadcastBlock
-import org.mechdancer.dataflow.blocks.BufferBlock
-import org.mechdancer.dataflow.blocks.TransformBlock
+import org.mechdancer.dataflow.blocks.StandardBlock
 import org.mechdancer.dataflow.core.intefaces.IPostable
 import org.mechdancer.dataflow.core.intefaces.ISource
 import org.mechdancer.dataflow.core.intefaces.ITarget
@@ -27,7 +26,7 @@ infix fun <T> ISource<T>.linkTo(target: ITarget<T>) =
 
 /** 中缀链接 */
 infix fun <T> ISource<T>.linkTo(target: suspend (T) -> Unit) =
-    linkTo(org.mechdancer.dataflow.blocks.ActionBlock(action = target))
+    linkTo(ActionBlock(action = target))
 
 /** 构造链接 */
 fun <T> link(source: ISource<T>, target: ITarget<T>) =
@@ -51,7 +50,12 @@ operator fun <T> ISource<T>.minus(target: ITarget<T>) =
 
 /** 构造链接 */
 operator fun <TIn, TOut> ISource<TIn>.minus(target: suspend (TIn) -> TOut) =
-    TransformBlock(map = target).also { linkTo(it) }
+    StandardBlock(name = "transform",
+                  bufferSize = Int.MAX_VALUE,
+                  broadcast = false,
+                  options = ExecutableOptions(),
+                  map = target
+    ).also { linkTo(it) }
 
 //-------------------------------
 // build
@@ -64,18 +68,38 @@ fun <T> action(
     action: suspend (T) -> Unit
 ) = ActionBlock(name, options, action)
 
-/** 构造 [BroadcastBlock] 节点 */
-fun <T> broadcast(name: String = "broadcast") = BroadcastBlock<T>(name)
+/** 构造基本广播节点节点 */
+fun <T> broadcast(name: String = "broadcast") =
+    StandardBlock<T, T>(name = name,
+                        bufferSize = 1,
+                        broadcast = true,
+                        options = ExecutableOptions(parallelismDegree = 1),
+                        map = { it })
 
-/** 构造 [BufferBlock] 节点 */
-fun <T> buffer(
-    name: String = "buffer",
-    size: Int = Int.MAX_VALUE
-) = BufferBlock<T>(name, size)
+/** 构造基本缓存节点节点 */
+fun <T> buffer(name: String = "buffer",
+               size: Int = Int.MAX_VALUE) =
+    StandardBlock<T, T>(name = name,
+                        bufferSize = size,
+                        broadcast = false,
+                        options = ExecutableOptions(parallelismDegree = 1),
+                        map = { it })
 
-/** 构造 [TransformBlock] 节点 */
-fun <TIn, TOut> transform(
-    name: String = "transform",
-    options: ExecutableOptions = ExecutableOptions(),
-    map: suspend (TIn) -> TOut
-) = TransformBlock(name, options, map)
+/** 构造转换节点 */
+fun <TIn, TOut> transform(name: String = "transform",
+                          options: ExecutableOptions = ExecutableOptions(),
+                          map: suspend (TIn) -> TOut) =
+    StandardBlock(name = name,
+                  bufferSize = Int.MAX_VALUE,
+                  broadcast = false,
+                  options = options,
+                  map = map)
+
+/** 构造延时节点 */
+fun <T> delayBlock(name: String = "delay",
+                   time: Long) =
+    StandardBlock<T, T>(name = name,
+                        bufferSize = Int.MAX_VALUE,
+                        broadcast = false,
+                        options = ExecutableOptions(parallelismDegree = Int.MAX_VALUE),
+                        map = { delay(time); it })

@@ -14,7 +14,7 @@ class LinkManageTest {
     @Test
     fun test() {
         val list = ConcurrentSkipListSet<ILink<*>>()
-        LinkServer.changed linkTo { list.add(it) }
+        ILink.changed linkTo { list.add(it) }
 
         val source = broadcast<Int>("source")
         val bridge1 = transform("bridge1") { x: Int -> x - 1 }
