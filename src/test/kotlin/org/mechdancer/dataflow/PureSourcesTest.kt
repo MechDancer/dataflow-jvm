@@ -25,7 +25,7 @@ class PureSourcesTest {
             b2 - b4
             b4 - b2
 
-            Thread.sleep(1000)
+            Thread.sleep(30)
             LinkServer.list.forEach(::println)
         }
     }

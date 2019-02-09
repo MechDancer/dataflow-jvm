@@ -28,7 +28,7 @@ class LinkManageTest {
         bridge2 linkTo source
         source linkTo { println(link.count / (System.currentTimeMillis() - begin)) }
 
-        Thread.sleep(1000)
+        Thread.sleep(30)
         println("--------------------------------")
         list.forEach(::println)
         println("--------------------------------")
