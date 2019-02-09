@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.novoda.gradle.release.PublishExtension
+import org.jetbrains.dokka.gradle.DokkaTask
 
 buildscript {
     repositories {
