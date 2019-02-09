@@ -3,11 +3,11 @@ package org.mechdancer.dataflow.external.eventbus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asCoroutineDispatcher
 import org.mechdancer.dataflow.blocks.BroadcastBlock
-import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.action
 import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.core.intefaces.IPostable
 import org.mechdancer.dataflow.core.linkTo
+import org.mechdancer.dataflow.core.options.ExecutableOptions
 import org.mechdancer.dataflow.core.post
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.Executor
@@ -27,7 +27,8 @@ class EventBusImpl : EventBus {
     private fun subscribe(receiver: Any, kFunction: KFunction<Unit>, executor: Executor?) {
         kFunction.let { f ->
             links[f] = broadcast linkTo action(
-                options = ExecutableOptions(executor = executor?.asCoroutineDispatcher() ?: Dispatchers.Default)
+                options = ExecutableOptions(executor = executor?.asCoroutineDispatcher()
+                                                       ?: Dispatchers.Default)
             ) {
                 if (it::class.starProjectedType == f.parameters[1].type ||
                     Event::class.starProjectedType == f.parameters[1].type

@@ -1,14 +1,13 @@
 package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.dataflow.core.Feedback.DecliningPermanently
-import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.UUIDBase
 import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.core.intefaces.ILink.Companion.changed
-import org.mechdancer.dataflow.core.intefaces.ILink.Companion.list
 import org.mechdancer.dataflow.core.intefaces.ISource
 import org.mechdancer.dataflow.core.intefaces.ITarget
 import org.mechdancer.dataflow.core.intefaces.IWithUUID
+import org.mechdancer.dataflow.core.options.LinkOptions
 import org.mechdancer.dataflow.core.post
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -26,8 +25,7 @@ internal class Link<T>(
 ) : ILink<T>, IWithUUID by UUIDBase() {
     //构造时加入列表
     init {
-        ILink.list.add(this)
-        changed.post(list.toList())
+        if (source != changed) changed post this
     }
 
     private val _count = AtomicInteger(0)
@@ -46,8 +44,8 @@ internal class Link<T>(
 
     override fun close() {
         closed = true
-        list.remove(this).also { if (it) changed.post(list.toList()) }
+        changed post this
     }
 
-    override fun toString() = "$source -> $target"
+    override fun toString() = "${source.name} -> ${target.name}"
 }

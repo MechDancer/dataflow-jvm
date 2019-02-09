@@ -7,6 +7,8 @@ import org.mechdancer.dataflow.blocks.TransformBlock
 import org.mechdancer.dataflow.core.intefaces.IPostable
 import org.mechdancer.dataflow.core.intefaces.ISource
 import org.mechdancer.dataflow.core.intefaces.ITarget
+import org.mechdancer.dataflow.core.options.ExecutableOptions
+import org.mechdancer.dataflow.core.options.LinkOptions
 
 //-------------------------------
 // post

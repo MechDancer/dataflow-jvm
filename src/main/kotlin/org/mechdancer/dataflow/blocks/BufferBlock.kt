@@ -1,21 +1,21 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.BlockBase
-import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.intefaces.IBlock
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import org.mechdancer.dataflow.core.intefaces.IFullyBlock
 import org.mechdancer.dataflow.core.intefaces.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.intefaces.ITarget
 import org.mechdancer.dataflow.core.internal.*
+import org.mechdancer.dataflow.core.options.LinkOptions
 
 class BufferBlock<T>(
     name: String = "buffer",
-    size: Int = Int.MAX_VALUE
+    bufferSize: Int = Int.MAX_VALUE
 ) : IFullyBlock<T, T>, IBlock by BlockBase(name) {
     private val linkManager = LinkManager(this)
     private val receiveCore = ReceiveCore()
-    private val sourceCore = SourceCore<T>(size)
+    private val sourceCore = SourceCore<T>(bufferSize)
     private val targetCore = TargetCore<T> { event ->
         linkManager.offer(sourceCore.offer(event), event)
         receiveCore.call()

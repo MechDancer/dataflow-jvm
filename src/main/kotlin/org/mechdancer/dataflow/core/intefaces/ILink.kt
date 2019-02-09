@@ -1,10 +1,9 @@
 package org.mechdancer.dataflow.core.intefaces
 
 import org.mechdancer.dataflow.core.Feedback
-import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.buffer
+import org.mechdancer.dataflow.core.options.LinkOptions
 import java.io.Closeable
-import java.util.concurrent.ConcurrentSkipListSet
 
 /**
  * 链接的定义
@@ -29,11 +28,7 @@ interface ILink<T> : IWithUUID,
     infix fun offer(id: Long): Feedback
 
     companion object {
-        /** 全局链接列表 */
-        val list = ConcurrentSkipListSet<ILink<*>>()
-
         /** 拓扑改变事件 */
-        val changed =
-            buffer<List<ILink<*>>>("LinkInfo", 20)
+        internal val changed = buffer<ILink<*>>()
     }
 }

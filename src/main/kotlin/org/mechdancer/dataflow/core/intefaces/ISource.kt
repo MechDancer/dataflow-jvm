@@ -1,6 +1,6 @@
 package org.mechdancer.dataflow.core.intefaces
 
-import org.mechdancer.dataflow.core.LinkOptions
+import org.mechdancer.dataflow.core.options.LinkOptions
 
 /**
  * 源节点

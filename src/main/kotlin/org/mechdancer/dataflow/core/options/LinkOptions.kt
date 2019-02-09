@@ -1,4 +1,4 @@
-package org.mechdancer.dataflow.core
+package org.mechdancer.dataflow.core.options
 
 /** 链接可选项 */
 data class LinkOptions<T>(

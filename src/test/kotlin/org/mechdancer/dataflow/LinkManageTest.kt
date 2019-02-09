@@ -4,6 +4,7 @@ import org.junit.Test
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.util.treeView
+import java.util.concurrent.ConcurrentSkipListSet
 
 class LinkManageTest {
     /**
@@ -12,14 +13,8 @@ class LinkManageTest {
      */
     @Test
     fun test() {
-        val lock = Object()
-        ILink.changed linkTo { list ->
-            synchronized(lock) {
-                println(list.size)
-                list.forEach { println(it) }
-                println()
-            }
-        }
+        val list = ConcurrentSkipListSet<ILink<*>>()
+        LinkServer.changed linkTo { list.add(it) }
 
         val source = broadcast<Int>("source")
         val bridge1 = transform("bridge1") { x: Int -> x - 1 }
@@ -33,8 +28,10 @@ class LinkManageTest {
         bridge2 linkTo source
         source linkTo { println(link.count / (System.currentTimeMillis() - begin)) }
 
-        ILink.list.forEach(::println)
-        println()
+        Thread.sleep(1000)
+        println("--------------------------------")
+        list.forEach(::println)
+        println("--------------------------------")
         println(source.treeView())
     }
 }

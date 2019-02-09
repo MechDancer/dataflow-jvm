@@ -1,13 +1,13 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.BlockBase
-import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.intefaces.IBlock
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import org.mechdancer.dataflow.core.intefaces.IFullyBlock
 import org.mechdancer.dataflow.core.intefaces.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.intefaces.ITarget
 import org.mechdancer.dataflow.core.internal.*
+import org.mechdancer.dataflow.core.options.LinkOptions
 import java.util.concurrent.TimeUnit
 
 class DelayBlock<T>(

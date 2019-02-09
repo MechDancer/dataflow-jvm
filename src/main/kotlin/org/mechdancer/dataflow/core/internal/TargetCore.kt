@@ -3,11 +3,11 @@ package org.mechdancer.dataflow.core.internal
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.mechdancer.dataflow.annotations.ThreadSafety
-import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.Feedback.*
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import org.mechdancer.dataflow.core.intefaces.IIngress
+import org.mechdancer.dataflow.core.options.ExecutableOptions
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -27,7 +27,7 @@ internal class TargetCore<T>(
     private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, IEgress<T>>>()
 
     override fun offer(id: Long, egress: IEgress<T>): Feedback {
-        var feedback = NotAvailable
+        var feedback = Declined
 
         if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
             parallelismDegree.decrementAndGet()

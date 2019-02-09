@@ -1,12 +1,12 @@
 package org.mechdancer.dataflow.blocks
 
 import org.mechdancer.dataflow.core.BlockBase
-import org.mechdancer.dataflow.core.ExecutableOptions
 import org.mechdancer.dataflow.core.intefaces.IBlock
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import org.mechdancer.dataflow.core.intefaces.IEntranceBlock
 import org.mechdancer.dataflow.core.intefaces.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.internal.TargetCore
+import org.mechdancer.dataflow.core.options.ExecutableOptions
 
 /**
  * 动作块

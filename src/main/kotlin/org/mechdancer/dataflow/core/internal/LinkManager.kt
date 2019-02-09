@@ -1,10 +1,10 @@
 package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.dataflow.core.Feedback.DecliningPermanently
-import org.mechdancer.dataflow.core.LinkOptions
 import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.core.intefaces.ISource
 import org.mechdancer.dataflow.core.intefaces.ITarget
+import org.mechdancer.dataflow.core.options.LinkOptions
 import java.util.concurrent.ConcurrentSkipListSet
 
 /**
