@@ -12,5 +12,5 @@ interface ISource<T> : IBlock,
     val targets: Set<ITarget<T>>
 
     /** 添加到指定宿的链接 */
-    fun linkTo(target: ITarget<T>, options: LinkOptions<T> = LinkOptions()): ILink<T>
+    fun linkTo(target: ITarget<T>, options: LinkOptions<T>): ILink<T>
 }

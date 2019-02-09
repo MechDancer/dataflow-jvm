@@ -6,6 +6,7 @@ import org.mechdancer.dataflow.core.action
 import org.mechdancer.dataflow.core.broadcast
 import org.mechdancer.dataflow.core.intefaces.ILink
 import org.mechdancer.dataflow.core.intefaces.IPostable
+import org.mechdancer.dataflow.core.linkTo
 import org.mechdancer.dataflow.core.options.ExecutableOptions
 import org.mechdancer.dataflow.core.post
 import java.util.concurrent.ConcurrentHashMap
@@ -25,7 +26,7 @@ class EventBusImpl : EventBus {
 
     private fun subscribe(receiver: Any, kFunction: KFunction<Unit>, executor: Executor?) {
         kFunction.let { f ->
-            links[f] = broadcast.linkTo(action(
+            links[f] = broadcast linkTo (action(
                 options = ExecutableOptions(executor = executor?.asCoroutineDispatcher()
                                                        ?: Dispatchers.Default)
             ) {
