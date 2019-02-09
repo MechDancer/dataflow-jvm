@@ -4,6 +4,7 @@ import org.mechdancer.dataflow.blocks.TargetType.Broadcast
 import org.mechdancer.dataflow.blocks.TargetType.Cold
 import org.mechdancer.dataflow.core.BlockBase
 import org.mechdancer.dataflow.core.Feedback
+import org.mechdancer.dataflow.core.Feedback.Accepted
 import org.mechdancer.dataflow.core.intefaces.IBlock
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import org.mechdancer.dataflow.core.intefaces.IFullyBlock
@@ -27,10 +28,14 @@ class StandardBlock<TIn, TOut>(
     { event ->
         val out = map(event)
         val id = sourceCore.offer(out)
-        val significant = linkManager.offer(id, out).none(Feedback::positive)
-        receiveCore.call()
-        if (targetType == Cold && significant)
-            sourceCore consume id
+        val altitudes = linkManager.offer(id, out)
+
+        when {
+            targetType == Cold && altitudes.none(Feedback::positive) ->
+                sourceCore consume id
+            targetType == Broadcast || Accepted !in altitudes        ->
+                receiveCore.call()
+        }
     }
 
     override val defaultSource by lazy { DefaultSource(this) }
