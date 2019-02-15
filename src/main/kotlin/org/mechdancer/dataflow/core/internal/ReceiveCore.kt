@@ -1,26 +1,29 @@
 package org.mechdancer.dataflow.core.internal
 
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.runBlocking
 import org.mechdancer.common.extension.Optional
+import java.util.concurrent.ConcurrentSkipListMap
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 /**
  * 接收模块内核
  */
 internal class ReceiveCore {
-    private val channel = Channel<Unit>(1)
 
-    fun call() = runBlocking { channel.offer(Unit) }
-
-    private suspend inline fun <T> get(block: () -> Optional<T>): T {
-        while (true) {
-            block().then {
-                channel.offer(Unit)
-                return it
-            }
-            channel.receive()
+    fun call() {
+        waitList.forEach { (con, block) ->
+            con.resume(block())
         }
     }
+
+    private val waitList = ConcurrentSkipListMap<Continuation<Any?>, () -> Optional<*>>()
+
+    @Suppress("UNCHECKED_CAST")
+    private suspend fun <T> get(block: () -> Optional<T>): T = suspendCoroutine {
+        waitList[it as Continuation<Any?>] = block
+    }
+
 
     /**
      * 从 [sourceCore] 消费最新的消息

@@ -78,7 +78,7 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      */
     fun consume(): Optional<T> {
         while (true) {
-            val id = buffer.keys.min() ?: return Optional.otherwise<T>()
+            val id = buffer.keys.min() ?: return Optional.otherwise()
             return buffer.remove(id) ?: continue
         }
     }
