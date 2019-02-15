@@ -51,7 +51,7 @@ class StandardBlock<TIn, TOut>(
         if (targetType == Broadcast) sourceCore[id]
         else sourceCore consume id
 
-    override fun receive() =
+    override suspend fun receive() =
         if (targetType == Broadcast) receiveCore getFrom sourceCore
         else receiveCore consumeFrom sourceCore
 

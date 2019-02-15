@@ -42,7 +42,7 @@ class IntervalBlock(
     fun pause() = task?.cancel(false)
 
     override fun consume(id: Long) = sourceCore consume id
-    override fun receive() = receiveCore consumeFrom sourceCore
+    override suspend fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<Long>, options: LinkOptions<Long>) =
         linkManager.linkTo(target, options)
 }
