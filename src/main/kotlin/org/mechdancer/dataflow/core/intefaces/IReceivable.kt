@@ -11,5 +11,5 @@ interface IReceivable<T> {
      *
      * 阻塞接收
      */
-    fun receive(): T
+    suspend fun receive(): T
 }
