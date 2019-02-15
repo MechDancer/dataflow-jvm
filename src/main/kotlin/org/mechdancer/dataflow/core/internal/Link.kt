@@ -12,6 +12,8 @@ import org.mechdancer.dataflow.core.post
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
+ * Link impl, see [ILink]
+ *
  * 链接信息
  *
  * @param source 事件源

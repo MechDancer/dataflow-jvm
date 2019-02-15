@@ -1,6 +1,6 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.novoda.gradle.release.PublishExtension
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
@@ -35,7 +35,7 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.1")
     implementation("org.mechdancer", "common-extension", "v0.1.0-1")
-    testImplementation("junit", "junit", "+")
+    testImplementation("junit", "junit", "4.12")
 }
 
 configure<JavaPluginConvention> {

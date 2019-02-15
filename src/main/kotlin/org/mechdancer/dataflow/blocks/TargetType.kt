@@ -1,6 +1,8 @@
 package org.mechdancer.dataflow.blocks
 
 /**
+ * Target mode
+ *
  * 宿类型
  */
 enum class TargetType {

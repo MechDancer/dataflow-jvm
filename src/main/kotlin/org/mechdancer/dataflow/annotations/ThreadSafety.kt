@@ -4,7 +4,9 @@ import kotlin.annotation.AnnotationRetention.SOURCE
 import kotlin.annotation.AnnotationTarget.CLASS
 
 /**
- * 线程安全性说明
+ * Thread safety instruction
+ *
+ * Class annotated this annotation implies that this class is thread-safe.
  */
 @Target(CLASS)
 @Retention(SOURCE)

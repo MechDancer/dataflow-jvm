@@ -7,19 +7,21 @@ import org.mechdancer.dataflow.core.Feedback
 import org.mechdancer.dataflow.core.Feedback.*
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import org.mechdancer.dataflow.core.intefaces.IIngress
-import org.mechdancer.dataflow.core.options.ExecutableOptions
+import org.mechdancer.dataflow.core.options.ExecutionOptions
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
+ * Common kernel for target block
+ *
  * 目的节点的通用内核
  *
- * @param action 目的节点接收事件后的动作
+ * @param action action after receiving events 目的节点接收事件后的动作
  */
 @ThreadSafety
 internal class TargetCore<T>(
-    private val options: ExecutableOptions = ExecutableOptions(),
-    private val action: suspend (T) -> Unit
+        private val options: ExecutionOptions = ExecutionOptions(),
+        private val action: suspend (T) -> Unit
 ) : IIngress<T> {
 
     private val parallelismDegree = AtomicInteger(0)
