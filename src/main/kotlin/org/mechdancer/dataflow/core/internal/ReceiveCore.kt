@@ -15,19 +15,20 @@ internal class ReceiveCore<T> {
 
     @Suppress("UNCHECKED_CAST")
     fun call() {
-        for (i in 0 until waitList.size)
+        for (i in 0 until waitList.size) {
             waitList
                 .poll()
                 ?.also { (con, block) ->
                     val temp: Any? = block()
                     if (temp == null) con.resume(null as T)
-                    else (block() as? T)
+                    else (temp as? T)
                              ?.toOptional()
                              ?.then { con.resume(it) }
                              ?.getOrNull()
                          ?: waitList.add(con to block)
                 }
             ?: break
+        }
     }
 
     /**
