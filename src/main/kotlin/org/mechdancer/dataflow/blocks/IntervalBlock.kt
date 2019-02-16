@@ -10,13 +10,13 @@ import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 class IntervalBlock(
-        name: String = "interval",
-        private val period: Long,
-        private val unit: TimeUnit,
-        start: Boolean
+    name: String = "interval",
+    private val period: Long,
+    private val unit: TimeUnit,
+    start: Boolean
 ) : IExitBlock<Long>, IBlock by BlockBase(name) {
     private val linkManager = LinkManager(this)
-    private val receiveCore = ReceiveCore()
+    private val receiveCore = ReceiveCore<Long>()
     private val sourceCore = SourceCore<Long>(Int.MAX_VALUE)
 
     private var t = 0L

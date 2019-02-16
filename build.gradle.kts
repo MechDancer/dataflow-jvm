@@ -1,6 +1,6 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.novoda.gradle.release.PublishExtension
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
@@ -23,7 +23,7 @@ apply {
 }
 
 group = "org.mechdancer"
-version = "0.2.0-dev-5"
+version = "0.2.0-dev-6"
 
 repositories {
     mavenCentral()

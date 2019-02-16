@@ -15,14 +15,14 @@ import org.mechdancer.dataflow.core.options.ExecutionOptions
 import org.mechdancer.dataflow.core.options.LinkOptions
 
 class StandardBlock<TIn, TOut>(
-        name: String,
-        bufferSize: Int,
-        private val targetType: TargetType,
-        options: ExecutionOptions,
-        private val map: suspend (TIn) -> TOut
+    name: String,
+    bufferSize: Int,
+    private val targetType: TargetType,
+    options: ExecutionOptions,
+    private val map: suspend (TIn) -> TOut
 ) : IFullyBlock<TIn, TOut>, IBlock by BlockBase(name) {
     private val linkManager = LinkManager(this)
-    private val receiveCore = ReceiveCore()
+    private val receiveCore = ReceiveCore<TOut>()
     private val sourceCore = SourceCore<TOut>(bufferSize)
     private val targetCore = TargetCore<TIn>(options)
     { event ->
