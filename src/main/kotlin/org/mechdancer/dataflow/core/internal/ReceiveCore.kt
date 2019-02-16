@@ -19,7 +19,7 @@ internal class ReceiveCore<T> {
             waitList
                 .poll()
                 ?.also { (con, block) ->
-                    val temp: Any? = block()
+                    val temp: Any? = block() //TODO: unboxed data mistakenly, which can be `null`
                     if (temp == null) con.resume(null as T)
                     else (temp as? T)
                              ?.toOptional()
