@@ -13,16 +13,19 @@ import kotlin.coroutines.suspendCoroutine
 internal class ReceiveCore<T> {
     private val waitList = ConcurrentLinkedQueue<Pair<Continuation<T>, () -> Optional<T>>>()
 
+    @Suppress("UNCHECKED_CAST")
     fun call() {
         for (i in 0 until waitList.size)
             waitList
                 .poll()
-                ?.let { (con, block) ->
-                    @Suppress("UNCHECKED_CAST")
-                    (block() as? T)
-                        ?.toOptional()
-                        ?.then { con.resume(it) }
-                        ?.otherwise { waitList.add(con to block) }
+                ?.also { (con, block) ->
+                    val temp: Any? = block()
+                    if (temp == null) con.resume(null as T)
+                    else (block() as? T)
+                             ?.toOptional()
+                             ?.then { con.resume(it) }
+                             ?.getOrNull()
+                         ?: waitList.add(con to block)
                 }
             ?: break
     }
