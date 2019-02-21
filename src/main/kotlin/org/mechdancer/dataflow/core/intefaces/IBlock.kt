@@ -1,10 +1,12 @@
 package org.mechdancer.dataflow.core.intefaces
 
 /**
- * 节点
+ * 块
  *
- * 有 `名字` 和 `UUID`
+ * 有 [name] 和 [uuid]
  */
 interface IBlock : IWithUUID {
+
     val name: String
+
 }

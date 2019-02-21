@@ -13,10 +13,10 @@ class IntervalBlock(
     name: String = "interval",
     private val period: Long,
     private val unit: TimeUnit,
-    immediately: Boolean
+    start: Boolean
 ) : IExitBlock<Long>, IBlock by BlockBase(name) {
     private val linkManager = LinkManager(this)
-    private val receiveCore = ReceiveCore()
+    private val receiveCore = ReceiveCore<Long>()
     private val sourceCore = SourceCore<Long>(Int.MAX_VALUE)
 
     private var t = 0L
@@ -25,7 +25,7 @@ class IntervalBlock(
     override val targets get() = linkManager.targets
 
     init {
-        if (immediately) start()
+        if (start) start()
     }
 
     /** 启动 */
@@ -42,7 +42,7 @@ class IntervalBlock(
     fun pause() = task?.cancel(false)
 
     override fun consume(id: Long) = sourceCore consume id
-    override fun receive() = receiveCore consumeFrom sourceCore
+    override suspend fun receive() = receiveCore consumeFrom sourceCore
     override fun linkTo(target: ITarget<Long>, options: LinkOptions<Long>) =
         linkManager.linkTo(target, options)
 }

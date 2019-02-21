@@ -11,18 +11,18 @@ import org.mechdancer.dataflow.core.intefaces.IFullyBlock
 import org.mechdancer.dataflow.core.intefaces.IPostable.DefaultSource
 import org.mechdancer.dataflow.core.intefaces.ITarget
 import org.mechdancer.dataflow.core.internal.*
-import org.mechdancer.dataflow.core.options.ExecutableOptions
+import org.mechdancer.dataflow.core.options.ExecutionOptions
 import org.mechdancer.dataflow.core.options.LinkOptions
 
 class StandardBlock<TIn, TOut>(
     name: String,
     bufferSize: Int,
     private val targetType: TargetType,
-    options: ExecutableOptions,
+    options: ExecutionOptions,
     private val map: suspend (TIn) -> TOut
 ) : IFullyBlock<TIn, TOut>, IBlock by BlockBase(name) {
     private val linkManager = LinkManager(this)
-    private val receiveCore = ReceiveCore()
+    private val receiveCore = ReceiveCore<TOut>()
     private val sourceCore = SourceCore<TOut>(bufferSize)
     private val targetCore = TargetCore<TIn>(options)
     { event ->
@@ -51,7 +51,7 @@ class StandardBlock<TIn, TOut>(
         if (targetType == Broadcast) sourceCore[id]
         else sourceCore consume id
 
-    override fun receive() =
+    override suspend fun receive() =
         if (targetType == Broadcast) receiveCore getFrom sourceCore
         else receiveCore consumeFrom sourceCore
 

@@ -1,24 +1,49 @@
 package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.common.extension.Optional
+import org.mechdancer.common.extension.toOptional
+import java.util.concurrent.ConcurrentLinkedQueue
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-internal class ReceiveCore {
-    private val receiveLock = Object()
+/**
+ * 接收模块内核
+ */
+internal class ReceiveCore<T> {
+    private val waitList = ConcurrentLinkedQueue<Pair<Continuation<T>, () -> Optional<T>>>()
 
+    @Suppress("UNCHECKED_CAST")
     fun call() {
-        synchronized(receiveLock) { receiveLock.notifyAll() }
-    }
-
-    private inline fun <T> get(block: () -> Optional<T>): T {
-        while (true) {
-            block().then { return it }
-            synchronized(receiveLock) { receiveLock.wait() }
+        for (i in 0 until waitList.size) {
+            waitList
+                .poll()
+                ?.also { (con, block) ->
+                    val temp: Any? = block() //TODO: unboxed data mistakenly, which can be `null`
+                    if (temp == null) con.resume(null as T)
+                    else (temp as? T)
+                             ?.toOptional()
+                             ?.then { con.resume(it) }
+                             ?.getOrNull()
+                         ?: waitList.add(con to block)
+                }
+            ?: break
         }
     }
 
-    infix fun <T> consumeFrom(sourceCore: SourceCore<T>): T =
-        get { sourceCore.consume() }
+    /**
+     * 从 [sourceCore] 消费最新的消息
+     */
+    suspend infix fun consumeFrom(sourceCore: SourceCore<T>): T {
+        sourceCore.consume().then { return it }
+        return suspendCoroutine { waitList.add(it to sourceCore::consume) }
+    }
 
-    infix fun <T> getFrom(sourceCore: SourceCore<T>) =
-        get { sourceCore.get() }
+    /**
+     * 从 [sourceCore] 获取最新的消息（不消费）
+     */
+    suspend infix fun getFrom(sourceCore: SourceCore<T>): T {
+        sourceCore.get().then { return it }
+        return suspendCoroutine { waitList.add(it to sourceCore::get) }
+    }
 }

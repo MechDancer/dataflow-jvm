@@ -1,8 +1,9 @@
 package org.mechdancer.dataflow
 
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.mechdancer.dataflow.core.*
 import org.mechdancer.dataflow.util.treeView
 import java.util.concurrent.atomic.AtomicInteger
@@ -21,16 +22,18 @@ fun main() {
     source post 100
 
     val count = AtomicInteger(0)
-    GlobalScope.launch {
-        while (true) {
-            delay(1000)
-            val last = count.getAndSet(link.count)
-            println(count.get() - last)
+    runBlocking(Dispatchers.Default) {
+        launch {
+            while (true) {
+                delay(1000)
+                val last = count.getAndSet(link.count)
+                println(count.get() - last)
+            }
         }
-    }
 
-    while (true) {
-        readLine()
-        println("收到: ${source.receive()}")
+        while (true) {
+            readLine()
+            println("收到: ${source.receive()}")
+        }
     }
 }

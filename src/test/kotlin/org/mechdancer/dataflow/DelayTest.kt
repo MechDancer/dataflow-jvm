@@ -1,5 +1,6 @@
 package org.mechdancer.dataflow
 
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
 import org.mechdancer.dataflow.core.delayBlock
@@ -8,7 +9,7 @@ import org.mechdancer.dataflow.core.post
 class DelayTest {
     /** 测试延时模块 */
     @Test
-    fun test() {
+    fun test() = runBlocking {
         val delay = delayBlock<Int>(time = 2000)
         delay post 10
         System.nanoTime()
