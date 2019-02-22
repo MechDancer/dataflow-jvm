@@ -41,7 +41,7 @@ class StandardBlock<TIn, TOut>(
     override val defaultSource by lazy { DefaultSource(this) }
     override val targets get() = linkManager.targets
 
-    val bufferSize get() = sourceCore.bufferCount
+    val bufferSize get() = sourceCore.bufferSize
     fun clear() = sourceCore.clear()
 
     override fun offer(id: Long, egress: IEgress<TIn>) =

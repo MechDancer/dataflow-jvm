@@ -2,28 +2,26 @@ package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.common.extension.Optional
 import org.mechdancer.common.extension.toOptional
-import org.mechdancer.dataflow.annotations.ThreadSafety
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
 /**
- * Common kernel for source block
- *
- * Provides event management and hash-based event caching.
- *
+ * Common core for source blocks
  * 源节点的通用内核
  *
+ * Provides event management and hash-based event caching.
  * 提供事件管理和基于散列的事件缓存
- * @param size cache capacity 缓存容量（超过则丢弃最旧的）
+ *
+ * @param size cache capacity
+ *             缓存容量（超过则丢弃最旧的）
  */
-@ThreadSafety
 internal class SourceCore<T>(private val size: Int) : IEgress<T> {
 
-    /** 原子长整型，用于生成事件的唯一 id */
-    private val id = AtomicLong(0)
+    // 原子长整型，用于生成消息的唯一 id
+    private val lastId = AtomicLong(0)
 
-    /** 事件堆 */
+    // 消息缓存
     private val buffer = ConcurrentHashMap<Long, Optional<T>>()
 
     /**
@@ -31,18 +29,19 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      *
      * 缓存存量
      */
-    val bufferCount get() = buffer.size
+    val bufferSize get() = buffer.size
 
     /**
-     * Puts [event] into heap
+     * cache an [msg]
      *
-     * 将一个事件放入堆
+     * 缓存一则消息
      */
-    fun offer(event: T): Long {
-        val newId = id.getAndIncrement()
-        buffer[newId] = event.toOptional()
+    fun offer(msg: T): Long {
+        val newId = lastId.getAndIncrement()
+        buffer[newId] = msg.toOptional()
+
         synchronized(buffer) {
-            while (buffer.size > size) buffer.remove(buffer.keys.min())
+            while (buffer.size > size) buffer.remove(buffer.keys.first())
         }
         return newId
     }
@@ -78,7 +77,7 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      */
     fun consume(): Optional<T> {
         while (true) {
-            val id = buffer.keys.min() ?: return Optional.otherwise()
+            val id = buffer.keys.first() ?: return Optional.otherwise()
             return buffer.remove(id) ?: continue
         }
     }

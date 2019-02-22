@@ -30,10 +30,9 @@ fun main() {
                 println(count.get() - last)
             }
         }
-
-        while (true) {
-            readLine()
-            println("收到: ${source.receive()}")
-        }
     }
+    //        while (true) {
+//            readLine()
+//            println("收到: ${source.receive()}")
+//        }
 }
