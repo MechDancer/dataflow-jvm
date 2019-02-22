@@ -32,7 +32,7 @@ infix fun <T> IPostable<T>.post(event: T) = defaultSource(event)
  * 中缀链接
  */
 infix fun <T> ISource<T>.linkTo(target: ITarget<T>) =
-        linkTo(target, LinkOptions())
+    linkTo(target, LinkOptions())
 
 /**
  * Infix link, see [linkTo]
@@ -40,7 +40,7 @@ infix fun <T> ISource<T>.linkTo(target: ITarget<T>) =
  * 中缀链接
  */
 infix fun <T> ISource<T>.linkTo(target: suspend (T) -> Unit) =
-        linkTo(ActionBlock(action = target))
+    linkTo(ActionBlock(action = target))
 
 /**
  * Builds a link between [source] and [target]
@@ -48,7 +48,7 @@ infix fun <T> ISource<T>.linkTo(target: suspend (T) -> Unit) =
  * 构造链接
  */
 fun <T> link(source: ISource<T>, target: ITarget<T>) =
-        source.linkTo(target)
+    source.linkTo(target)
 
 /**
  * Builds a link between [source] and [target] specifying [eventLimit]
@@ -56,7 +56,7 @@ fun <T> link(source: ISource<T>, target: ITarget<T>) =
  * 构造链接
  */
 fun <T> link(source: ISource<T>, target: ITarget<T>, eventLimit: Int) =
-        source.linkTo(target, LinkOptions(eventLimit = eventLimit))
+    source.linkTo(target, LinkOptions(eventLimit = eventLimit))
 
 /**
  * Builds a link between [source] and [target] specifying [predicate] (event filter)
@@ -64,7 +64,7 @@ fun <T> link(source: ISource<T>, target: ITarget<T>, eventLimit: Int) =
  * 构造链接
  */
 fun <T> link(source: ISource<T>, target: ITarget<T>, predicate: (T) -> Boolean) =
-        source.linkTo(target, LinkOptions(predicate))
+    source.linkTo(target, LinkOptions(predicate))
 
 /**
  * Builds a link between [source] and [target] specifying [options]
@@ -72,7 +72,7 @@ fun <T> link(source: ISource<T>, target: ITarget<T>, predicate: (T) -> Boolean) 
  * 构造链接
  */
 fun <T> link(source: ISource<T>, target: ITarget<T>, options: LinkOptions<T>) =
-        source.linkTo(target, options)
+    source.linkTo(target, options)
 
 /**
  * See [link]
@@ -80,7 +80,7 @@ fun <T> link(source: ISource<T>, target: ITarget<T>, options: LinkOptions<T>) =
  * 构造链接
  */
 operator fun <T> ISource<T>.minus(target: ITarget<T>) =
-        linkTo(target)
+    linkTo(target)
 
 /**
  * See [link]
@@ -88,12 +88,12 @@ operator fun <T> ISource<T>.minus(target: ITarget<T>) =
  * 构造链接
  */
 operator fun <TIn, TOut> ISource<TIn>.minus(target: suspend (TIn) -> TOut) =
-        StandardBlock(name = "transform",
-                bufferSize = Int.MAX_VALUE,
-                targetType = Normal,
-                options = ExecutionOptions(),
-                map = target
-        ).also { linkTo(it) }
+    StandardBlock(name = "transform",
+                  bufferSize = Int.MAX_VALUE,
+                  targetType = Normal,
+                  options = ExecutionOptions(),
+                  map = target
+    ).also { linkTo(it) }
 
 //-------------------------------
 // build
@@ -105,9 +105,9 @@ operator fun <TIn, TOut> ISource<TIn>.minus(target: suspend (TIn) -> TOut) =
  * 构造 [ActionBlock] 节点
  */
 fun <T> action(
-        name: String = "action",
-        options: ExecutionOptions = ExecutionOptions(),
-        action: suspend (T) -> Unit
+    name: String = "action",
+    options: ExecutionOptions = ExecutionOptions(),
+    action: suspend (T) -> Unit
 ) = ActionBlock(name, options, action)
 
 /**
@@ -116,11 +116,11 @@ fun <T> action(
  * 构造基本广播节点
  */
 fun <T> broadcast(name: String = "broadcast") =
-        StandardBlock<T, T>(name = name,
-                bufferSize = 1,
-                targetType = Broadcast,
-                options = ExecutionOptions(parallelismDegree = 1),
-                map = { it })
+    StandardBlock<T, T>(name = name,
+                        bufferSize = 1,
+                        targetType = Broadcast,
+                        options = ExecutionOptions(parallelismDegree = 1),
+                        map = { it })
 
 /**
  * Builds a buffer block
@@ -129,11 +129,11 @@ fun <T> broadcast(name: String = "broadcast") =
  */
 fun <T> buffer(name: String = "buffer",
                size: Int = Int.MAX_VALUE) =
-        StandardBlock<T, T>(name = name,
-                bufferSize = size,
-                targetType = Normal,
-                options = ExecutionOptions(parallelismDegree = 1),
-                map = { it })
+    StandardBlock<T, T>(name = name,
+                        bufferSize = size,
+                        targetType = Normal,
+                        options = ExecutionOptions(parallelismDegree = 1),
+                        map = { it })
 
 /**
  * Builds a transform block
@@ -143,11 +143,11 @@ fun <T> buffer(name: String = "buffer",
 fun <TIn, TOut> transform(name: String = "transform",
                           options: ExecutionOptions = ExecutionOptions(),
                           map: suspend (TIn) -> TOut) =
-        StandardBlock(name = name,
-                bufferSize = Int.MAX_VALUE,
-                targetType = Normal,
-                options = options,
-                map = map)
+    StandardBlock(name = name,
+                  bufferSize = Int.MAX_VALUE,
+                  targetType = Normal,
+                  options = options,
+                  map = map)
 
 /**
  * Builds a delay block
@@ -156,8 +156,8 @@ fun <TIn, TOut> transform(name: String = "transform",
  */
 fun <T> delayBlock(name: String = "delay",
                    time: Long) =
-        StandardBlock<T, T>(name = name,
-                bufferSize = Int.MAX_VALUE,
-                targetType = Normal,
-                options = ExecutionOptions(parallelismDegree = Int.MAX_VALUE),
-                map = { delay(time); it })
+    StandardBlock<T, T>(name = name,
+                        bufferSize = Int.MAX_VALUE,
+                        targetType = Normal,
+                        options = ExecutionOptions(parallelismDegree = Int.MAX_VALUE),
+                        map = { delay(time); it })

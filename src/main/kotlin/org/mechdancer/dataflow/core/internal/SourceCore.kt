@@ -1,17 +1,20 @@
 package org.mechdancer.dataflow.core.internal
 
 import org.mechdancer.common.extension.Optional
+import org.mechdancer.common.extension.check
 import org.mechdancer.common.extension.toOptional
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.math.max
 
 /**
  * Common core for source blocks
  * 源节点的通用内核
  *
- * Provides event management and hash-based event caching.
- * 提供事件管理和基于散列的事件缓存
+ * Provides message management and hash-based message caching.
+ * 提供消息管理和基于散列的消息缓存
  *
  * @param size cache capacity
  *             缓存容量（超过则丢弃最旧的）
@@ -22,7 +25,18 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
     private val lastId = AtomicLong(0)
 
     // 消息缓存
-    private val buffer = ConcurrentHashMap<Long, Optional<T>>()
+    private val buffer: ConcurrentHashMap<Long, Optional<T>> =
+        when {
+            size <= 0  -> throw IllegalArgumentException("size must be greater than 0")
+            size <= 16 -> ConcurrentHashMap(16)
+            else       -> ConcurrentHashMap(1)
+        }
+
+    // 缓存清理周期
+    private val cleanPeriod = max(16, size)
+
+    // 缓存清理锁
+    private val lock = ReentrantLock()
 
     /**
      * Cached size
@@ -32,7 +46,7 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
     val bufferSize get() = buffer.size
 
     /**
-     * cache an [msg]
+     * cache a [msg]
      *
      * 缓存一则消息
      */
@@ -40,52 +54,62 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
         val newId = lastId.getAndIncrement()
         buffer[newId] = msg.toOptional()
 
-        synchronized(buffer) {
-            while (buffer.size > size) buffer.remove(buffer.keys.first())
+        // 每到周期就触发一次清理
+        if (newId % cleanPeriod == 0L && lock.tryLock()) {
+            (buffer.size - size)
+                .check { it > 0 }
+                .then {
+                    buffer
+                        .keys
+                        .toSortedSet()
+                        .take(it)
+                        .map(buffer::remove)
+                }
+            lock.unlock()
         }
         return newId
     }
 
     /**
-     * Gets an event from the heap with a specific [id]
+     * Gets a specific buffered message marked [id]
      *
-     * 从堆中获取一个事件
+     * 获取一个缓存的消息
      */
     operator fun get(id: Long): Optional<T> =
         buffer[id] ?: Optional.otherwise()
 
     /**
-     * Gets the first event from the heap
+     * Gets the first buffered message
      *
-     * 从堆中获取第一个事件
+     * 获取第一个缓存的消息
      */
     fun get(): Optional<T> =
         buffer.values.firstOrNull() ?: Optional.otherwise()
 
     /**
-     * Consumes an specific event from the heap with a specific [id]
+     * Consumes a specific buffered message marked [id]
      *
-     * 从堆中消费一个事件
+     * 消费一个缓存的消息
      */
     override infix fun consume(id: Long): Optional<T> =
         buffer.remove(id) ?: Optional.otherwise()
 
     /**
-     * Consumes the first event from the heap
+     * Consumes the first buffered message
      *
-     * 从堆中消费第一个事件
+     * 消费缓冲中的第一个消息
      */
     fun consume(): Optional<T> {
         while (true) {
-            val id = buffer.keys.first() ?: return Optional.otherwise()
+            val id = buffer.keys.min() ?: return Optional.otherwise()
             return buffer.remove(id) ?: continue
         }
     }
 
     /**
-     * Disposes all events in the heap
+     * Drop all the buffered messages
      *
-     * 从堆中丢弃所有事件
+     * 丢弃所有缓冲的消息
      */
     fun clear() = buffer.clear()
 }

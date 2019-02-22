@@ -18,9 +18,9 @@ import org.mechdancer.dataflow.core.options.ExecutionOptions
  * 对每个到来的消息执行对应的动作
  */
 class ActionBlock<T>(
-        name: String = "action",
-        options: ExecutionOptions = ExecutionOptions(),
-        action: suspend (T) -> Unit
+    name: String = "action",
+    options: ExecutionOptions = ExecutionOptions(),
+    action: suspend (T) -> Unit
 ) : IEntranceBlock<T>, IBlock by BlockBase(name) {
 
     override val defaultSource by lazy { DefaultSource(this) }

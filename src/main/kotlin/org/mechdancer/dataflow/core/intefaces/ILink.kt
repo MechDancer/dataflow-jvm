@@ -55,11 +55,11 @@ interface ILink<T> : IWithUUID,
          * 拓扑改变事件
          */
         internal val changed = StandardBlock<ILink<*>, ILink<*>>(
-                name = "link changed",
-                bufferSize = 1024,
-                targetType = Broadcast,
-                options = ExecutionOptions(1),
-                map = { it }
+            name = "link changed",
+            bufferSize = 1024,
+            targetType = Broadcast,
+            options = ExecutionOptions(1),
+            map = { it }
         )
     }
 }

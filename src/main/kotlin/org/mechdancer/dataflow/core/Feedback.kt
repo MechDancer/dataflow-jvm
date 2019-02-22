@@ -12,10 +12,10 @@ package org.mechdancer.dataflow.core
  * @param positive 积极性，是否会消费事件
  */
 enum class Feedback(
-        /**
-         * Whether this event will be consumed
-         */
-        val positive: Boolean
+    /**
+     * Whether this event will be consumed
+     */
+    val positive: Boolean
 ) {
     Accepted(true),
     Declined(false),
