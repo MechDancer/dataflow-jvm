@@ -5,7 +5,7 @@ import org.mechdancer.common.extension.Optional
 /**
  * Event exit
  *
- * Can consume a event.
+ * Can consume events
  *
  * 事件出口
  *

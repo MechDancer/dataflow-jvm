@@ -14,7 +14,7 @@ buildscript {
 }
 
 plugins {
-    kotlin("jvm") version "1.3.21"
+    kotlin("jvm") version "1.3.50"
     id("org.jetbrains.dokka") version "0.9.17"
 }
 
@@ -31,19 +31,32 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.1.1")
-    implementation("org.mechdancer", "common-extension", "0.1.0-3")
-    testImplementation("junit", "junit", "4.12")
-}
-
-configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
+    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "+")
+    implementation("org.mechdancer", "common-extension", "+")
+    // 单元测试
+    testImplementation("junit", "junit", "+")
+    testImplementation(kotlin("test-junit"))
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions { jvmTarget = "1.8" }
+}
+tasks.withType<JavaCompile> {
+    sourceCompatibility = "1.8"
+    targetCompatibility = "1.8"
+}
+
+// 源码导出任务
+with("sourcesJar") {
+    tasks["jar"].dependsOn(this)
+    tasks.register<Jar>(this) {
+        archiveClassifier.set("sources")
+        group = "build"
+
+        from(sourceSets["main"].allSource)
+    }
 }
 
 configure<PublishExtension> {
@@ -54,11 +67,6 @@ configure<PublishExtension> {
     desc = "from @Microsoft .Net Core: \"System.threading.tasks.dataflow\""
     website = "https://github.com/MechDancer/dataflow-jvm"
     setLicences("WTFPL")
-}
-
-task<Jar>("sourceJar") {
-    classifier = "sources"
-    from(sourceSets["main"].allSource)
 }
 
 task<Jar>("javadocJar") {
@@ -72,5 +80,4 @@ tasks.withType<DokkaTask> {
 }
 
 tasks["javadoc"].dependsOn("dokka")
-tasks["jar"].dependsOn("sourceJar")
 tasks["jar"].dependsOn("javadocJar")

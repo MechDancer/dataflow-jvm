@@ -5,14 +5,13 @@ import org.mechdancer.dataflow.core.Feedback
 /**
  * Event entry
  *
- * Represents a object can notify target event coming.
+ * Represents a object can notify target event coming
  *
  * 事件入口
  *
  * 可通知其事件到达的端口
  */
 interface IIngress<T> {
-
     /**
      * Notify target that some source linked to this entry passing a event.
      * Called by source linked to this entry.
@@ -25,5 +24,4 @@ interface IIngress<T> {
      * @return feedback of this event 入口对事件的态度
      */
     fun offer(id: Long, egress: IEgress<T>): Feedback
-
 }
