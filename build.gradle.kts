@@ -33,7 +33,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))
-    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "+")
+    implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.3.2")
     implementation("org.mechdancer", "common-extension", "+")
     // 单元测试
     testImplementation("junit", "junit", "+")
@@ -70,7 +70,7 @@ configure<PublishExtension> {
 }
 
 task<Jar>("javadocJar") {
-    classifier = "javadoc"
+    archiveClassifier.set("javadoc")
     from("$buildDir/javadoc")
 }
 

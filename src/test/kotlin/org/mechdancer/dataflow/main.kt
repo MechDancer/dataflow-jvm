@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /** 使用案例 */
 fun main() {
     val source = broadcast<Int>("source")
-    source - { delay(1); it - 1 } - source
+//    source - { delay(1); it - 1 } - source
     source - { delay(1); it + 1 } - source
     val link = source linkTo action { }
 

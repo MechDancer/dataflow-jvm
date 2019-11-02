@@ -1,5 +1,6 @@
 package org.mechdancer.dataflow.core.internal
 
+import kotlinx.coroutines.*
 import org.mechdancer.common.extension.Optional
 import org.mechdancer.common.extension.check
 import org.mechdancer.common.extension.toOptional
@@ -7,6 +8,8 @@ import org.mechdancer.dataflow.core.intefaces.IEgress
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.thread
+import kotlin.concurrent.withLock
 import kotlin.math.max
 
 /**
@@ -32,6 +35,9 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
             else       -> ConcurrentHashMap(1)
         }
 
+    // 消费计数
+    private val removeCount = AtomicLong(0)
+
     // 缓存清理周期
     private val cleanPeriod = max(16, size)
 
@@ -43,7 +49,7 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      *
      * 缓存存量
      */
-    val bufferSize get() = buffer.size
+    val bufferSize get() = lastId.get() - removeCount.get()
 
     /**
      * cache a [msg]
@@ -55,18 +61,13 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
         buffer[newId] = msg.toOptional()
 
         // 每到周期就触发一次清理
-        if (newId % cleanPeriod == 0L && lock.tryLock()) {
-            (buffer.size - size)
-                .check { it > 0 }
-                .then {
-                    buffer
-                        .keys
-                        .toSortedSet()
-                        .take(it)
-                        .map(buffer::remove)
+        if (newId > 0 && newId % cleanPeriod == 0L)
+            lock.withTryLock {
+                while (bufferSize > size) {
+                    val id = buffer.keys.firstOrNull() ?: break
+                    if (buffer.remove(id) != null) removeCount.incrementAndGet()
                 }
-            lock.unlock()
-        }
+            }
         return newId
     }
 
@@ -76,7 +77,8 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      * 获取一个缓存的消息
      */
     operator fun get(id: Long): Optional<T> =
-        buffer[id] ?: Optional.otherwise()
+        buffer[id]
+        ?: Optional.otherwise()
 
     /**
      * Gets the first buffered message
@@ -84,15 +86,18 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      * 获取第一个缓存的消息
      */
     fun get(): Optional<T> =
-        buffer.values.firstOrNull() ?: Optional.otherwise()
+        buffer.values.firstOrNull()
+        ?: Optional.otherwise()
 
     /**
      * Consumes a specific buffered message marked [id]
      *
      * 消费一个缓存的消息
      */
-    override infix fun consume(id: Long): Optional<T> =
-        buffer.remove(id) ?: Optional.otherwise()
+    override fun consume(id: Long): Optional<T> =
+        buffer.remove(id)
+            ?.also { removeCount.incrementAndGet() }
+        ?: Optional.otherwise()
 
     /**
      * Consumes the first buffered message
@@ -101,8 +106,8 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      */
     fun consume(): Optional<T> {
         while (true) {
-            val id = buffer.keys.min() ?: return Optional.otherwise()
-            return buffer.remove(id) ?: continue
+            val id = buffer.keys.firstOrNull() ?: return Optional.otherwise()
+            return buffer.remove(id)?.also { removeCount.incrementAndGet() } ?: continue
         }
     }
 

@@ -36,49 +36,41 @@ internal class TargetCore<T>(
     private val waitingQueue = ConcurrentLinkedQueue<Pair<Long, IEgress<T>>>()
 
     override fun offer(id: Long, egress: IEgress<T>): Feedback {
-        var feedback = Declined
-
-        if (parallelismDegree.incrementAndGet() > options.parallelismDegree) {
-            // 若当前并行度已超过最大值则不启动新的协程
-            parallelismDegree.decrementAndGet()
-            feedback =
-                if (queueSize.incrementAndGet() > options.queueSize) {
-                    // 若当前等待队列已满则拒绝这个消息
-                    queueSize.decrementAndGet()
-                    Declined
-                } else {
+        // 更新并行数
+        if (!parallelismDegree.increaseIf { it < options.parallelismDegree })
+            return when {
+                queueSize.increaseIf { it < options.queueSize } -> {
                     // 若可以加入队列则加入队列，并通知消息处理被推迟
                     waitingQueue.add(id to egress)
                     Postponed
                 }
-        } else
+                else                                            ->
+                    // 若当前等待队列已满则拒绝这个消息
+                    Declined
+            }
         // 否则从源消费这个消息
-            egress
-                .consume(id)
-                .then {
-                    // 得到消息则通知消息被接收
-                    feedback = Accepted
-                    // 启动协程以处理消息
-                    GlobalScope.launch(options.executor) {
-                        action(it)
-                        // 利用同一个协程尽量处理排队的消息，直到队列空
-                        while (true)
-                            waitingQueue.poll()
-                                ?.also { queueSize.decrementAndGet() }
-                                ?.let { (id, egress) -> egress.consume(id) }
-                                ?.then { action(it) }
-                            ?: break
-                        // 关闭协程前减小并行度
-                        parallelismDegree.decrementAndGet()
-                    }
-                }
-                .otherwise {
-                    // 消息已被消费，未能取得
-                    feedback = NotAvailable
-                    // 不会启动协程，减小并行度
+        egress
+            .consume(id)
+            .then {
+                // 启动协程以处理消息
+                GlobalScope.launch(options.executor) {
+                    action(it)
+                    // 利用同一个协程尽量处理排队的消息，直到队列空
+                    while (true)
+                        waitingQueue.poll()
+                            ?.also { queueSize.decrementAndGet() }
+                            ?.let { (id, egress) -> egress.consume(id) }
+                            ?.then { action(it) }
+                        ?: break
+                    // 关闭协程前减小并行度
                     parallelismDegree.decrementAndGet()
                 }
-        // 发出反馈信息
-        return feedback
+                // 得到消息则通知消息被接收
+                return Accepted
+            }
+        // 不会启动协程，减小并行度
+        parallelismDegree.decrementAndGet()
+        // 消息已被消费，未能取得
+        return NotAvailable
     }
 }
