@@ -32,14 +32,11 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
         when {
             size <= 0  -> throw IllegalArgumentException("size must be greater than 0")
             size <= 16 -> ConcurrentHashMap(16)
-            else       -> ConcurrentHashMap(1)
+            else       -> ConcurrentHashMap()
         }
 
     // 消费计数
     private val removeCount = AtomicLong(0)
-
-    // 缓存清理周期
-    private val cleanPeriod = max(16, size)
 
     // 缓存清理锁
     private val lock = ReentrantLock()
@@ -59,15 +56,13 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
     fun offer(msg: T): Long {
         val newId = lastId.getAndIncrement()
         buffer[newId] = msg.toOptional()
-
-        // 每到周期就触发一次清理
-        if (newId > 0 && newId % cleanPeriod == 0L)
-            lock.withTryLock {
-                while (bufferSize > size) {
-                    val id = buffer.keys.firstOrNull() ?: break
-                    if (buffer.remove(id) != null) removeCount.incrementAndGet()
-                }
+        // FIXME 下面这个会导致奇怪的问题
+        lock.withTryLock {
+            while (bufferSize > size) {
+                val id = buffer.keys.firstOrNull() ?: break
+                if (buffer.remove(id) != null) removeCount.incrementAndGet()
             }
+        }
         return newId
     }
 
