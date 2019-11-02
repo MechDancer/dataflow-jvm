@@ -1,16 +1,11 @@
 package org.mechdancer.dataflow.core.internal
 
-import kotlinx.coroutines.*
 import org.mechdancer.common.extension.Optional
-import org.mechdancer.common.extension.check
 import org.mechdancer.common.extension.toOptional
 import org.mechdancer.dataflow.core.intefaces.IEgress
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 import java.util.concurrent.locks.ReentrantLock
-import kotlin.concurrent.thread
-import kotlin.concurrent.withLock
-import kotlin.math.max
 
 /**
  * Common core for source blocks
@@ -24,7 +19,7 @@ import kotlin.math.max
  */
 internal class SourceCore<T>(private val size: Int) : IEgress<T> {
 
-    // 原子长整型，用于生成消息的唯一 id
+    // 生成消息的唯一 id
     private val lastId = AtomicLong(0)
 
     // 消息缓存
@@ -56,10 +51,9 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
     fun offer(msg: T): Long {
         val newId = lastId.getAndIncrement()
         buffer[newId] = msg.toOptional()
-        // FIXME 下面这个会导致奇怪的问题
         lock.withTryLock {
             while (bufferSize > size) {
-                val id = buffer.keys.firstOrNull() ?: break
+                val id = buffer.keys.min() ?: break
                 if (buffer.remove(id) != null) removeCount.incrementAndGet()
             }
         }
@@ -101,7 +95,7 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      */
     fun consume(): Optional<T> {
         while (true) {
-            val id = buffer.keys.firstOrNull() ?: return Optional.otherwise()
+            val id = buffer.keys.min() ?: return Optional.otherwise()
             return buffer.remove(id)?.also { removeCount.incrementAndGet() } ?: continue
         }
     }
@@ -112,4 +106,8 @@ internal class SourceCore<T>(private val size: Int) : IEgress<T> {
      * 丢弃所有缓冲的消息
      */
     fun clear() = buffer.clear()
+}
+
+fun main() {
+
 }
