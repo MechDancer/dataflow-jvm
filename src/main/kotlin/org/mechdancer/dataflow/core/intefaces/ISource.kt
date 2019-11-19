@@ -12,11 +12,11 @@ import org.mechdancer.dataflow.core.options.LinkOptions
  *
  * 需要管理对应的宿
  */
-interface ISource<T> : IBlock,
-                       IEgress<T> {
-
+interface ISource<T> : IBlock, IEgress<T> {
     /**
      * Targets set
+     *
+     * 宿集合
      */
     val targets: Set<ITarget<T>>
 
