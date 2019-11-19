@@ -47,7 +47,7 @@ repositories {
     jcenter()
 }
 dependencies {
-    compile 'org.mechdancer:dataflow-jvm:0.2.0-dev-5'
+    compile 'org.mechdancer:dataflow-jvm:0.2.0-dev-6'
 }
 ```
 
@@ -65,7 +65,7 @@ dependencies {
 <dependency>
   <groupId>org.mechdancer</groupId>
   <artifactId>dataflow-jvm</artifactId>
-  <version>0.2.0-dev-5</version>
+  <version>0.2.0-dev-6</version>
   <type>pom</type>
 </dependency>
 ```

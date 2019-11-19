@@ -30,6 +30,7 @@ deploy:
       branch:     master
   - provider:     script
     script: ./gradlew bintrayUpload
+    skip_cleanup: true
     on:
       tags:       true
       branch:     master
